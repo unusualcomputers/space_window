@@ -1,5 +1,5 @@
 
-html_template_main=u"""
+_html_template_main=u"""
 <!doctype html>
 <html>
 <head>
@@ -127,7 +127,7 @@ def build_html(body):
 
 def get_main_html(rows_html):
     global _cnt
-    html = html_template_main.replace('HTML_BODY',_main_table).\
+    html = _html_template_main.replace('HTML_BODY',_main_table).\
         replace('STREAM_ROWS',rows_html)
     _cnt+=1
     cntstr='%i' % _cnt
