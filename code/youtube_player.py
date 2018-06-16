@@ -20,7 +20,17 @@ class YouTubePlayer:
         self.run=False
         self.video_cache=Cache(_cache_size)
         self.playlist_cache=Cache(_cache_size)
-        
+        self._status_func=None
+
+    def set_status_func(self,func):
+         self._status_func=func
+
+    def _status(self,msg):
+        if self._status_func is not None:
+            self._status_func(msg)
+        else:
+            print msg
+
     def _get_video(self,url):
         v=self.video_cache.get(url)
         if v is not None:
@@ -51,14 +61,37 @@ class YouTubePlayer:
         # return a list, just easier like that
         try:
             if pfy is None: return []
+            mp4s=filter(lambda s: s.extension=='mp4',pfy.streams)
+            if len(mp4s)==0:return []
+            if quality=='worst' or len(mp4s)==1:
+                return [mp4s[0].url]
             if quality=='best':
                 return [pfy.getbestvideo('mp4').url]
-            if quality[-1]=='p': s='x'+quality[:-1]
-            else: s=quality
+            if quality[-1]=='p': 
+                s='x'+quality[:-1]
+                try:
+                    nq=int(quality[:-1])
+                except:
+                    nq=360
+            else: 
+                s=quality
+                nq=360
+
+            if quality != 'default':
+                for ss in mp4s:
+                    if s in ss.quality:
+                        return [ss.url]
             
-            for ss in pfy.streams:
-                if ss.extension=='mp4' and s in ss.quality:
-                    return [ss.url]
+            # not found, look for first smaller than nq
+            smaller=[]
+            for ss in mp4s:
+                try:
+                    q=int(ss.quality.split('x')[-1])
+                except:
+                    break
+                if q<nq: smaller.append(ss)
+            if len(smaller)>0:
+                return [smaller[-1].url]    
             # if nothing else worked, get me the best one
             return [pfy.getbestvideo('mp4').url]
         except:
@@ -69,8 +102,12 @@ class YouTubePlayer:
         pl=self._get_playlist(url)
         if pl is None:
             return []
+        sz=len(pl['items'])
         ret=[]
+        i=1
         for v in pl['items']:
+            self._status('getting data for video %i of %i'%(i,sz))
+            i=i+1
             ret=ret+self._get_video_url(v['pafy'],quality)
         return ret        
 
@@ -84,56 +121,65 @@ class YouTubePlayer:
     def _get_video_qualities(self,pfy):
         mp4s=filter(lambda s: s.extension=='mp4',pfy.streams)
         resolutions=[mp4.quality for mp4 in mp4s]
-        print resolutions
         ret=[]
         for r in resolutions:
             i=r.find('x')
             if i==-1: ret.append(r) 
             else: ret.append(r[i+1:]+'p')
-        ret.append('best')
+        ret=ret+['worst','default','best']
         return ret
 
     def _get_playlist_qualities(self,pfys):
         # get all qualities for all lists
         # then return a list of those that appear everywhere
-        qualities=[self._get_video_qualities(pfy) for pfy in pfys]
+        sz=len(pfys)
+        i=1
+        qualities=[]
+        for pfy in pfys:
+            self._status('getting video quality data for video %i of %i' \
+                %(i,sz))
+            i=i+1
+            qualities.append(self._get_video_qualities(pfy))
         first=qualities[0]
         rest=qualities[1:]
-        print "ALL:", qualities,first
         ret=[]
         for f in first:
             t=[q for q in rest if f in q]
             if len(t)==len(rest): ret.append(f)
-        print "filtered",ret
         return ret
 
     def _play_loop(self,url,quality):
+        self._status('Retrieving videos...')
         urls=self._get_urls(url,quality)
-        print "urls:",urls
         while True:
             for url in urls:
                 if not self.run: return
-                print "starting ",url
                 cmd='%s %s "%s"' % (_player_cmd,_player_args,url)
                 os.system(cmd)
 
     def get_qualities(self,url):
+        self._status('getting playlist information')
         v=self._get_playlist(url)
         if v is not None: 
             v=[vv['pafy'] for vv in v['items']] 
+            self._status('getting available video qualities for the playlist')
             return self._get_playlist_qualities(v)
+        self._status('oups, this was not a playlist, getting video information')
         v=self._get_video(url)
         if v is not None: 
+            self._status('getting available video qualities')
             return self._get_video_qualities(v)
+        self._status('this is not a youtube video')
         return []
 
     def can_play(self,url):
+        self._status('checking video status for ' + url)
         return ((self._get_video(url) is not None) or\
             (self._get_playlist(url) is not None))
 
     def play(self,url,quality):
         qualities=self.get_qualities(url)
-        if quality not in qualities: return False
+        #if quality not in qualities: return False
         if self.run: self.stop()
         else: os.system('pkill -9 %s' % _player_cmd)
         self.run=True
