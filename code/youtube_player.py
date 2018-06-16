@@ -5,10 +5,10 @@ import time
 from cache import Cache
 from datetime import datetime
 
-#_player_cmd='omxplayer'
-#_player_args='--vol 500 --timeout 60'
-_player_cmd='mplayer'
-_player_args='-cache 8192'
+_player_cmd='omxplayer'
+_player_args='--vol 500 --timeout 60'
+#_player_cmd='mplayer'
+#_player_args='-cache 8192'
 
 _cache_size=200
 
@@ -21,6 +21,7 @@ class YouTubePlayer:
         self.video_cache=Cache(_cache_size)
         self.playlist_cache=Cache(_cache_size)
         self._status_func=None
+        self.lock=threading.Lock()
 
     def set_status_func(self,func):
          self._status_func=func
@@ -52,6 +53,36 @@ class YouTubePlayer:
             return v
         except:
             return None
+
+    def _get_video_qualities(self,pfy):
+        mp4s=filter(lambda s: s.extension=='mp4',pfy.streams)
+        resolutions=[mp4.quality for mp4 in mp4s]
+        ret=[]
+        for r in resolutions:
+            i=r.find('x')
+            if i==-1: ret.append(r) 
+            else: ret.append(r[i+1:]+'p')
+        ret=ret+['worst','default','best']
+        return ret
+
+    def _get_playlist_qualities(self,pfys):
+        # get all qualities for all lists
+        # then return a list of those that appear everywhere
+        sz=len(pfys)
+        i=1
+        qualities=[]
+        for pfy in pfys:
+            self._status('getting video quality data for video %i of %i' \
+                %(i,sz))
+            i=i+1
+            qualities.append(self._get_video_qualities(pfy))
+        first=qualities[0]
+        rest=qualities[1:]
+        ret=[]
+        for f in first:
+            t=[q for q in rest if f in q]
+            if len(t)==len(rest): ret.append(f)
+        return ret
 
     def _get_video_url(self,pfy,quality):
         # quality is a string with the second part of resolution and 'p'
@@ -118,44 +149,64 @@ class YouTubePlayer:
             urls=self._get_video_url(pfy,quality)
         return urls
 
-    def _get_video_qualities(self,pfy):
-        mp4s=filter(lambda s: s.extension=='mp4',pfy.streams)
-        resolutions=[mp4.quality for mp4 in mp4s]
-        ret=[]
-        for r in resolutions:
-            i=r.find('x')
-            if i==-1: ret.append(r) 
-            else: ret.append(r[i+1:]+'p')
-        ret=ret+['worst','default','best']
-        return ret
-
-    def _get_playlist_qualities(self,pfys):
-        # get all qualities for all lists
-        # then return a list of those that appear everywhere
-        sz=len(pfys)
-        i=1
-        qualities=[]
-        for pfy in pfys:
-            self._status('getting video quality data for video %i of %i' \
-                %(i,sz))
-            i=i+1
-            qualities.append(self._get_video_qualities(pfy))
-        first=qualities[0]
-        rest=qualities[1:]
-        ret=[]
-        for f in first:
-            t=[q for q in rest if f in q]
-            if len(t)==len(rest): ret.append(f)
-        return ret
+    def _get_first_url(self,url,quality,urls):
+        pl=self._get_playlist(url)
+        if pl is None:
+            pfy=self._get_video(url)
+            urls+=self._get_video_url(pfy,quality)
+        else:
+            sz=len(pl['items'])
+            if sz==0: return
+            self._status('getting data for video 1 of %i'%sz)
+            urls+=self._get_video_url(pl['items'][0]['pafy'],quality)
+    
+    def _get_remaining_urls(self,url,quality,urls):
+        pl=self._get_playlist(url)
+        if pl is None: return
+        rest=pl['items'][1:]
+        sz=len(rest)+1
+        j=2
+        for i in rest:
+            self._status('getting data for video %i of %i'%(j,sz))
+            j+=1
+            u=self._get_video_url(i['pafy'],quality)
+            self.lock.acquire()
+            urls+=u
+            self.lock.release()
 
     def _play_loop(self,url,quality):
         self._status('Retrieving videos...')
-        urls=self._get_urls(url,quality)
+        urls=[]
+        self._get_first_url(url,quality,urls)
+ 
+        threading.Thread(target=self._get_remaining_urls,
+            args=(url,quality,urls)).start()
+        prev_sz=1
         while True:
-            for url in urls:
+            self.lock.acquire()
+            sz=len(urls)
+            if sz > prev_sz:
+                first=prev_sz
+                prev_sz=sz
+            else:
+                first=0
+            self.lock.release()
+            for i in range(first,sz):
                 if not self.run: return
-                cmd='%s %s "%s"' % (_player_cmd,_player_args,url)
+                self.lock.acquire()
+                u=urls[i]
+                self.lock.release()
+                cmd='%s %s "%s"' % (_player_cmd,_player_args,u)
                 os.system(cmd)
+
+    #def _play_loop(self,url,quality):
+    #    self._status('Retrieving videos...')
+    #    urls=self._get_urls(url,quality)
+    #    while True:
+    #        for url in urls:
+    #            if not self.run: return
+    #            cmd='%s %s "%s"' % (_player_cmd,_player_args,url)
+    #            os.system(cmd)
 
     def get_qualities(self,url):
         self._status('getting playlist information')
@@ -178,8 +229,6 @@ class YouTubePlayer:
             (self._get_playlist(url) is not None))
 
     def play(self,url,quality):
-        qualities=self.get_qualities(url)
-        #if quality not in qualities: return False
         if self.run: self.stop()
         else: os.system('pkill -9 %s' % _player_cmd)
         self.run=True
