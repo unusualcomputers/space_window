@@ -114,7 +114,7 @@ class Streams(Jsonable):
         html=u''
         for name in self.streams:
             (uri,quality)=self.streams[name]
-            row = u"""<tr><td>{}</td><td><a href="{}">{}</a></td><td>{}</td><td>
+            row = u"""<tr><td>{}</td><td>{}</td><td>
                 <input type="hidden" name="hidden_{}" value="{}">
                 <button type="submit" name="action" value="play {}">
                     play
@@ -125,8 +125,9 @@ class Streams(Jsonable):
                 <button type="submit" name="action" value="remove {}">
                         remove
                 </button></td>
+                <td><a href="{}" target="_blank"> Show in browser </a></td>
                 </tr>
-                """.format(name,uri,uri,quality,_cnt,name,name,name,name)
+                """.format(name,quality,_cnt,name,name,name,name,uri)
             html+=row
         return html
         
