@@ -1,86 +1,116 @@
-from streamlink_cli import *
+from streamlink_cli.main import *
+from streamlink_cli.argparser import build_parser
+from streamlink_cli.utils import NamedPipe
+from streamlink_cli.output import PlayerOutput
+from streamlink import Streamlink
 import sys
-from cache import SychronisedCache as Cache
+from cache import SynchronisedCache as Cache
+import threading
+import time
+import os
+from contextlib import closing
+from functools import partial
+from itertools import chain
 
-#_player_cmd='omxplayer'
-#_player_args='--vol 500 --timeout 60'
-_player_cmd='mplayer -cache 2000'
-_player_args='-cache 8192'
+_player_cmd='omxplayer'
+_player_args='--vol 500 --timeout 60'
+#_player_cmd='mplayer -cache 8192'
+#_player='mpv'
+#_player_args=''
+_player_cmd=_player_cmd+' '+_player_args
+_default_res='360p'
 
+_chunk_size=10240
 _cache_size=50                               
 class Streamer:
-    def __init__(
-            self, 
-            arguments=[
-                '--player', '%s %s' %(_player_cmd,_player_args), 
-                '--player-continuous-http']):
+    def __init__(self):
         self.plugin_cache=Cache(_cache_size)
         self.streams_cache=Cache(_cache_size)
-        self.streamlink
-        self.arglist=arguments  
-        setup_streamlink()
-        self.setup_args()
-        setup_console(sys.stdout)
+        self.streamlink=Streamlink()
         self.thread=None           
-
-        #setup_http_session()
+        self.playing=True
     
-    def setup_args(self):
-        global args
-        parser = build_parser()
-        args,unknown=parser.parse_known_args(self.arglist)
-        if args.stream:
-            args.stream = [stream.lower() for stream in args.stream]
-        if not args.url and args.url_param:
-            args.url = args.url_param
-        #setup_plugins(args.plugin_dirs)
-        #setup_plugin_args(streamlink, parser)
+    def _create_output(self):
+        pipename='unusualpipe={0}'.format(os.getpid())
+        namedpipe=NamedPipe(pipename)
+        return PlayerOutput(_player_cmd,args='{filename}',
+            quiet=False,kill=True,namedpipe=namedpipe,http=None)
 
-    def _get_plugin(self,url):
-        plugin=self.plugin_cache.get(url)
-        if plugin is None:
-            plugin=streamlink.resolve_url(url)
-            self.plugin_cache.add(url, plugin)
-        return plugin
+    def _open_stream(self,stream):
+        stream_fd=stream.open()
+        try:
+            prebuffer=stream_fd.read(_chunk_size)
+        except:
+            stream_fd.close()
+            raise 'Cannot read from stream'
+        return stream_fd,prebuffer
+        
+    def _output_stream(self,stream):
+        output=self._create_output()
 
-    def can_handle(self,url):
+        stream_fd,prebuff=self._open_stream(stream)
+        output.open()
+        with closing(output):
+            stream_iterator = chain(
+                [prebuff],
+                iter(partial(stream_fd.read, _chunk_size), b"")
+            )
+            try:
+                for data in stream_iterator:
+                    if not self.playing: break
+                    output.write(data)
+            finally:
+                stream_fd.close()
+    
+    def _get_streams(self, url):
+        streams=self.streams_cache.get(url)
+        if streams is None:
+            streams=self.streamlink.streams(url)
+            self.streams_cache.add(url,plugin)
+        return streams
+            
+    def can_play(self,url):
         try:
             self.get_streams(url)
             return True
-        except NoPluginError:
+        except:
             return False
 
-    def get_streams(self, url):
-        global args #from streamlink_cli
-        streams=self.streams_cache.get(url)
-        if streams is None:
-            args.url=url
-            plugin=self._get_plugin(url)
-            streams=fetch_streams(plugin)
-            self.streams_cache.add(url,plugin)
-        return streams
-                
+    def get_qualities(self,url):
+        return self._get_streams(url).keys()
+     
     def _play_thread(self,url, quality):
-        if self.playing==True: return
         try:
-            streams=get_streams(url)
+            streams=self._get_streams(url)
             if not streams: return
-            if quality in streams:
-                plugin=self._get_plugin(url)
-                handle_stream(plugin, streams,quality)
+            stream=None
+            if len(streams)==1:
+                stream=streams.values()[0]
+            elif quality in streams:
+                stream=streams[quality]
+            elif _default_res in streams:
+                stream=streams[_default_res]
+            elif 'best' in streams:
+                stream=streams['best']
+            if stream is not None:
+                self._output_stream(stream)
         finally:
-            pass
+            self.playing=false
+    
     def is_playing(self):
-        return (self.thread is not None) and self.thread.is_alive()
+        return self.playing 
                    
     def play(self,url,quality):
-        if (self.thread is not None) or self.thread.is_alive():
+        if self.is_playing():
             self.stop()
-        self.thread=\
-            threading.Thread(self._play_thread, arguments=(url,quality)).start()
+        self.playing=True
+        self.thread=threading.Thread(
+            target=self._play_thread, 
+            args=(url,quality)).start()
 
     def stop(self):
         self.thread=None
-        os.system('pkill -9 %s' % _player_cmd)
+        self.playing=False
+        os.system('pkill -9 %s' % _player)
         time.sleep(0.1)#poor man's sychronisation
-        os.system('pkill -9 %s' % _player_cmd)
+        os.system('pkill -9 %s' % _player)
