@@ -5,32 +5,17 @@ import time
 from cache import Cache
 from datetime import datetime
 
-_player_cmd='omxplayer'
-_player_args='--vol 500 --timeout 60'
-#_player_cmd='mplayer'
-#_player_args='-cache 8192'
-
 _cache_size=200
 
-def _now():
-    return datetime.now()
-
-class YouTubePlayer:
-    def __init__(self):
+class YouTubePlayer(VidePlayer):
+    def __init__(self,
+            status_func=None,
+            player=None,
+            player_args=None):
+        VideoPlayer.__init__(self,status_func,player,player_args)
         self.video_cache=Cache(_cache_size)
         self.playlist_cache=Cache(_cache_size)
-        self._status_func=None
         self.lock=threading.Lock()
-        self.playing=False
-
-    def set_status_func(self,func):
-         self._status_func=func
-
-    def _status(self,msg):
-        if self._status_func is not None:
-            self._status_func(msg)
-        else:
-            print msg
 
     def _get_video(self,url):
         v=self.video_cache.get(url)
@@ -174,33 +159,30 @@ class YouTubePlayer:
             urls+=u
             self.lock.release()
 
-    def _play_loop(self,url,quality):
-        try:
-            self._status('Retrieving videos...')
-            urls=[]
-            self._get_first_url(url,quality,urls)
-     
-            threading.Thread(target=self._get_remaining_urls,
-                args=(url,quality,urls)).start()
-            prev_sz=1
-            while True:
+    def _play_loop_impl(self,url,quality):
+        self._status('Retrieving videos...')
+        urls=[]
+        self._get_first_url(url,quality,urls)
+ 
+        threading.Thread(target=self._get_remaining_urls,
+            args=(url,quality,urls)).start()
+        prev_sz=1
+        while True:
+            self.lock.acquire()
+            sz=len(urls)
+            if sz > prev_sz:
+                first=prev_sz
+                prev_sz=sz
+            else:
+                first=0
+            self.lock.release()
+            for i in range(first,sz):
+                if not self.playing: return
                 self.lock.acquire()
-                sz=len(urls)
-                if sz > prev_sz:
-                    first=prev_sz
-                    prev_sz=sz
-                else:
-                    first=0
+                u=urls[i]
                 self.lock.release()
-                for i in range(first,sz):
-                    if not self.playing: return
-                    self.lock.acquire()
-                    u=urls[i]
-                    self.lock.release()
-                    cmd='%s %s "%s"' % (_player_cmd,_player_args,u)
-                    os.system(cmd)
-        finally:
-            self.playing=False
+                cmd='%s "%s"' % (_player_cmd,u)
+                os.system(cmd)
 
     def get_qualities(self,url):
         self._status('getting playlist information')
@@ -214,29 +196,5 @@ class YouTubePlayer:
         if v is not None: 
             self._status('getting available video qualities')
             return self._get_video_qualities(v)
-        self._status('this is not a youtube video')
-        return []
-
-    def can_play(self,url):
-        self._status('checking video status for ' + url)
-        return ((self._get_video(url) is not None) or\
-            (self._get_playlist(url) is not None))
-
-    def is_playing(self):
-        return self.playing
-
-    def play(self,url,quality):
-        if self.playing: self.stop()
-        else: os.system('pkill -9 %s' % _player_cmd)
-        self.playing=True
-        threading.Thread(target=self._play_loop,args=(url,quality)).start()
-        return True
-
-    def stop(self):
-        if not self.playing: return
-        self.playing=False    
-        os.system('pkill -9 %s' % _player_cmd)
-        time.sleep(0.1)#poor man's sychronisation
-        os.system('pkill -9 %s' % _player_cmd)
-
+        raise 'this is not a youtube video'
 
