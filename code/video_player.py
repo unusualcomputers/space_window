@@ -31,7 +31,7 @@ class Player:
     def can_play(self,url):
         try:
             self._get_player(url)
-            return True:
+            return True
         except:
             return False
 
@@ -42,4 +42,5 @@ class Player:
         self._get_player(url).play(url,quality)
 
     def stop(self):
-        self._get_player(url).stop()
+        if self.yt_player.is_playing: self.yt_player.stop()
+        elif self.streamer.is_playing: self.streamer.stop()

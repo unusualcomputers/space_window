@@ -9,6 +9,7 @@ _html_template_main=u"""
     <meta http-equiv="Cache-Control" content="no-cache, no-store,must-revalidate"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="-1"/>
+    [%REFRESH%]
 <style>
         body {
             color: #ff8000;
@@ -72,7 +73,7 @@ _main_table=u"""
     <form align="center" action="/add_link">
     <input type="text" name="name" value="NAME">
     <input type="text" name="link" value="LINK">
-    <input type="text" name="quality" value="best">
+    <input type="text" name="quality" value="default">
     <input type="hidden" name="hiddenadd_CNT" value="ADDLINK">
     <input type="submit" value="Add">
 </form></div>
@@ -96,6 +97,11 @@ _main_table=u"""
     <input type="hidden" name="hiddenrough_CNT" value="ROUGH">
     <input type="submit" value="Radio Rough">
     </form>
+</td><td>
+    <form action="/refresh_caches">
+    <input type="hidden" name="hiddenrefresh_CNT" value="REFRESH_CACHES">
+    <input type="submit" value="Refresh Caches">
+    </form>
 <!--</td><td>
     <form action="/kodi">
     <input type="hidden" name="hiddenkodi_CNT" value="KODI">
@@ -118,9 +124,16 @@ _main_table=u"""
 """
 
 _cnt=0
-def build_html(body):
+def build_html(body,refresh_time=None):
     global _cnt
-    html = _html_template_main.replace('HTML_BODY',body)
+    if refresh_time is None:
+        refresh=''
+    else:
+        refresh_html=\
+            '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
+
+    html = _html_template_main.replace('[%REFRESH%]',refresh).\
+        replace('HTML_BODY',body)
     _cnt+=1
     cntstr='%i' % _cnt
     return html.replace('CNT',cntstr)

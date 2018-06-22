@@ -1,14 +1,22 @@
 from mopidy_json_client import MopidyClient
+import wifi_setup_ap.wifi_control as wifi
 
 class MopidyUpdates:
     def __init__(self,updates_func):
-        self.update=updates_func
-        self._mopidy=MopidyClient()
+        ip=wifi.get_ip()
+        ws_url='ws://%s:6680/mopidy/ws' % ip
+        self._update_func=updates_func
+        self._mopidy=MopidyClient(ws_url=ws_url)
         self._mopidy.bind_event('track_playback_started', self.playback_started)
         self._mopidy.bind_event('stream_title_changed', self.title_changed)
+        self._show_updates=False
+
+    def update(self,msg):
+        if self._show_updates:
+            self._update_func(msg)
 
     # mopidy updates
-    def playback_started(tl_track):
+    def playback_started(self,tl_track):
         try:
             track=tl_track.get('track') if tl_track else None
             if not track:
@@ -23,9 +31,14 @@ class MopidyUpdates:
         except: 
             pass
 
-    def title_changed(title):
+    def title_changed(self,title):
         try:
             self.update(title)
         except:
             pass
+    def show_updates(self):
+        self._show_updates=True
 
+    def stop(self):
+        self._mopidy.playback.stop()
+        self._show_updates=False

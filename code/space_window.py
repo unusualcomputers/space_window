@@ -3,287 +3,181 @@ from urlparse import urlparse, parse_qs
 import os
 import signal
 import subprocess
-from collections import OrderedDict
 from time import sleep
-from nasa_pod import *
+from nasa_pod import NasaPod
 from threading import Timer
 import wifi_setup_ap.py_game_msg as msg
-import sys
 import wifi_setup_ap.wifi_control as wifi
 import wifi_setup_ap.connection_http as connection
-from jsonable import Jsonable
 from mopidy_listener import MopidyUpdates
-from html import get_main_html,build_html
+from html import get_main_html
 import pygame
+from streams import Streams
+from sync_job import Job
+
 PORT_NUMBER = 80
 
 _msg=msg.MsgScreen()
 def status_update(txt):
     _msg.set_text(txt)
 
-_mopidy=MopidyUpdates(status_update)
 
-_streams_data='.space.window'
-_base_path=os.path.join(os.path.expanduser('~'),_streams_data)
-_config_path=os.path.join(_base_path,_streams_data)
-_cnt=0 # global counter, used to make html more responsive
+class WaitingMsgs:
+    def __init__(self):
+        self._msgs=['this may take a little while...',
+        '...still at it...','...working hard, have some respect...',
+        '...do be patient...','...after all, this is a wonder of technology...',
+        '...thank you for your patience :)...','...this is taking time, but...',
+        '...few years ago you would have had to go to cinema for this...',
+        '...admire the colors on the screen and wait...']
+        self._current=0
+        self.delay=10
+        self.action_label=''
+        self.action_name=''
 
-# streams
-#   main class managing sreams to play
-class Streams(Jsonable):
-
-    @classmethod
-    def load(cls):
-        if not cls.file_exists(_base_path):
-            os.mkdir(_base_path)
-        path=_config_path
-        if cls.file_exists(path):
-            return cls.from_file(path)
-        s=cls()
-        s.save()
-        return s                
-
-    def save(self):
-        self.to_file(_config_path)
-
-    def __init__(self,streams=OrderedDict()):
-        self.streams=streams
-
-    def len(self):
-        return len(self.streams.items())
-
-    def first(self):
-        return self.at(0)
-
-    def at(self,i):
-        if i >= self.len():
-            return None
-        else:
-            return self.streams.items()[i][0]
-  	
-    def next(self, name):
-        for k in range(self.len()):
-           if self.at(k)==name:
-               return self.at(k+1)
-        return self.at(0)
-
-    def add(self, name, uri, quality):
-        self.streams[name]=(uri,quality)
-        self.save()
-        
-    def remove(self,name):
-        self.streams.pop(name,None)
-        self.save()
+    def _make_html(self,msg):
+        body = u"""    
+            <p style="font-size:35px">{}?</p>
+        """.format(self.msg)
+        return build_html(body,self.delay)
     
-    def find(self,name):
-        for i in range(0,self.len()):
-            if self.at(i) == name: return i
-        return -1
+    def start(self,action_label,action_name):
+        self._current=0
+        self.action=action
+       
+    def next(self):
+        msg=self._msgs[self._current]
+        self._current+=1
+        if self._current >= len(self._msgs):
+            self._current=0
+        msg=self.action_name+'\n\n'+msg
+        return msg
 
-    def up(self,name):
-        i=self.find(name)
-        if i==-1: return
-        if i<=0 or i>=self.len():
+    def next_html(self):
+        return self._make_html(self.next())    
+
+_processes=None
+
+#TODO:  REFRESH CACHES - TEST SPEED
+#       TEST MOPIDY DOESN'T KILL SPEED
+#       ADD WAITING MESSAGES AT LAUNCH
+class ProcessHandling:
+    def __init__(self,status_update_func):
+        self._mopidy=MopidyUpdates(status_update)
+        self._streams=None
+        self._nasa=None
+
+        self._current_stream=None
+        self._check_timer_delay=90
+        self._check_timer=None
+        self._wait=False
+        self._streams=Streams.load()
+        self._nasa=NasaPod()
+        threading.Thread(target=self.launch_mopidy).start()
+        self._status_update=status_update_func    
+
+    def lauch_mopidy(self):
+        print 'starting mopidy'
+        subprocess.Popen(['mopidy'])
+        print 'started mopidy'
+    
+    def start_mopidy(self):
+        self._mopidy.show_updates()
+
+    def streams(self):
+        return self._streams
+            
+    def kill_running():
+        print 'stopping running shows'
+        self._status_update('stopping running shows')
+        if self._check_timer is not None: 
+            self.check_timer.cancel()
+        _streams.stop()
+        _nasa.stop()
+        self._mopidy.stop()
+        #wifi.run('pkill -9 mopidy')
+       
+    def wait(self):
+        self._wait=True
+
+    def stop_waiting(self):
+        self._wait=False
+ 
+    def play_stream(self,name):
+        print 'starting stream %s' % name 
+        if self._current_stream==name and _streams.is_playing():
+            print 'stream %s is aready playing'
             return
-        l=self.streams.keys()
-        c=l[i]
-        l[i]=l[i-1]
-        l[i-1]=c
-        d=OrderedDict()
-        for i in l:
-            d[i]=self.streams[i]
-        self.streams=d
-        self.save()
+        self.kill_running()   
+        self._status_update('starting stream %s' % name)
+        self._current_stream=name
+        self._streams.play(name)
 
-    def make_remove_html(self,name):
-        form = u"""    
-            <p style="font-size:45px">Really, really remove {}?</p>
+    def play_apod(self):
+        self._current_stream=None
+        self._streams.stop()
+        self._nasa.play()
+     
+    def play_next(self.):
+        if self.current_stream is None:
+            name=self._streams.first()
+        else:
+            name=self._streams.next(current_stream) 
+        if name is None: 
+            print 'about to play apod'
+            self.play_apod()
+        else: 
+            print 'about to play stream %s' % name
+            self.play_stream(name)
 
-            <form action="/really_remove">
-            <input type="hidden" name="hidden_{}" value="{}">
-            <button type="submit" name="action" value="really remove {}">
-                    Yes, really remove it!
-            </button></td><td>
-            </form>
-        """.format(name,name,name,name)
-        return build_html(form)
-
-    def make_html(self):
-        global _cnt
-        _cnt+=1
-        html=u''
-        for name in self.streams:
-            (uri,quality)=self.streams[name]
-            row = u"""<tr><td>{}</td><td>{}</td><td>
-                <input type="hidden" name="hidden_{}" value="{}">
-                <button type="submit" name="action" value="play {}">
-                    play
-                </button></td><td>
-                <button type="submit" name="action" value="moveup {}">
-                    up</button></td>
-                <td>
-                <button type="submit" name="action" value="remove {}">
-                        remove
-                </button></td>
-                <td><a href="{}" target="_blank"> Show in browser </a></td>
-                </tr>
-                """.format(name,quality,_cnt,name,name,name,name,uri)
-            html+=row
-        return html
+    def run_something(self):
+        if self._wait: return
+        if self._check_timer is not None: return
+        if not self._streams.is_playing():
+            self.play_next()
+        if self._streams.is_playing():
+            self._check_timer=Timer(self.check_timer_delay, self.run_something)
+            self._check_timer.start()
         
-    def make_command_line(self,name):
-        (uri,quality)=self.streams[name]
-        # raspberry version
-        command= u'streamlink {} {} --player "omxplayer --vol 500 --timeout 60" --player-fifo'.format(uri,quality)
-        return command
-        # ubuntu version
-        #return u'streamlink {} {} --player "mplayer -cache 8000" --player-continuous-http'.format(uri,quality)
-
-_streams=Streams.load()
-
-
-current_process=None
-current_stream=None
-running_apod=False
-check_timer_delay=90
-check_timer = None
-wifi_setup=False
-streaming=False
-
-def kill_running():
-    global running_apod 
-    global streaming
-    global check_timer
-    print 'stopping running shows'
-    status_update('stopping running shows')
-    if check_timer is not None: 
-        check_timer.cancel()
-    if current_process is not None:
-        os.killpg(os.getpgid(current_process.pid), signal.SIGTERM)
-        current_process.terminate()
-    sleep(1)
-    if check_timer is not None: 
-        check_timer.cancel()
-    check_timer=None
-    if current_process is not None:
-        os.killpg(os.getpgid(current_process.pid), signal.SIGTERM)
-        current_process.terminate()
-    stop_apod()
-    wifi.run('pkill -9 mopidy')
-    sreaming=False
-    running_apod=False
-        
-def play_stream(name):
-    global current_stream
-    global current_process 
-    global running_apod 
-    global streaming
-
-    print 'starting stream %s' % name 
-    if current_stream==name and is_running():
-        print 'stream %s is aready playing'
-        return
-    kill_running()   
-    status_update('starting stream %s' % name)
-    current_stream=name
-    cmd=_streams.make_command_line(current_stream)
-    current_process=subprocess.Popen(cmd, shell=True,
-        stdin=None, stdout=None, stderr=None, 
-        close_fds=True,preexec_fn=os.setsid)
-    streaming=True
-
-def play_apod():
-    global current_stream
-    global current_process 
-    global running_apod
-    global streaming
-    streaming=False
-    if current_process is not None:
-        os.killpg(os.getpgid(current_process.pid), signal.SIGTERM)
-        current_process.terminate()
-        current_stream=None
-        current_process=None 
-    start_apod()
-    running_apod=True
-    
-def play_next():
-    if current_stream is None:
-        name=_streams.first()
-    else:
-        name=_streams.next(current_stream) 
-    if name is None: 
-        print 'about to play apod'
-        play_apod()
-    else: 
-        print 'about to play stream %s' % name
-        play_stream(name)
-
-
-def is_running():
-    global current_stream
-    global current_process 
-    if wifi_setup: return True
-    if current_process is not None:
-        current_process.poll()
-    if running_apod: return True
-    if current_process is None: return False
-    try:
-        os.kill(current_process.pid, 0)
+    def handle_wifi_change_req(self,params,server):
+        wifi_name='noname'
+        password=None
+        for n in params:
+            v=params[n]
+            if v==['Connect']:
+                wifi_name=n
+            elif n=='password':
+                password=v[0]
+        self._status_update('thanks! trying to connect to %s now' % wifi_name)
+        wifi.set_wifi(wifi_name,password)
+        wifi.restart_wifi()
+        server.return_to_front()
         return True
-    except:
-        current_process=None
-        return False
 
-def check_running():
-    global check_timer
-    if wifi_setup: return
-    if not is_running():
-        play_next()
-    if streaming:
-        check_timer=Timer(check_timer_delay, check_running)
-        check_timer.start()
-        
-def handle_wifi_change_req(params,server):
-    wifi_name='noname'
-    password=None
-    for n in params:
-        v=params[n]
-        if v==['Connect']:
-            wifi_name=n
-        elif n=='password':
-            password=v[0]
-    status_update('thanks! trying to connect to %s now' % wifi_name)
-    wifi.set_wifi(wifi_name,password)
-    wifi.restart_wifi()
-    server.return_to_front()
-    return True
+    def refresh_caches(self):
+        self._streams.refresh_caches(True)
 
-
+_cnt=0 # global counter, used to make html more responsive
 class SpaceWindowServer(BaseHTTPRequestHandler):
-    def return_to_front(self):
+    def send_to(self,addr):
         self.send_response(301)
-        self.send_header('Location', '/')
+        self.send_header('Location',addr)
         self.end_headers()
 
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
+    
+    def return_to_front(self):
+        self.send_to('/')
     
     def send_to_mopidy(self):
-        self.send_response(301)
         ip=wifi.get_ip()
-        self.send_header('Location', 'http://%s:6680/radiorough' %ip)
-        self.end_headers()
-
-        self.send_response(200)
-        self.send_header('Content-type','text/html')
-        self.end_headers()
+        self.send_to('http://%s:6680/radiorough' %ip)
     
     #Handler for the GET requests
     def do_GET(self):
-        global current_process
         global _cnt
-        global wifi_setup
         params = parse_qs(urlparse(self.path).query)
 
         if 'play_remove' in self.path:
@@ -295,8 +189,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             elif 'moveup' in ps:
                 _streams.up(ps[len('moveup '):])
             else: #if it's not remove, then it's play
-                play_stream(ps[len('play '):])
-                if check_timer is None: check_running()
+                _processes.play_stream(ps[len('play '):])
+                _processes.run_something()
             self.return_to_front()
             return
         elif 'really_remove' in self.path:
@@ -312,7 +206,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             self.return_to_front()
             return
         elif 'slideshow' in self.path:
-            play_apod()
+            _processes.play_apod()
             self.return_to_front()
             return
         elif 'wifi' in self.path:
@@ -324,28 +218,24 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             self.wfile.write(html)
             return
         elif 'connect' in self.path:
-            wifi_setup=True
-            kill_running()
-            sleep(2)
-            kill_running()
+            _processes.wait()
+            _processes.kill_running()
             self.return_to_front()
             status_update("changing wifi networks\nthis is a fragile process\ngive it a few minutes\nif it didn't work, reboot")
-            handle_wifi_change_req(params,self)
+            _processes.handle_wifi_change_req(params,self)
             status_update('testing the new connection')
             if connection.test_connection():
                 display_connection_details()
                 sleep(20)
-            wifi_setup=False
+            _processes.stop_waiting()
             #check_running()
             return
         elif 'shutdown' in self.path:
             os.system('shutdown -h now')
             return
         elif 'kodi' in self.path:
-            wifi_setup=True
-            kill_running()
-            sleep(2)
-            kill_running()
+            _processes.wait()
+            _processes.kill_running()
             status_update('starting kodi')
             print 'starting kodi'
             os.system('sudo -u pi kodi-standalone')
@@ -357,30 +247,31 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             print txt
             status_update(txt)
             self.return_to_front()
-            wifi_setup=False
+            _processes.stop_waiting()
             return
         elif 'rough' in self.path:
-            wifi_setup=True
-            kill_running()
-            sleep(2)
-            kill_running()
-            status_update('starting radio rough')
-            print 'starting mopidy'
-            subprocess.Popen(['mopidy'])
-            print 'started mopidy'
-            sleep(40)
-            print 'slept a bit'
+            #_processes.wait()
+            #_processes.kill_running()
+            #status_update('starting radio rough')
+            #print 'starting mopidy'
+            #subprocess.Popen(['mopidy'])
+            #print 'started mopidy'
+            #sleep(40)
+            #print 'slept a bit'
             ip=wifi.get_ip()
             txt='go to spacewindow.local:6680/radiorough\nor %s:6680/radiorough' % ip
             print txt
             status_update(txt)
             self.send_to_mopidy()
-            wifi_setup=False
+            _processes.start_mopidy()
+            #_processes.stop_waiting()            
             return
         elif 'next' in self.path:
-            play_next()
+            _processes.play_next()
             self.return_to_front()
             return
+        elif 'refresh_caches' in self.path:
+            _processes.refresh_caches()
         elif self.path.endswith('.jpg'):
             mimetype='image/jpg'
             #Open the static file requested and send it
@@ -399,23 +290,49 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.wfile.write(html)
 
 _server=None
+_waiting_msg=WaitingMsg()
+_waiting_job=None
+_waiting_timer=None
+
+def initialise_streams():
+    _processes=ProcessHandling(status_update)
+    return True   
+ 
+def initialise_streams_timer():
+    if _waiting_job is None:
+        _waiting_job=Job(initialise_streams).start()
+       
+    if not _waiting_job.done:
+        status_update(_waiting_msg.next())
+        _waiting_timer=threading.Timer(initialise_streams_timer,10)
+    else:
+        _waiting_job=None
+        if _waiting_timer is not None:
+            _waiting_timer.cancel()
+            _waiting_timer=None
 try:
     print 'configuring wifi'
     connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the
     #incoming request
+    initialise_streams_timer()
+    while _waiting_job is not None and not _waiting_job.done:
+        sleep(5)
+    #status_update('getting streams information.\n'+\
+    #    "do be patient, few years ago you'd have had to go to cinema for this" 
+    #_processes=ProcessHandling(status_update)
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
     print 'Started httpserver on port ' , PORT_NUMBER, _server.server_address
     connection.display_connection_details()
     sleep(10)
-    check_running()    
+    _processes.run_something()    
     #Wait forever for incoming http requests
     _server.serve_forever()
 
 except KeyboardInterrupt:
     print 'space window is shutting down'
-    kill_running()
+    _processes.kill_running()
     if _server is not None:
         _server.socket.close()
 finally:

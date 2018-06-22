@@ -1,14 +1,9 @@
-from streamlink_cli.main import *
-from streamlink_cli.argparser import build_parser
 from streamlink_cli.utils import NamedPipe
 from streamlink_cli.output import PlayerOutput
 from streamlink import Streamlink
-import sys
 from cache import SynchronisedCache as Cache
-import threading
 import time
 import os
-from contextlib import closing
 from functools import partial
 from itertools import chain
 from player_base import VideoPlayer
@@ -23,9 +18,12 @@ class Streamer(VideoPlayer):
             player=None,
             player_args=None):
         VideoPlayer.__init__(self,status_func,player,player_args)
-        self.plugin_cache=Cache(_cache_size)
         self.streams_cache=Cache(_cache_size)
         self.streamlink=Streamlink()
+        #check if this works for multiple streams
+        self._output=self._create_output()
+        self.lock=threading.Lock()
+        self.alive_threads=[]
     
     def _create_output(self):
         pipename='unusualpipe={0}'.format(os.getpid())
@@ -35,8 +33,8 @@ class Streamer(VideoPlayer):
 
     def _open_stream(self,stream):
         self._status('buffering...')
-        stream_fd=stream.open()
         try:
+            stream_fd=stream.open()
             prebuffer=stream_fd.read(_chunk_size)
         except:
             stream_fd.close()
@@ -44,31 +42,33 @@ class Streamer(VideoPlayer):
         return stream_fd,prebuffer
         
     def _output_stream(self,stream):
-        output=self._create_output()
-
-        stream_fd,prebuff=self._open_stream(stream)
-        self._status('preparing player...')
-        output.open()
-        with closing(output):
+        try:        
+            with self.lock:
+                thread_id=threading.get_ident()
+                self.alive_threads.append(thread_id)
+            stream_fd,prebuff=self._open_stream(stream)
+            self._status('preparing player...')
+            self._output.open()
             stream_iterator = chain(
                 [prebuff],
                 iter(partial(stream_fd.read, _chunk_size), b"")
             )
-            try:
-                self._status('playing :)')
-                for data in stream_iterator:
-                    if not self.playing: break
-                    output.write(data)
-            finally:
-                stream_fd.close()
-    
+            self._status('playing :)')
+            for data in stream_iterator:
+                with self.lock:
+                    if thread_id not in self.alive_threads: break
+                self._output.write(data)
+        finally:
+            stream_fd.close()
+            self._output.close()
+
     def _get_streams(self, url):
-        self._status('getting stream information.\n'+
-            'do be patient,\nthis is a true miracle of technology.')
         streams=self.streams_cache.get(url)
         if streams is None:
+            self._status('getting stream information.\n'+
+                'do be patient,\nthis is a true miracle of technology.')
             streams=self.streamlink.streams(url)
-            self.streams_cache.add(url,plugin)
+            self.streams_cache.add(url,streams)
         return streams
             
     def get_qualities(self,url):
@@ -86,6 +86,13 @@ class Streamer(VideoPlayer):
             stream=streams[_default_res]
         elif 'best' in streams:
             stream=streams['best']
+        elif 'worst' in streams:
+            stream=streams['worst']
+        
         if stream is not None:
             self._output_stream(stream)
     
+    def _stop_threads(self):
+        with self.lock:
+            self.alive_threds=[]
+
