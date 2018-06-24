@@ -2,8 +2,21 @@ import jsonpickle
 import io
 import os
 
+# base class for object that can be serialised to Json
+# subclasses should implement class methods to load, something like:
+#
+#    @classmethod
+#    def load(cls):
+#        if not cls.file_exists(_base_path):
+#            os.mkdir(_base_path)
+#        path=_config_path
+#        if cls.file_exists(path):
+#            return cls.from_file(path)
+#        s=cls()
+#        s.save()
+#        return s                
+
 class Jsonable(object):
-    # base class for object that can be serialised to Json
 
     @classmethod
     def file_exists(self, path):

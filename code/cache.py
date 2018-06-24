@@ -1,5 +1,10 @@
 import threading
 
+# simple limited size caches for things
+# 
+# SynchronisedCache is for multithreaded use, it will lock when accessing values
+# Cache is for single threaded use
+
 class SynchronisedCache:
     def __init__(self, size):
         self.cache_size=size
