@@ -2,6 +2,7 @@ from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from urlparse import urlparse, parse_qs
 import os
 import signal
+import threading
 import subprocess
 from time import sleep
 from nasa_pod import NasaPod
@@ -13,7 +14,7 @@ from mopidy_listener import MopidyUpdates
 from html import get_main_html
 import pygame
 from streams import Streams
-from sync_job import Job
+from async_job import Job
 
 PORT_NUMBER = 80
 
@@ -118,7 +119,7 @@ class ProcessHandling:
         self._streams.stop()
         self._nasa.play()
      
-    def play_next(self.):
+    def play_next(self):
         if self.current_stream is None:
             name=self._streams.first()
         else:
@@ -290,21 +291,26 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.wfile.write(html)
 
 _server=None
-_waiting_msg=WaitingMsg()
+_waiting_msg=WaitingMsgs()
 _waiting_job=None
 _waiting_timer=None
 
 def initialise_streams():
+    global _processes
     _processes=ProcessHandling(status_update)
     return True   
  
 def initialise_streams_timer():
+    global _waiting_job
+    global _waiting_timer
     if _waiting_job is None:
-        _waiting_job=Job(initialise_streams).start()
+        _waiting_job=Job(initialise_streams)
+
+    _waiting_job.start()
        
     if not _waiting_job.done:
         status_update(_waiting_msg.next())
-        _waiting_timer=threading.Timer(initialise_streams_timer,10)
+        _waiting_timer=threading.Timer(10,initialise_streams_timer)
     else:
         _waiting_job=None
         if _waiting_timer is not None:

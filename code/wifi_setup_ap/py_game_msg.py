@@ -77,7 +77,7 @@ class MsgScreenThread:
         return zip(surfaces,rects)   
     
     def run_msg(self):
-        #pg.init()
+        pg.init()
         local_text=''
         while(self.get_running()):
             for event in pg.event.get():

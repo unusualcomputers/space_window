@@ -25,11 +25,11 @@ class Job:
                 self.result=self.target()
             else:
                 self.result=self.target(*args)
-        except e:
+        except Exception as e:
             self.exception=e
         finally:
             self.done=True
 
     def start(self):
         self.done=False
-        threading.thread(target=self.target,args=self.args).start()
+        threading.Thread(target=self._target).start()

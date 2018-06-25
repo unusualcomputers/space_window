@@ -32,7 +32,7 @@ class NasaPod:
         pages=filter(lambda x:'<a href="' in x,html[s:e].split('\n'))
         return pages
 
-    def _load_at_index(self.x,pages,scrw,scrh):
+    def _load_at_index(self,x,pages,scrw,scrh):
         l=pages[x]
         t=l.split(':')
         uri=self._apod_url+t[1].split('"')[1]
@@ -67,7 +67,7 @@ class NasaPod:
         else: x+=1
         return self._load(x,pages,scrw,scrh)
      
-    def _place_text(self,p,y=0,pref="",screen):
+    def _place_text(self,p,y=0,pref="",screen=None):
         text = self._font.render(pref+p[0], True,self._text_col)
         textrect = text.get_rect()
         textrect.centerx = screen.get_rect().centerx
