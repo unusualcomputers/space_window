@@ -41,7 +41,7 @@ class NasaPod:
         if s != -1:    
             l=len('<IMG SRC="')
             e=html.find('"',s+l)
-            uri=self._apod_uri+html[s+l:e]
+            uri=self._apod_url+html[s+l:e]
             date=t[0]
             name=t[1].split('>')[1].split('<')[0]
             image_file = io.BytesIO(requests.get(uri).content)
@@ -71,10 +71,10 @@ class NasaPod:
         text = self._font.render(pref+p[0], True,self._text_col)
         textrect = text.get_rect()
         textrect.centerx = screen.get_rect().centerx
-        textrect.centery = screen.get_height()/self._test_height_ratio+y
+        textrect.centery = screen.get_height()/self._text_height_ratio+y
         return (text,textrect)
 
-    def _slideshow():    
+    def _slideshow(self):    
         try:
             pg.mouse.set_visible(False)	
             screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
@@ -82,7 +82,8 @@ class NasaPod:
             scrw=screen.get_width()
             black=screen.copy()
             black.fill((0,0,0))
-            (text,textrect)=place_text(("Loading first image",""),screen)
+            (text,textrect)=self._place_text(("loading first image",""),
+                screen=screen)
             screen.blit(text, textrect)
             pg.display.flip()
 
@@ -90,7 +91,7 @@ class NasaPod:
             self._running=True
             p=self._load(0, pages,scrw,scrh) 
             prev_p=None
-            t0=time()-delay
+            t0=time()-self._delay
             screen.blit(black,(0,0))
             pg.display.flip()
             while self._running:
@@ -109,8 +110,8 @@ class NasaPod:
                     iw=image.get_width()
                     x=(scrw-iw)/2
                     y=(scrh-ih)/2
-                    (text,textrect)=self._place_text(prev_p,screen)
-                    (nt,ntr)=self._place_text(p,40,"Next: ",screen)
+                    (text,textrect)=self._place_text(prev_p,screen=screen)
+                    (nt,ntr)=self._place_text(p,40,"Next: ",screen=screen)
                     black.blit(text, textrect)
                     black.blit(nt, ntr)
                     #fading out
@@ -129,8 +130,8 @@ class NasaPod:
                 x=(scrw-iw)/2
                 y=(scrh-ih)/2
                 if prev_p is None: prev_p=p
-                (text,textrect)=self._place_text(prev_p,screen)
-                (nt,ntr)=self._place_text(p,40,"Next: ",screen)
+                (text,textrect)=self._place_text(prev_p,screen=screen)
+                (nt,ntr)=self._place_text(p,40,"Next: ",screen=screen)
                 screen.blit(black,(0,0))
                 screen.blit(text, textrect)
                 screen.blit(nt, ntr)
@@ -150,6 +151,8 @@ class NasaPod:
                 p=load(randint(1,len(pages)-1),pages)
         except:
             traceback.print_stack()
+            self._place_text('something is wrong with nasa pod :('
+                ,screen=screen)
             raise
 
     def is_playing(self):

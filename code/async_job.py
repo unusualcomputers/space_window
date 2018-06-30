@@ -1,4 +1,6 @@
 import threading
+import traceback
+import sys
 
 # run a function on a thread and keep track of result
 # to use:
@@ -21,13 +23,16 @@ class Job:
 
     def _target(self):
         try:
-            if args is None:
+            if self.args is None:
                 self.result=self.target()
             else:
                 self.result=self.target(*args)
         except Exception as e:
+            print e
+            traceback.print_exc(file=sys.stdout)            
             self.exception=e
         finally:
+            print 'done'
             self.done=True
 
     def start(self):

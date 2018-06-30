@@ -25,7 +25,7 @@ def status_update(txt):
 
 class WaitingMsgs:
     def __init__(self):
-        self._msgs=['this may take a little while...',
+        self._msgs=['','this may take a little while...',
         '...still at it...','...working hard, have some respect...',
         '...do be patient...','...after all, this is a wonder of technology...',
         '...thank you for your patience :)...','...this is taking time, but...',
@@ -33,8 +33,6 @@ class WaitingMsgs:
         '...admire the colors on the screen and wait...']
         self._current=0
         self.delay=10
-        self.action_label=''
-        self.action_name=''
 
     def _make_html(self,msg):
         body = u"""    
@@ -42,48 +40,48 @@ class WaitingMsgs:
         """.format(self.msg)
         return build_html(body,self.delay)
     
-    def start(self,action_label,action_name):
+    def start(self):
         self._current=0
-        self.action=action
        
-    def next(self):
+    def next(self,action_name=None):
         msg=self._msgs[self._current]
         self._current+=1
         if self._current >= len(self._msgs):
             self._current=0
-        msg=self.action_name+'\n\n'+msg
+        if action_name is not None:
+            msg=action_name+'\n\n'+msg
         return msg
 
-    def next_html(self):
-        return self._make_html(self.next())    
+    def next_html(self,action_name=None):
+        return self._make_html(self.next(action_name))    
 
 _processes=None
 
 #TODO:  REFRESH CACHES - TEST SPEED
 #       TEST MOPIDY DOESN'T KILL SPEED
-#       ADD WAITING MESSAGES AT LAUNCH
 class ProcessHandling:
     def __init__(self,status_update_func):
-        self._mopidy=MopidyUpdates(status_update)
-        self._streams=None
-        self._nasa=None
-
         self._current_stream=None
         self._check_timer_delay=90
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
+        print 'STREAMS: ',self._streams
         self._nasa=NasaPod()
         threading.Thread(target=self.launch_mopidy).start()
         self._status_update=status_update_func    
 
-    def lauch_mopidy(self):
-        print 'starting mopidy'
+    def launch_mopidy(self):
         subprocess.Popen(['mopidy'])
-        print 'started mopidy'
+        self._mopidy=MopidyUpdates(status_update)
     
     def start_mopidy(self):
-        self._mopidy.show_updates()
+        if self._mopidy is not None:
+            self._mopidy.show_updates()
+        else:
+            self._mopidy=MopidyUpdates(status_update)
+            self._mopidy.show_updates()
+            
 
     def streams(self):
         return self._streams
@@ -115,12 +113,14 @@ class ProcessHandling:
         self._streams.play(name)
 
     def play_apod(self):
+        print 'stopping streams'
         self._current_stream=None
         self._streams.stop()
+        print 'playing apod'
         self._nasa.play()
      
     def play_next(self):
-        if self.current_stream is None:
+        if self._current_stream is None:
             name=self._streams.first()
         else:
             name=self._streams.next(current_stream) 
@@ -291,9 +291,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.wfile.write(html)
 
 _server=None
-_waiting_msg=WaitingMsgs()
-_waiting_job=None
-_waiting_timer=None
 
 def initialise_streams():
     global _processes
@@ -301,29 +298,25 @@ def initialise_streams():
     return True   
  
 def initialise_streams_timer():
-    global _waiting_job
-    global _waiting_timer
-    if _waiting_job is None:
-        _waiting_job=Job(initialise_streams)
-
-    _waiting_job.start()
+    waiting_job=Job(initialise_streams)
+    waiting_job.start()
        
-    if not _waiting_job.done:
-        status_update(_waiting_msg.next())
-        _waiting_timer=threading.Timer(10,initialise_streams_timer)
-    else:
-        _waiting_job=None
-        if _waiting_timer is not None:
-            _waiting_timer.cancel()
-            _waiting_timer=None
+    waiting_msg=WaitingMsgs()
+    
+    next_cnt=0
+    while not waiting_job.done:
+        if next_cnt==0:
+            next_cnt=5
+            status_update(waiting_msg.next('initialising streams'))
+        next_cnt-=1
+        sleep(1)
+
 try:
     print 'configuring wifi'
     connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the
     #incoming request
     initialise_streams_timer()
-    while _waiting_job is not None and not _waiting_job.done:
-        sleep(5)
     #status_update('getting streams information.\n'+\
     #    "do be patient, few years ago you'd have had to go to cinema for this" 
     #_processes=ProcessHandling(status_update)

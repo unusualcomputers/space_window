@@ -7,6 +7,7 @@ import os
 from functools import partial
 from itertools import chain
 from player_base import VideoPlayer
+import threading 
 
 _default_res='360p'
 _chunk_size=10240
@@ -25,9 +26,20 @@ class Streamer(VideoPlayer):
         self.lock=threading.Lock()
         self.alive_threads=[]
     
+    
+    def _make_pipe(self,cnt=10):
+        try:
+            pipename='unusualpipe={}{}'.format(os.getpid(),cnt)
+            print 'pipename : ',pipename
+            return NamedPipe(pipename)
+        except OSError:
+            if cnt>0:
+                return self._make_pipe(cnt-1)
+            else:
+                raise
+      
     def _create_output(self):
-        pipename='unusualpipe={0}'.format(os.getpid())
-        namedpipe=NamedPipe(pipename)
+        namedpipe=self._make_pipe()
         return PlayerOutput(self._player_cmd,args='{filename}',
             quiet=False,kill=True,namedpipe=namedpipe,http=None)
 

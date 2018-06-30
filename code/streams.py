@@ -3,12 +3,14 @@ import os
 from html import build_html
 from collections import OrderedDict
 from video_player import Player
+import threading
 
 _streams_data='.space.window'
 _base_path=os.path.join(os.path.expanduser('~'),_streams_data)
 _config_path=os.path.join(_base_path,_streams_data)
 _cnt=0 # global counter, used to make html more responsive
 
+_player=None
 # streams
 #   main class managing sreams to play
 class Streams(Jsonable):
@@ -18,10 +20,13 @@ class Streams(Jsonable):
         if not cls.file_exists(_base_path):
             os.mkdir(_base_path)
         path=_config_path
+        print 'PATH', path
         if cls.file_exists(path):
-            return cls.from_file(path)
-        s=cls()
-        s.save()
+            s=cls.from_file(path)
+            s.refresh_caches(True)
+        else:
+            s=cls()
+            s.save()
         return s                
 
     def save(self):
@@ -33,18 +38,21 @@ class Streams(Jsonable):
 
     def _get_data_for_first_video(self):
         if self.len() == 0: return
-        (url,quality)=self.streams[0]
-        self.player.can_play(url,quality)
+        (url,quality)=self.streams.items()[0]
+        _player.can_play(url,quality)
 
     def _get_data_for_rest(self):
+        print "GETTING REST"
         l=self.len()
         if l < 2: return
         for k in range(1,l):
-            (url,quality)=self.streams[i]
-            self.player.can_play(url,quality)
+            (url,quality)=self.streams.items()[i]
+            _player.can_play(url,quality)
 
     def refresh_caches(self,threaded=False):
-        self.player=Player()
+        print "INITIALISING PLAYER"
+        global _player
+        _player=Player()
         self._get_data_for_first_video()
         if threaded:
             threading.Thread(target=self._get_data_for_rest).start()        
@@ -52,7 +60,7 @@ class Streams(Jsonable):
             self._get_data_for_rest()
 
     def get_qualities(self,url):
-        return self.player.get_qualities(url)
+        return _player.get_qualities(url)
 
     def len(self):
         return len(self.streams.items())
@@ -74,7 +82,7 @@ class Streams(Jsonable):
 
     def add(self, name, uri, quality):
         self.streams[name]=(uri,quality)
-        threading.Thread(target=self.player.can_play,
+        threading.Thread(target=_player.can_play,
             args=(url,quality))
         self.save()
         
@@ -140,10 +148,10 @@ class Streams(Jsonable):
         
     def play(self,name):
         (uri,quality)=self.streams[name]
-        self.player.play(url,quality)
+        _player.play(url,quality)
 
     def stop(self):
-        self.player.stop()
+        _player.stop()
 
     def is_playing(self):
-        self.player.is_playing()
+        _player.is_playing()
