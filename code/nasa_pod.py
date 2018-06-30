@@ -116,7 +116,7 @@ class NasaPod:
                     black.blit(nt, ntr)
                     #fading out
                     for i in range(0,255,1):
-                        if not running: 
+                        if not self._running: 
                             return
                         #sleep(0.02)
                         image.set_alpha(255-i)
@@ -137,7 +137,7 @@ class NasaPod:
                 screen.blit(nt, ntr)
                 # fading in
                 for i in range(0,255,1):
-                    if not running: 
+                    if not self._running: 
                         return
                     #sleep(0.02)
                     image.set_alpha(i)
@@ -148,7 +148,7 @@ class NasaPod:
                 screen.blit(image,(x,y))
                 pg.display.flip()
                 prev_p=p
-                p=load(randint(1,len(pages)-1),pages)
+                p=self._load(randint(1,len(pages)-1),pages,scrw,scrh)
         except:
             traceback.print_stack()
             self._place_text('something is wrong with nasa pod :('
