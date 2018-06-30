@@ -82,11 +82,10 @@ class ProcessHandling:
             self._mopidy=MopidyUpdates(status_update)
             self._mopidy.show_updates()
             
-
     def streams(self):
         return self._streams
             
-    def kill_running():
+    def kill_running(self):
         print 'stopping running shows'
         self._status_update('stopping running shows')
         if self._check_timer is not None: 
