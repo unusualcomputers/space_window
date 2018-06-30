@@ -26,6 +26,7 @@ class YouTubePlayer(VideoPlayer):
             return v
         try:
             v=pafy.new(url)
+            if v.length == 0.0: return None #live stream
             self.video_cache.add(url,v)
             return v
         except:
@@ -171,6 +172,7 @@ class YouTubePlayer(VideoPlayer):
                     if thread_id not in self.alive_threads: return
 
                 cmd='%s "%s"' % (self._player_cmd,u)
+                print 'playing next',cmd
                 os.system(cmd)
 
     def _stop_threads(self):
