@@ -16,7 +16,6 @@ class SynchronisedCache:
             if len(self.cache)!=0:
                 for k,val in self.cache:
                     if k==key:
-                        self.lock.release()
                         return val
             return None
 

@@ -22,7 +22,7 @@ class Player:
         
         if c is not None:
             self.players_cache.add(url,c)
-            print "FOUND PLAYER"
+            print "FOUND PLAYER",c
             return c
         
         raise 'cannot play this video :('
