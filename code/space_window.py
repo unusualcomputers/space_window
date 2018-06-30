@@ -90,8 +90,8 @@ class ProcessHandling:
         self._status_update('stopping running shows')
         if self._check_timer is not None: 
             self.check_timer.cancel()
-        _streams.stop()
-        _nasa.stop()
+        self._streams.stop()
+        self._nasa.stop()
         self._mopidy.stop()
         #wifi.run('pkill -9 mopidy')
        

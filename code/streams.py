@@ -45,7 +45,7 @@ class Streams(Jsonable):
         print "GETTING REST"
         l=self.len()
         if l < 2: return
-        for k in range(1,l):
+        for i in range(1,l):
             (url,quality)=self.streams.items()[i]
             _player.can_play(url,quality)
 
