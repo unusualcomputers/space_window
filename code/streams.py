@@ -39,7 +39,7 @@ class Streams(Jsonable):
     def _get_data_for_first_video(self):
         if self.len() == 0: return
         (url,quality)=self.streams.items()[0]
-        _player.can_play(url,quality)
+        _player.can_play(url)
 
     def _get_data_for_rest(self):
         print "GETTING REST"
