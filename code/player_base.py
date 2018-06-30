@@ -2,10 +2,10 @@ import os
 import time
 import threading
 
-#_player='omxplayer'
-#_player_args='--vol 500 --timeout 60'
-_player='mpv'
-_player_args=''
+_player='omxplayer'
+_player_args='--vol 500 --timeout 60'
+#_player='mpv'
+#_player_args=''
 _synchronisation_sleep=0.1
 
 class VideoPlayer:

@@ -20,7 +20,6 @@ class Streams(Jsonable):
         if not cls.file_exists(_base_path):
             os.mkdir(_base_path)
         path=_config_path
-        print 'PATH', path
         if cls.file_exists(path):
             s=cls.from_file(path)
             s.refresh_caches(True)
@@ -147,7 +146,7 @@ class Streams(Jsonable):
         return html
         
     def play(self,name):
-        (uri,quality)=self.streams[name]
+        (url,quality)=self.streams[name]
         _player.play(url,quality)
 
     def stop(self):
