@@ -47,7 +47,7 @@ class Streams(Jsonable):
         if l < 2: return
         for i in range(1,l):
             (url,quality)=self.streams.items()[i]
-            _player.can_play(url,quality)
+            _player.can_play(url)
 
     def refresh_caches(self,threaded=False):
         print "INITIALISING PLAYER"
@@ -83,7 +83,7 @@ class Streams(Jsonable):
     def add(self, name, uri, quality):
         self.streams[name]=(uri,quality)
         threading.Thread(target=_player.can_play,
-            args=(url,quality))
+            args=(url))
         self.save()
         
     def remove(self,name):

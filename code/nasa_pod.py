@@ -163,7 +163,7 @@ class NasaPod:
         self._running=True
         threading.Thread(target=self._slideshow).start()
 
-    def stop():
+    def stop(self):
         self._running=False
 
 if __name__=="__main__":    
