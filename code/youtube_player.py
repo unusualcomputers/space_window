@@ -1,6 +1,7 @@
 import pafy
 import os
 import threading
+import thread
 import time
 from cache import Cache
 from player_base import VideoPlayer
@@ -128,7 +129,7 @@ class YouTubePlayer(VideoPlayer):
     
     def _get_remaining_urls(self,url,quality,urls):
         with self.lock:
-            thread_id=threading.get_ident()
+            thread_id=thread.get_ident()
             self.alive_threads.append(thread_id)
         pl=self._get_playlist(url)
         if pl is None: 
@@ -146,13 +147,13 @@ class YouTubePlayer(VideoPlayer):
 
     def _play_loop_impl(self,url,quality):
         with self.lock:
-            thread_id=threading.get_ident()
+            thread_id=thread.get_ident()
             self.alive_threads.append(thread_id)
         
         self._status('retrieving videos...')
         urls=[]
         self._get_first_url(url,quality,urls)
-        thread=threading.Thread(target=self._get_remaining_urls,
+        threading.Thread(target=self._get_remaining_urls,
             args=(url,quality,urls)).start()
         prev_sz=1
         while True:

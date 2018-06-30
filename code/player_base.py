@@ -1,7 +1,7 @@
 import os
 import time
 import threading
-
+import traceback
 _player='omxplayer'
 _player_args='--vol 500 --timeout 60'
 #_player='mpv'
@@ -41,8 +41,11 @@ class VideoPlayer:
     
     def _play_loop(self,url,quality):
         try:
+            print "STARTING PLAYER LOOP"
             self._play_loop_impl(url,quality)
         except:
+            print "player loop exception"
+            traceback.print_exc()
             pass
         finally:
             self.playing=False
