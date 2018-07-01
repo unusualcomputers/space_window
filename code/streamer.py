@@ -8,6 +8,7 @@ from functools import partial
 from itertools import chain
 from player_base import VideoPlayer
 import threading 
+import thread
 
 _default_res='360p'
 _chunk_size=10240
@@ -56,7 +57,7 @@ class Streamer(VideoPlayer):
     def _output_stream(self,stream):
         try:        
             with self.lock:
-                thread_id=threading.get_ident()
+                thread_id=thread.get_ident()
                 self.alive_threads.append(thread_id)
             stream_fd,prebuff=self._open_stream(stream)
             self._status('preparing player...')
@@ -106,5 +107,5 @@ class Streamer(VideoPlayer):
     
     def _stop_threads(self):
         with self.lock:
-            self.alive_threds=[]
+            self.alive_threads=[]
 
