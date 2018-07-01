@@ -22,7 +22,7 @@ class Streams(Jsonable):
         path=_config_path
         if cls.file_exists(path):
             s=cls.from_file(path)
-            s.refresh_caches(True)
+            s.refresh_caches(False)
         else:
             s=cls()
             s.save()
