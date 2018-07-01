@@ -153,4 +153,4 @@ class Streams(Jsonable):
         _player.stop()
 
     def is_playing(self):
-        _player.is_playing()
+        return _player.is_playing()

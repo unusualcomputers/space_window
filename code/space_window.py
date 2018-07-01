@@ -132,12 +132,11 @@ class ProcessHandling:
 
     def run_something(self):
         if self._wait: return
-        if self._check_timer is not None: return
+        if self._check_timer is not None: self._check_timer.cancel()
         if not self._streams.is_playing():
             self.play_next()
-        if self._streams.is_playing():
-            self._check_timer=Timer(self.check_timer_delay, self.run_something)
-            self._check_timer.start()
+        self._check_timer=Timer(self.check_timer_delay, self.run_something)
+        self._check_timer.start()
         
     def handle_wifi_change_req(self,params,server):
         wifi_name='noname'
