@@ -135,7 +135,7 @@ class ProcessHandling:
         if self._check_timer is not None: self._check_timer.cancel()
         if not self._streams.is_playing():
             self.play_next()
-        self._check_timer=Timer(self.check_timer_delay, self.run_something)
+        self._check_timer=Timer(self._check_timer_delay, self.run_something)
         self._check_timer.start()
         
     def handle_wifi_change_req(self,params,server):
