@@ -122,7 +122,7 @@ class ProcessHandling:
         if self._current_stream is None:
             name=self._streams.first()
         else:
-            name=self._streams.next(current_stream) 
+            name=self._streams.next(self._current_stream) 
         if name is None: 
             print 'about to play apod'
             self.play_apod()
