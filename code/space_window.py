@@ -89,7 +89,7 @@ class ProcessHandling:
         print 'stopping running shows'
         self._status_update('stopping running shows')
         if self._check_timer is not None: 
-            self.check_timer.cancel()
+            self._check_timer.cancel()
         self._streams.stop()
         self._nasa.stop()
         self._mopidy.stop()
