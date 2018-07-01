@@ -45,8 +45,9 @@ class Streams(Jsonable):
         print "GETTING REST",l
         if l < 2: return
         for i in range(1,l):
-            print 'GETTING: ',i 
+            print 'GETTING: ',self.streams.items()[i] 
             (url,quality)=self.streams.items()[i]
+            
             _player.can_play(url)
             print 'GOT ',i,url
 
