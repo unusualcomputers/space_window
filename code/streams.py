@@ -37,7 +37,7 @@ class Streams(Jsonable):
 
     def _get_data_for_first_video(self):
         if self.len() == 0: return
-        (url,quality)=self.streams.items()[0]
+        (url,quality)=self.streams.items()[0][1]
         _player.can_play(url)
 
     def _get_data_for_rest(self):
@@ -46,7 +46,7 @@ class Streams(Jsonable):
         if l < 2: return
         for i in range(1,l):
             print 'GETTING: ',self.streams.items()[i] 
-            (url,quality)=self.streams.items()[i]
+            (url,quality)=self.streams.items()[i][1]
             
             _player.can_play(url)
             print 'GOT ',i,url
