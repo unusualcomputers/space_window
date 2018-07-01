@@ -26,7 +26,7 @@ class Player:
             print "FOUND PLAYER",c,url
             return c
         
-        raise 'cannot play this video :('
+        raise Exception('cannot play this video :( '+url)
 
     def get_qualities(self,url):
         return self._get_player(url).get_qualities(url)
