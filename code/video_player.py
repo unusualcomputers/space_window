@@ -1,6 +1,7 @@
 from youtube_player import YouTubePlayer
 from streamer import Streamer
 from cache import Cache
+import traceback
 
 _cache_size=200
 class Player:
@@ -35,6 +36,8 @@ class Player:
             self._get_player(url)
             return True
         except:
+            print 'exception while getting qualities'
+            traceback.print_exc()
             return False
 
     def is_playing(self):

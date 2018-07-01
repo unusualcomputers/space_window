@@ -48,6 +48,7 @@ class Streams(Jsonable):
             print 'GETTING: ',i 
             (url,quality)=self.streams.items()[i]
             _player.can_play(url)
+            print 'GOT ',i,url
 
     def refresh_caches(self,threaded=False):
         print "INITIALISING PLAYER"
