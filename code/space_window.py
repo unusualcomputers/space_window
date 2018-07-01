@@ -285,7 +285,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_header('Content-type','text/html')
         self.end_headers()
         # Send the html message
-        html = get_main_html(_streams.make_html())
+        html = get_main_html(self._streams.make_html())
         self.wfile.write(html)
 
 _server=None

@@ -12,7 +12,7 @@ class Player:
     def _get_player(self,url):
         c=self.players_cache.get(url)
         if c is not None:
-            print "FOUND PLAYER IN CACHE"
+            print "FOUND PLAYER IN CACHE",url
             return c
         
         if self.yt_player.can_play(url):
@@ -22,7 +22,7 @@ class Player:
         
         if c is not None:
             self.players_cache.add(url,c)
-            print "FOUND PLAYER",c
+            print "FOUND PLAYER",c,url
             return c
         
         raise 'cannot play this video :('

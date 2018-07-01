@@ -41,10 +41,11 @@ class Streams(Jsonable):
         _player.can_play(url)
 
     def _get_data_for_rest(self):
-        print "GETTING REST"
         l=self.len()
+        print "GETTING REST",l
         if l < 2: return
         for i in range(1,l):
+            print 'GETTING: ',i 
             (url,quality)=self.streams.items()[i]
             _player.can_play(url)
 
