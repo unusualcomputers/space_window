@@ -37,7 +37,7 @@ class VideoPlayer:
             print msg
 
     def _play_loop_impl(self,url,quality):
-        raise 'play loop is not implemented, create one of my children'
+        raise Exception('play loop is not implemented')
     
     def _play_loop(self,url,quality):
         try:
@@ -46,12 +46,11 @@ class VideoPlayer:
         except:
             print "player loop exception"
             traceback.print_exc()
-            pass
         finally:
             self.playing=False
 
     def get_qualities(self,url):
-        raise 'get_qualities not implemented, create one of my children'
+        raise Exception('get_qualities not implemented')
 
     def can_play(self,url):
         self._status('checking video status')

@@ -5,6 +5,7 @@ import thread
 import time
 from cache import Cache
 from player_base import VideoPlayer
+import traceback
 
 _cache_size=200
 _default_res=360
@@ -129,23 +130,28 @@ class YouTubePlayer(VideoPlayer):
             urls+=self._get_video_url(pl['items'][0]['pafy'],quality)
     
     def _get_remaining_urls(self,url,quality,urls):
-        with self.lock:
-            thread_id=thread.get_ident()
-            self.alive_threads.append(thread_id)
-        pl=self._get_playlist(url)
-        if pl is None: 
-            return
-        rest=pl['items'][1:]
-        sz=len(rest)+1
-        j=2
-        for i in rest:
-            self._status('getting data for video %i of %i'%(j,sz))
-            j+=1
-            u=self._get_video_url(i['pafy'],quality)
+        try:        
             with self.lock:
-                urls+=u
-                if thread_id not in self.alive_threads: return
-
+                thread_id=thread.get_ident()
+                self.alive_threads.append(thread_id)
+            pl=self._get_playlist(url)
+            if pl is None: 
+                return
+            rest=pl['items'][1:]
+            sz=len(rest)+1
+            j=2
+            for i in rest:
+                self._status('getting data for video %i of %i'%(j,sz))
+                j+=1
+                u=self._get_video_url(i['pafy'],quality)
+                with self.lock:
+                    urls+=u
+                    if thread_id not in self.alive_threads: return
+        except:
+            print 'exception while getting remaining you tube urls'
+            traceback.print_exc()
+            raise
+    
     def _play_loop_impl(self,url,quality):
         with self.lock:
             thread_id=thread.get_ident()
@@ -172,7 +178,6 @@ class YouTubePlayer(VideoPlayer):
                     if thread_id not in self.alive_threads: return
 
                 cmd='%s "%s"' % (self._player_cmd,u)
-                print 'playing next',cmd
                 os.system(cmd)
 
     def _stop_threads(self):
@@ -186,10 +191,10 @@ class YouTubePlayer(VideoPlayer):
             v=[vv['pafy'] for vv in v['items']] 
             self._status('getting available video qualities for the playlist')
             return self._get_playlist_qualities(v)
-        self._status('oups, this was not a playlist, getting video information')
+        #self._status('this was not a playlist, getting video information')
         v=self._get_video(url)
         if v is not None: 
             self._status('getting available video qualities')
             return self._get_video_qualities(v)
-        raise 'this is not a youtube video'
+        raise Exception('this is not a youtube video')
 

@@ -36,7 +36,8 @@ class Player:
             self._get_player(url)
             return True
         except:
-            print 'exception while getting qualities'
+            #TODO: once debugging is done we don't need traces here
+            print 'exception while checkin if can play'
             traceback.print_exc()
             return False
 

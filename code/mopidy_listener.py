@@ -1,5 +1,6 @@
 from mopidy_json_client import MopidyClient
 import wifi_setup_ap.wifi_control as wifi
+import traceback
 
 class MopidyUpdates:
     def __init__(self,updates_func):
@@ -36,9 +37,15 @@ class MopidyUpdates:
             self.update(title)
         except:
             pass
+
     def show_updates(self):
         self._show_updates=True
 
     def stop(self):
-        self._mopidy.playback.stop()
-        self._show_updates=False
+        try:
+            self._mopidy.playback.stop()
+        except:
+            print 'error stopping mopidy'
+            traceback.print_exc()
+        finally:
+            self._show_updates=False

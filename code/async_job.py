@@ -28,11 +28,11 @@ class Job:
             else:
                 self.result=self.target(*args)
         except Exception as e:
-            print e
-            traceback.print_exc(file=sys.stdout)            
+            print 'exception in async job'
+            traceback.print_exc()            
             self.exception=e
         finally:
-            print 'done'
+            print 'async job done'
             self.done=True
 
     def start(self):

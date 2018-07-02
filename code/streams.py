@@ -4,6 +4,7 @@ from html import build_html
 from collections import OrderedDict
 from video_player import Player
 import threading
+import traceback
 
 _streams_data='.space.window'
 _base_path=os.path.join(os.path.expanduser('~'),_streams_data)
@@ -41,15 +42,20 @@ class Streams(Jsonable):
         _player.can_play(url)
 
     def _get_data_for_rest(self):
-        l=self.len()
-        print "GETTING REST",l
-        if l < 2: return
-        for i in range(1,l):
-            print 'GETTING: ',self.streams.items()[i] 
-            (url,quality)=self.streams.items()[i][1]
-            
-            _player.can_play(url)
-            print 'GOT ',i,url
+        try:
+            l=self.len()
+            print "GETTING REST",l
+            if l < 2: return
+            for i in range(1,l):
+                print 'GETTING: ',self.streams.items()[i] 
+                (url,quality)=self.streams.items()[i][1]
+                
+                _player.can_play(url)
+                print 'GOT ',i,url
+        except:
+            print 'exception while getting rest of videos'
+            traceback.print_exc()
+            raise
 
     def refresh_caches(self,threaded=False):
         print "INITIALISING PLAYER"
@@ -153,7 +159,11 @@ class Streams(Jsonable):
         _player.play(url,quality)
 
     def stop(self):
-        _player.stop()
+        try:
+            _player.stop()
+        except:
+            print 'exception while stopping streams'
+            traceback.print_exc()
 
     def is_playing(self):
         return _player.is_playing()

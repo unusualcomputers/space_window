@@ -51,7 +51,7 @@ class Streamer(VideoPlayer):
             prebuffer=stream_fd.read(_chunk_size)
         except:
             stream_fd.close()
-            raise 'Cannot read from stream'
+            raise Exception('Cannot read from stream')
         return stream_fd,prebuffer
         
     def _output_stream(self,stream):

@@ -150,7 +150,8 @@ class NasaPod:
                 prev_p=p
                 p=self._load(randint(1,len(pages)-1),pages,scrw,scrh)
         except:
-            traceback.print_stack()
+            print 'exception in nasa pod slideshow'
+            traceback.print_exc()
             self._place_text('something is wrong with nasa pod :('
                 ,screen=screen)
             raise

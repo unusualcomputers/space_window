@@ -15,6 +15,7 @@ from html import get_main_html
 import pygame
 from streams import Streams
 from async_job import Job
+import traceback
 
 PORT_NUMBER = 80
 
@@ -72,9 +73,13 @@ class ProcessHandling:
         self._status_update=status_update_func    
 
     def launch_mopidy(self):
-        subprocess.Popen(['mopidy'])
-        self._mopidy=MopidyUpdates(status_update)
-    
+        try:
+            subprocess.Popen(['mopidy'])
+            self._mopidy=MopidyUpdates(status_update)
+        except:
+            print 'exception while launching mopidy'
+            traceback.print_exc()
+            
     def start_mopidy(self):
         if self._mopidy is not None:
             self._mopidy.show_updates()
@@ -85,9 +90,10 @@ class ProcessHandling:
     def streams(self):
         return self._streams
             
-    def kill_running(self):
+    def kill_running(self,updates=True):
         print 'stopping running shows'
-        self._status_update('stopping running shows')
+        if(updates):
+            self._status_update('stopping running shows')
         if self._check_timer is not None: 
             self._check_timer.cancel()
         self._streams.stop()
@@ -329,9 +335,12 @@ try:
 
 except KeyboardInterrupt:
     print 'space window is shutting down'
-    _processes.kill_running()
+    _processes.kill_running(False)
     if _server is not None:
         _server.socket.close()
+except:
+    print 'uncaught exception in space window'
+    traceback.print_exc()
 finally:
     pygame.quit()
     
