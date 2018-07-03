@@ -1,6 +1,7 @@
 import threading
-import traceback
 import sys
+import logger
+log=logger.get(__name__)
 
 # run a function on a thread and keep track of result
 # to use:
@@ -28,11 +29,10 @@ class Job:
             else:
                 self.result=self.target(*args)
         except Exception as e:
-            print 'exception in async job'
-            traceback.print_exc()            
+            log.exception('exception in async job')
             self.exception=e
         finally:
-            print 'async job done'
+            log.info('async job done')
             self.done=True
 
     def start(self):

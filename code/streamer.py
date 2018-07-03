@@ -31,7 +31,6 @@ class Streamer(VideoPlayer):
     def _make_pipe(self,cnt=10):
         try:
             pipename='unusualpipe={}{}'.format(os.getpid(),cnt)
-            print 'pipename : ',pipename
             return NamedPipe(pipename)
         except OSError:
             if cnt>0:
@@ -71,6 +70,8 @@ class Streamer(VideoPlayer):
                 with self.lock:
                     if thread_id not in self.alive_threads: break
                 self._output.write(data)
+        except:
+            log.exception('exception while outputing stream')
         finally:
             stream_fd.close()
             self._output.close()

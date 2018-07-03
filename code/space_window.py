@@ -15,7 +15,8 @@ from html import get_main_html
 import pygame
 from streams import Streams
 from async_job import Job
-import traceback
+import logger
+log=logger.get(__name__)
 
 PORT_NUMBER = 80
 
@@ -67,7 +68,6 @@ class ProcessHandling:
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
-        print 'STREAMS: ',self._streams
         self._nasa=NasaPod()
         threading.Thread(target=self.launch_mopidy).start()
         self._status_update=status_update_func    
@@ -75,10 +75,10 @@ class ProcessHandling:
     def launch_mopidy(self):
         try:
             subprocess.Popen(['mopidy'])
+            #TODO: wait for mopidy to start?
             self._mopidy=MopidyUpdates(status_update)
         except:
-            print 'exception while launching mopidy'
-            traceback.print_exc()
+            log.exception('exception while launching mopidy')
             
     def start_mopidy(self):
         if self._mopidy is not None:
@@ -91,7 +91,7 @@ class ProcessHandling:
         return self._streams
             
     def kill_running(self,updates=True):
-        print 'stopping running shows'
+        log.info('stopping running shows')
         if(updates):
             self._status_update('stopping running shows')
         if self._check_timer is not None: 
@@ -108,9 +108,9 @@ class ProcessHandling:
         self._wait=False
  
     def play_stream(self,name):
-        print 'starting stream %s' % name 
+        log.info('starting stream %s' % name)
         if self._current_stream==name and _streams.is_playing():
-            print 'stream %s is aready playing'
+            log.info('stream %s is aready playing')
             return
         self.kill_running()   
         self._status_update('starting stream %s' % name)
@@ -118,10 +118,10 @@ class ProcessHandling:
         self._streams.play(name)
 
     def play_apod(self):
-        print 'stopping streams'
+        log.info('stopping streams')
         self._current_stream=None
         self._streams.stop()
-        print 'playing apod'
+        log.info('playing apod')
         self._nasa.play()
      
     def play_next(self):
@@ -130,10 +130,10 @@ class ProcessHandling:
         else:
             name=self._streams.next(self._current_stream) 
         if name is None: 
-            print 'about to play apod'
+            log.info('about to play apod')
             self.play_apod()
         else: 
-            print 'about to play stream %s' % name
+            log.info('about to play stream %s' % name)
             self.play_stream(name)
 
     def run_something(self):
@@ -242,14 +242,11 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _processes.wait()
             _processes.kill_running()
             status_update('starting kodi')
-            print 'starting kodi'
+            log.info('starting kodi')
             os.system('sudo -u pi kodi-standalone')
-            print 'started kodi'
-            sleep(40)
-            print 'slept a bit'
+            log.info('started kodi')
             ip=wifi.get_ip()
             txt='enjoy'
-            print txt
             status_update(txt)
             self.return_to_front()
             _processes.stop_waiting()
@@ -264,8 +261,9 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             #sleep(40)
             #print 'slept a bit'
             ip=wifi.get_ip()
-            txt='go to spacewindow.local:6680/radiorough\nor %s:6680/radiorough' % ip
-            print txt
+            txt='go to spacewindow.local:6680/radiorough\n'+\
+                'or %s:6680/radiorough' % ip
+            log.info(txt)
             status_update(txt)
             self.send_to_mopidy()
             _processes.start_mopidy()
@@ -316,7 +314,7 @@ def initialise_streams_timer():
         sleep(1)
 
 try:
-    print 'configuring wifi'
+    log.info('configuring wifi')
     connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the
     #incoming request
@@ -326,7 +324,7 @@ try:
     #_processes=ProcessHandling(status_update)
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
-    print 'Started httpserver on port ' , PORT_NUMBER, _server.server_address
+    log.info('Started httpserver on port ',PORT_NUMBER,_server.server_address)
     connection.display_connection_details()
     sleep(10)
     _processes.run_something()    
@@ -334,13 +332,12 @@ try:
     _server.serve_forever()
 
 except KeyboardInterrupt:
-    print 'space window is shutting down'
+    log.info('space window is shutting down')
     _processes.kill_running(False)
     if _server is not None:
         _server.socket.close()
 except:
-    print 'uncaught exception in space window'
-    traceback.print_exc()
+    log.exception('uncaught exception in space window')
 finally:
     pygame.quit()
     

@@ -1,6 +1,7 @@
 from mopidy_json_client import MopidyClient
 import wifi_setup_ap.wifi_control as wifi
-import traceback
+import logger
+log=logger.get(__name__)
 
 class MopidyUpdates:
     def __init__(self,updates_func):
@@ -30,12 +31,14 @@ class MopidyUpdates:
             txt = u'{artists}\n{name}'.format(**trackinfo)
             self.update(txt)
         except: 
+            log.exception('in playback started')
             pass
 
     def title_changed(self,title):
         try:
             self.update(title)
         except:
+            log.exception('in title changed')
             pass
 
     def show_updates(self):
@@ -45,7 +48,6 @@ class MopidyUpdates:
         try:
             self._mopidy.playback.stop()
         except:
-            print 'error stopping mopidy'
-            traceback.print_exc()
+            log.exception('error stopping mopidy')
         finally:
             self._show_updates=False

@@ -5,7 +5,9 @@ import thread
 import time
 from cache import Cache
 from player_base import VideoPlayer
-import traceback
+import logger
+log=logger.get(__name__)
+
 
 _cache_size=200
 _default_res=360
@@ -148,8 +150,7 @@ class YouTubePlayer(VideoPlayer):
                     urls+=u
                     if thread_id not in self.alive_threads: return
         except:
-            print 'exception while getting remaining you tube urls'
-            traceback.print_exc()
+            log.exception('exception while getting remaining you tube urls')
             raise
     
     def _play_loop_impl(self,url,quality):
@@ -196,5 +197,5 @@ class YouTubePlayer(VideoPlayer):
         if v is not None: 
             self._status('getting available video qualities')
             return self._get_video_qualities(v)
-        raise Exception('this is not a youtube video')
+        return None
 

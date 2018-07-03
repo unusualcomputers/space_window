@@ -1,7 +1,8 @@
 from youtube_player import YouTubePlayer
 from streamer import Streamer
 from cache import Cache
-import traceback
+import logger
+log=logger.get(__name__)
 
 _cache_size=200
 class Player:
@@ -13,7 +14,7 @@ class Player:
     def _get_player(self,url):
         c=self.players_cache.get(url)
         if c is not None:
-            print "FOUND PLAYER IN CACHE",url
+            log.debug('FOUND PLAYER IN CACHE %s',url)
             return c
         
         if self.yt_player.can_play(url):
@@ -23,29 +24,30 @@ class Player:
         
         if c is not None:
             self.players_cache.add(url,c)
-            print "FOUND PLAYER",c,url
+            log.debug('FOUND PLAYER %s %s',c,url)
             return c
-        
-        raise Exception('cannot play this video :( '+url)
+        return None 
 
     def get_qualities(self,url):
-        return self._get_player(url).get_qualities(url)
+        p=self._get_player(url)
+        if p is None: return None
+        else: return p.get_qualities(url)
 
     def can_play(self,url):
         try:
-            self._get_player(url)
-            return True
+            return self._get_player(url) is not None
         except:
             #TODO: once debugging is done we don't need traces here
-            print 'exception while checkin if can play'
-            traceback.print_exc()
+            log.exception('exception while checkin if can play')
             return False
 
     def is_playing(self):
         return self.yt_player.is_playing() or self.streamer.is_playing()
 
     def play(self,url,quality):
-        self._get_player(url).play(url,quality)
+        p=self._get_player(url)
+        if p is None: raise Exception('No player found')
+        p.play(url,quality)
 
     def stop(self):
         if self.yt_player.is_playing: self.yt_player.stop()
