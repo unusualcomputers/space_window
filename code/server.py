@@ -51,7 +51,7 @@ def wait_to_initialise():
     while not waiting_job.done:
         if next_cnt==0:
             next_cnt=5
-            status_update(waiting_msg.next('initialising streams'))
+            _status_update(waiting_msg.next('initialising streams'))
         next_cnt-=1
         sleep(1)
     return waiting_job.result
