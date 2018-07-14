@@ -31,7 +31,7 @@ def _initialise_streams():
     global _processes
     global _streams
     if _processes is None:
-        _processes=ProcessHandling(status_update)
+        _processes=ProcessHandling(_status_update)
         _streams=_processes.streams()
 
 def initialise_server():
