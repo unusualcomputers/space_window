@@ -8,6 +8,7 @@ import wifi_setup_ap.connection_http as connection
 from html import get_main_html
 import wifi_setup_ap.py_game_msg as msg
 import logger
+from processes import *
 
 log=logger.get(__name__)
 
