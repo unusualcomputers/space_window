@@ -80,7 +80,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     
     #Handler for the GET requests
     def do_GET(self):
-        initialise_streams()
+        _initialise_streams()
         params = parse_qs(urlparse(self.path).query)
 
         if 'play_remove' in self.path:
