@@ -23,7 +23,7 @@ class ProcessHandling:
         try:
             subprocess.Popen(['mopidy'])
             #TODO: wait for mopidy to start?
-            self._mopidy=MopidyUpdates(status_update)
+            self._mopidy=MopidyUpdates(self._status_update)
         except:
             log.exception('exception while launching mopidy')
             
@@ -31,7 +31,7 @@ class ProcessHandling:
         if self._mopidy is not None:
             self._mopidy.show_updates()
         else:
-            self._mopidy=MopidyUpdates(status_update)
+            self._mopidy=MopidyUpdates(self._status_update)
             self._mopidy.show_updates()
             
     def streams(self):
