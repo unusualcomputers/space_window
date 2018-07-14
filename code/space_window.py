@@ -48,6 +48,6 @@ except KeyboardInterrupt:
 except:
     log.exception('uncaught exception in space window')
 finally:
-    stop_server()
     pygame.quit()
+    stop_server()
     
