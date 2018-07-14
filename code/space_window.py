@@ -13,7 +13,7 @@ import logger
 log=logger.get(__name__)
 
 def wait_to_initialise():
-    waiting_job=Job(_initialise_server)
+    waiting_job=Job(initialise_server)
     waiting_job.start()
        
     waiting_msg=WaitingMsgs()
