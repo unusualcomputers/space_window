@@ -12,6 +12,11 @@ import logger
 
 log=logger.get(__name__)
 
+_msg=msg.MsgScreen()
+def status_update(txt):
+    log.info(txt)
+    _msg.set_text(txt)
+
 def wait_to_initialise():
     waiting_job=Job(initialise_server)
     waiting_job.start()
