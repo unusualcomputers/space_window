@@ -9,6 +9,8 @@ from html import get_main_html
 import wifi_setup_ap.py_game_msg as msg
 import logger
 from processes import *
+from async_job import Job
+from waiting_messages import WaitingMsgs
 
 log=logger.get(__name__)
 
@@ -38,6 +40,21 @@ def initialise_server():
     _server = HTTPServer(('', PORT_NUMBER),handler )
     log.info('Started httpserver on port ',PORT_NUMBER,_server.server_address)
     _initialise_streams()
+
+def wait_to_initialise():
+    waiting_job=Job(initialise_server)
+    waiting_job.start()
+       
+    waiting_msg=WaitingMsgs()
+    
+    next_cnt=0
+    while not waiting_job.done:
+        if next_cnt==0:
+            next_cnt=5
+            status_update(waiting_msg.next('initialising streams'))
+        next_cnt-=1
+        sleep(1)
+    return waiting_job.result
 
 def start_server():
     #Wait forever for incoming http requests
