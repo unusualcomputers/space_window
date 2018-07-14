@@ -153,7 +153,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             #print 'slept a bit'
             txt='mopidy is starting'
             log.info(txt)
-            _status_update(txt)
+            #_status_update(txt)
             self._send_to('http://%s:%i' % (_ip,MOPIDY_PORT))
             _processes.start_mopidy()
             #_processes.stop_waiting()            

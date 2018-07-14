@@ -138,10 +138,16 @@ def build_html(body,refresh_time=None):
     cntstr='%i' % _cnt
     return html.replace('CNT',cntstr)
 
-def get_main_html(rows_html):
+def get_main_html(rows_html,refresh_time=None):
     global _cnt
+    if refresh_time is None:
+        refresh=''
+    else:
+        refresh_html=\
+            '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
+
     html = _html_template_main.replace('HTML_BODY',_main_table).\
-        replace('STREAM_ROWS',rows_html)
+        replace('STREAM_ROWS',rows_html).replace('[%REFRESH%]',refresh)
     _cnt+=1
     cntstr='%i' % _cnt
     return html.replace('CNT',cntstr)
