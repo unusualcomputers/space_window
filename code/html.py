@@ -109,6 +109,11 @@ _main_table=u"""
     </form>-->
 </td>
 <td>
+    <form action="/reboot">
+    <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
+    <input type="submit" value="Reboot">
+    </form>
+</td><td>
     <form action="/shutdown">
     <input type="hidden" name="hiddenshutdown_CNT" value="SHUTDOWN">
     <input type="submit" value="Shutdown">

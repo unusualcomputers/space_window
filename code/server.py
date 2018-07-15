@@ -129,6 +129,9 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 sleep(20)
             _processes.stop_waiting()
             #check_running()
+        elif 'reboot' in self.path:
+            _status_update('rebooting now')
+            os.system('reboot now')
         elif 'shutdown' in self.path:
             _status_update('shutting down')
             os.system('shutdown -h now')
