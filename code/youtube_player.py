@@ -6,7 +6,6 @@ import time
 from cache import Cache
 from player_base import VideoPlayer
 import logger
-log=logger.get(__name__)
 
 
 _cache_size=200
@@ -150,6 +149,7 @@ class YouTubePlayer(VideoPlayer):
                     urls+=u
                     if thread_id not in self.alive_threads: return
         except:
+            log=logger.get(__name__)
             log.exception('exception while getting remaining you tube urls')
             raise
     

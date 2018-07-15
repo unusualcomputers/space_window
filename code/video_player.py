@@ -2,7 +2,6 @@ from youtube_player import YouTubePlayer
 from streamer import Streamer
 from cache import Cache
 import logger
-log=logger.get(__name__)
 
 _cache_size=200
 class Player:
@@ -10,11 +9,12 @@ class Player:
         self.yt_player=YouTubePlayer()
         self.streamer=Streamer()
         self.players_cache=Cache(_cache_size)
+        self.log=logger.get(__name__)
 
     def _get_player(self,url):
         c=self.players_cache.get(url)
         if c is not None:
-            log.debug('FOUND PLAYER IN CACHE %s',url)
+            self.log.debug('FOUND PLAYER IN CACHE %s',url)
             return c
         
         if self.yt_player.can_play(url):
@@ -24,7 +24,7 @@ class Player:
         
         if c is not None:
             self.players_cache.add(url,c)
-            log.debug('FOUND PLAYER %s %s',c,url)
+            self.log.debug('FOUND PLAYER %s %s',c,url)
             return c
         return None 
 
@@ -38,7 +38,7 @@ class Player:
             return self._get_player(url) is not None
         except:
             #TODO: once debugging is done we don't need traces here
-            log.exception('exception while checkin if can play: ' + url)
+            self.log.exception('exception while checkin if can play: ' + url)
             return False
 
     def is_playing(self):

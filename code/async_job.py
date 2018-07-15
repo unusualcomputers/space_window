@@ -1,7 +1,6 @@
 import threading
 import sys
 import logger
-log=logger.get(__name__)
 
 # run a function on a thread and keep track of result
 # to use:
@@ -23,6 +22,7 @@ class Job:
         self.args=args
 
     def _target(self):
+        log=logger.get(__name__)
         try:
             if self.args is None:
                 self.result=self.target()

@@ -11,7 +11,6 @@ import threading
 import thread
 import logger
 
-log=logger.get(__name__)
 
 _default_res='360p'
 _chunk_size=10240
@@ -77,6 +76,7 @@ class Streamer(VideoPlayer):
                     if thread_id not in self.alive_threads: break
                 self._output.write(data)
         except:
+            log=logger.get(__name__)
             log.exception('exception while outputing stream')
         finally:
             try:
@@ -84,6 +84,7 @@ class Streamer(VideoPlayer):
                     stream_fd.close()
                 self._output.close()
             except:
+                log=logger.get(__name__)
                 log.exception('exception while closing streams')
 
     def _get_streams(self, url):

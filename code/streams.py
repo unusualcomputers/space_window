@@ -5,7 +5,6 @@ from collections import OrderedDict
 from video_player import Player
 import threading
 import logger
-log=logger.get(__name__)
 
 _streams_data='.space.window'
 _base_path=os.path.join(os.path.expanduser('~'),_streams_data)
@@ -36,31 +35,32 @@ class Streams(Jsonable):
     def __init__(self,streams=OrderedDict()):
         self.streams=streams
         self.refresh_caches(True)
+        self.log=logger.get(__name__)
 
     def _get_data_for_first_video(self):
         if self.len() == 0: return
         (url,quality)=self.streams.items()[0][1]
-        log.info('getting data for first video: '+url)
+        self.log.info('getting data for first video: '+url)
         _player.can_play(url)
-        log.info('got data for first video: ' + url)
+        self.log.info('got data for first video: ' + url)
 
     def _get_data_for_rest(self):
         try:
             l=self.len()
-            log.info('GETTING REST %i',l)
+            self.log.info('GETTING REST %i',l)
             if l < 2: return
             for i in range(1,l):
-                log.info('GETTING: %s',self.streams.items()[i]) 
+                self.log.info('GETTING: %s',self.streams.items()[i]) 
                 (url,quality)=self.streams.items()[i][1]
                 
                 _player.can_play(url)
-                log.info('GOT %i %s',i,url)
+                self.log.info('GOT %i %s',i,url)
         except:
-            log.exception('exception while getting rest of videos')
+            self.log.exception('exception while getting rest of videos')
             raise
 
     def refresh_caches(self,threaded=False):
-        log.info('INITIALISING PLAYER')
+        self.log.info('INITIALISING PLAYER')
         global _player
         _player=Player()
         self._get_data_for_first_video()
@@ -164,7 +164,7 @@ class Streams(Jsonable):
         try:
             _player.stop()
         except:
-            log.exception('exception while stopping streams')
+            self.log.exception('exception while stopping streams')
             
 
     def is_playing(self):

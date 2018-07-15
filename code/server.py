@@ -12,7 +12,6 @@ from processes import *
 from async_job import Job
 from waiting_messages import WaitingMsgs
 
-log=logger.get(__name__)
 
 PORT_NUMBER = 80
 MOPIDY_PORT=6680
@@ -24,6 +23,7 @@ _server=None
 
 _msg=msg.MsgScreen()
 def _status_update(txt):
+    log=logger.get(__name__)
     log.info(txt)
     _msg.set_text(txt)
 
@@ -38,6 +38,7 @@ def initialise_server():
     global _server
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
+    log=logger.get(__name__)
     log.info('Started httpserver on port ',PORT_NUMBER,_server.server_address)
     _initialise_streams()
 
@@ -82,6 +83,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     #Handler for the GET requests
     def do_GET(self):
         _initialise_streams()
+        log=logger.get(__name__)
         params = parse_qs(urlparse(self.path).query)
 
         if 'play_remove' in self.path:

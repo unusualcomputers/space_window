@@ -2,7 +2,6 @@ import os
 import time
 import threading
 import logger
-log=logger.get(__name__)
 
 _player='omxplayer'
 _player_args='--vol 500 --timeout 60'
@@ -28,6 +27,7 @@ class VideoPlayer:
             self._player_args=player_args
         
         self._player_cmd=self._player+' '+self._player_args
+        self.log=logger.get(__name__)
 
     def set_status_func(self,func):
          self._status_func=func
@@ -36,17 +36,17 @@ class VideoPlayer:
         if self._status_func is not None:
             self._status_func(msg)
         else:
-            log.info(msg)
+            self.log.info(msg)
 
     def _play_loop_impl(self,url,quality):
         raise Exception('play loop is not implemented')
     
     def _play_loop(self,url,quality):
         try:
-            log.debug('STARTING PLAYER LOOP')
+            self.log.debug('STARTING PLAYER LOOP')
             self._play_loop_impl(url,quality)
         except:
-            log.exception('player loop exception')
+            self.log.exception('player loop exception')
         finally:
             self.playing=False
 

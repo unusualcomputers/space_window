@@ -7,7 +7,6 @@ import threading
 import os
 import sys
 import logger
-log=logger.get(__name__)
 
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
@@ -151,6 +150,7 @@ class NasaPod:
                 prev_p=p
                 p=self._load(randint(1,len(pages)-1),pages,scrw,scrh)
         except:
+            log=logger.get(__name__)
             log.exception('exception in nasa pod slideshow')
             self._place_text('something is wrong with nasa pod :('
                 ,screen=screen)
@@ -172,6 +172,7 @@ if __name__=="__main__":
         apod=NasaPod()
         apod.play()
     except:
+        log=logger.get(__name__)
         log.exception('nasa pod main')
     finally:
         pg.quit()

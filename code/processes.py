@@ -6,7 +6,6 @@ import wifi_setup_ap.wifi_control as wifi
 from mopidy_listener import MopidyUpdates
 from streams import Streams
 import logger
-log=logger.get(__name__)
 
 class ProcessHandling:
     def __init__(self,status_update_func):
@@ -18,6 +17,7 @@ class ProcessHandling:
         self._nasa=NasaPod()
         threading.Thread(target=self.launch_mopidy).start()
         self._status_update=status_update_func    
+        self.log=logger.get(__name__)
 
     def launch_mopidy(self):
         try:
@@ -25,7 +25,7 @@ class ProcessHandling:
             #TODO: wait for mopidy to start?
             self._mopidy=MopidyUpdates(self._status_update)
         except:
-            log.exception('exception while launching mopidy')
+            self.log.exception('exception while launching mopidy')
             
     def start_mopidy(self):
         if self._mopidy is not None:
@@ -38,7 +38,7 @@ class ProcessHandling:
         return self._streams
             
     def kill_running(self,updates=True):
-        log.info('stopping running shows')
+        self.log.info('stopping running shows')
         if(updates):
             self._status_update('stopping running shows')
         if self._check_timer is not None: 
@@ -55,9 +55,9 @@ class ProcessHandling:
         self._wait=False
  
     def play_stream(self,name):
-        log.info('starting stream %s' % name)
+        self.log.info('starting stream %s' % name)
         if self._current_stream==name and self._streams.is_playing():
-            log.info('stream %s is aready playing')
+            self.log.info('stream %s is aready playing')
             return
         self.kill_running()   
         self._status_update('starting stream %s' % name)
@@ -65,10 +65,10 @@ class ProcessHandling:
         self._streams.play(name)
 
     def play_apod(self):
-        log.info('stopping streams')
+        self.log.info('stopping streams')
         self._current_stream=None
         self._streams.stop()
-        log.info('playing apod')
+        self.log.info('playing apod')
         self._nasa.play()
      
     def play_next(self):
@@ -77,10 +77,10 @@ class ProcessHandling:
         else:
             name=self._streams.next(self._current_stream) 
         if name is None: 
-            log.info('about to play apod')
+            self.log.info('about to play apod')
             self.play_apod()
         else: 
-            log.info('about to play stream %s' % name)
+            self.log.info('about to play stream %s' % name)
             self.play_stream(name)
 
     def run_something(self):
