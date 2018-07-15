@@ -91,7 +91,7 @@ class Streams(Jsonable):
     def add(self, name, uri, quality):
         self.streams[name]=(uri,quality)
         threading.Thread(target=_player.can_play,
-            args=(url))
+            args=(uri))
         self.save()
         
     def remove(self,name):
