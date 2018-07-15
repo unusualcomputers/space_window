@@ -48,11 +48,13 @@ class Streamer(VideoPlayer):
 
     def _open_stream(self,stream):
         self._status('buffering...')
+        stream_fd=None
         try:
             stream_fd=stream.open()
             prebuffer=stream_fd.read(_chunk_size)
         except:
-            stream_fd.close()
+            if stream_fd is not None:
+                stream_fd.close()
             raise Exception('Cannot read from stream')
         return stream_fd,prebuffer
         
