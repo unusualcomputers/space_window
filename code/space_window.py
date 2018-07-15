@@ -7,6 +7,7 @@ import logger
 log=logger.get(__name__)
 
 try:
+    log.info('hello :)')
     log.info('configuring wifi')
     connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the

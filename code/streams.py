@@ -40,25 +40,27 @@ class Streams(Jsonable):
     def _get_data_for_first_video(self):
         if self.len() == 0: return
         (url,quality)=self.streams.items()[0][1]
+        log.info('getting data for first video: '+url)
         _player.can_play(url)
+        log.info('got data for first video: ' + url)
 
     def _get_data_for_rest(self):
         try:
             l=self.len()
-            log.debug('GETTING REST %i',l)
+            log.info('GETTING REST %i',l)
             if l < 2: return
             for i in range(1,l):
-                log.debug('GETTING: %s',self.streams.items()[i]) 
+                log.info('GETTING: %s',self.streams.items()[i]) 
                 (url,quality)=self.streams.items()[i][1]
                 
                 _player.can_play(url)
-                log.debug('GOT %i %s',i,url)
+                log.info('GOT %i %s',i,url)
         except:
             log.exception('exception while getting rest of videos')
             raise
 
     def refresh_caches(self,threaded=False):
-        log.debug('INITIALISING PLAYER')
+        log.info('INITIALISING PLAYER')
         global _player
         _player=Player()
         self._get_data_for_first_video()
