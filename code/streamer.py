@@ -9,6 +9,9 @@ from itertools import chain
 from player_base import VideoPlayer
 import threading 
 import thread
+import logger
+
+log=logger.get(__name__)
 
 _default_res='360p'
 _chunk_size=10240

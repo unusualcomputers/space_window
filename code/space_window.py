@@ -4,10 +4,6 @@ import pygame
 from server import wait_to_initialise,start_server,stop_server
 import logger
 
-#TODO:  REFRESH CACHES - TEST SPEED
-#       TEST MOPIDY DOESN'T KILL SPEED
-
-
 log=logger.get(__name__)
 
 try:
