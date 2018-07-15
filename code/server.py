@@ -62,7 +62,8 @@ def start_server():
     _server.serve_forever()
 
 def stop_server():
-    _processes.kill_running(False)
+    if _processes is not None:
+        _processes.kill_running(False)
     if _server is not None:
         _server.socket.close()
 
