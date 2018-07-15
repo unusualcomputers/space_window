@@ -38,7 +38,7 @@ class Player:
             return self._get_player(url) is not None
         except:
             #TODO: once debugging is done we don't need traces here
-            log.exception('exception while checkin if can play')
+            log.exception('exception while checkin if can play: ' + url)
             return False
 
     def is_playing(self):

@@ -56,7 +56,7 @@ class ProcessHandling:
  
     def play_stream(self,name):
         log.info('starting stream %s' % name)
-        if self._current_stream==name and _streams.is_playing():
+        if self._current_stream==name and self._streams.is_playing():
             log.info('stream %s is aready playing')
             return
         self.kill_running()   

@@ -76,8 +76,11 @@ class Streamer(VideoPlayer):
         except:
             log.exception('exception while outputing stream')
         finally:
-            stream_fd.close()
-            self._output.close()
+            try:
+                stream_fd.close()
+                self._output.close()
+            except:
+                log.exception('exception while closing streams')
 
     def _get_streams(self, url):
         streams=self.streams_cache.get(url)
