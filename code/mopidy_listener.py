@@ -1,9 +1,14 @@
 from mopidy_json_client import MopidyClient
 import wifi_setup_ap.wifi_control as wifi
+from wifi_setup_ap.wifi_control import run
 import logger
+import subprocess
 
 class MopidyUpdates:
     def __init__(self,updates_func):
+        ps=run('ps -e')
+        if ps.find('opidy') == -1:
+            subprocess.Popen(['mopidy'])             
         ip=wifi.get_ip()
         ws_url='ws://%s:6680/mopidy/ws' % ip
         self._update_func=updates_func

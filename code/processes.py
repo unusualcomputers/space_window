@@ -1,5 +1,4 @@
 import threading
-import subprocess
 from nasa_pod import NasaPod
 from threading import Timer
 import wifi_setup_ap.wifi_control as wifi
@@ -21,7 +20,6 @@ class ProcessHandling:
 
     def launch_mopidy(self):
         try:
-            subprocess.Popen(['mopidy'])
             #TODO: wait for mopidy to start?
             self._mopidy=MopidyUpdates(self._status_update)
         except:
