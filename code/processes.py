@@ -65,8 +65,8 @@ class ProcessHandling:
         self.log.info('stopping streams')
         self._current_stream=None
         self.log.info('playing apod')
-        self._nasa.play()
         self._streams.stop()
+        self._nasa.play()
      
     def play_next(self):
         if self._current_stream is None:
