@@ -64,9 +64,9 @@ class ProcessHandling:
     def play_apod(self):
         self.log.info('stopping streams')
         self._current_stream=None
-        self._streams.stop()
         self.log.info('playing apod')
         self._nasa.play()
+        self._streams.stop()
      
     def play_next(self):
         if self._current_stream is None:
@@ -83,7 +83,7 @@ class ProcessHandling:
     def run_something(self):
         if self._wait: return
         if self._check_timer is not None: self._check_timer.cancel()
-        if not self._streams.is_playing():
+        if not (self._streams.is_playing() or self._nasa.is_playing()):
             self.play_next()
         self._check_timer=Timer(self._check_timer_delay, self.run_something)
         self._check_timer.start()
