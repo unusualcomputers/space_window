@@ -23,7 +23,7 @@ class Streams(Jsonable):
         path=_config_path
         if cls.file_exists(path):
             s=cls.from_file(path)
-            s.refresh_caches(False)
+            s._initialise()
         else:
             s=cls()
             s.save()
@@ -32,10 +32,13 @@ class Streams(Jsonable):
     def save(self):
         self.to_file(_config_path)
      
-    def __init__(self,streams=OrderedDict()):
+    def _initialise(self):
         self.log=logger.get(__name__)
-        self.streams=streams
         self.refresh_caches(True)
+    
+    def __init__(self,streams=OrderedDict()):
+        self.streams=streams
+        self._initialise()
 
     def _get_data_for_first_video(self):
         if self.len() == 0: return

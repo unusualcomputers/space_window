@@ -39,7 +39,7 @@ def initialise_server():
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
     log=logger.get(__name__)
-    log.info('Started httpserver on port ',PORT_NUMBER,_server.server_address)
+    log.info('Started httpserver on port %i',PORT_NUMBER)
     _initialise_streams()
 
 def wait_to_initialise():
