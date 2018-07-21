@@ -33,9 +33,9 @@ class Streams(Jsonable):
         self.to_file(_config_path)
      
     def __init__(self,streams=OrderedDict()):
+        self.log=logger.get(__name__)
         self.streams=streams
         self.refresh_caches(True)
-        self.log=logger.get(__name__)
 
     def _get_data_for_first_video(self):
         if self.len() == 0: return

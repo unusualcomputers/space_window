@@ -8,7 +8,7 @@ console = logging.StreamHandler(sys.stdout)
 console.setLevel(lvl)
 console.setFormatter(formatter)
 rootLog='SpaceWindow'
-#logging.basicConfig(format=logfrmt,level=lvl)
+logging.basicConfig(format=logfrmt,level=lvl)
 def get(subname):
     global loggers
     name='%s.%s' %(rootLog,subname)
