@@ -9,7 +9,7 @@ import logger
 class ProcessHandling:
     def __init__(self,status_update_func):
         self._current_stream=None
-        self._check_timer_delay=90
+        self._check_timer_delay=10
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
@@ -20,7 +20,6 @@ class ProcessHandling:
 
     def launch_mopidy(self):
         try:
-            #TODO: wait for mopidy to start?
             self._mopidy=MopidyUpdates(self._status_update)
         except:
             self.log.exception('exception while launching mopidy')

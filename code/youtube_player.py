@@ -186,7 +186,7 @@ class YouTubePlayer(VideoPlayer):
             self.alive_threds=[]
 
     def get_qualities(self,url):
-        self._status('getting playlist information')
+        self._status('getting playlist information for ' + url)
         v=self._get_playlist(url)
         if v is not None: 
             v=[vv['pafy'] for vv in v['items']] 
