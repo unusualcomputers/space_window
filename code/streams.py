@@ -93,7 +93,7 @@ class Streams(Jsonable):
         return self.at(0)
 
     def add(self, name, url, quality):
-        resp=session.head(url,allow_redirects=True)
+        resp=_session.head(url,allow_redirects=True)
         url=resp.url
         if not _player.can_play(url):
             raise Exception('Cannot play ' + url)
