@@ -8,7 +8,7 @@ from player_base import VideoPlayer
 import logger
 
 
-_cache_size=200
+_cache_size=100
 _default_res=360
 
 class YouTubePlayer(VideoPlayer):
@@ -21,6 +21,11 @@ class YouTubePlayer(VideoPlayer):
         self.playlist_cache=Cache(_cache_size)
         self.lock=threading.Lock()
         self.alive_threads=[]
+
+    def can_play(self,url):
+        self._status('checking video status')
+        return (pafy.playlist.extract_playlist_id(url) is not None) or \
+            (self._get_video(url) is not None)         
 
     def _get_video(self,url):
         v=self.video_cache.get(url)

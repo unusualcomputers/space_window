@@ -5,11 +5,13 @@ from collections import OrderedDict
 from video_player import Player
 import threading
 import logger
+import requests
 
 _streams_data='.space.window'
 _base_path=os.path.join(os.path.expanduser('~'),_streams_data)
 _config_path=os.path.join(_base_path,_streams_data)
 _cnt=0 # global counter, used to make html more responsive
+_session=requests.Session()
 
 _player=None
 # streams
@@ -67,14 +69,11 @@ class Streams(Jsonable):
         global _player
         _player=Player()
         self._get_data_for_first_video()
-        if threaded:
-            threading.Thread(target=self._get_data_for_rest).start()        
-        else:
-            self._get_data_for_rest()
-
-    def get_qualities(self,url):
-        return _player.get_qualities(url)
-
+        #if threaded:
+        #    threading.Thread(target=self._get_data_for_rest).start()        
+        #else:
+        #    self._get_data_for_rest()
+    
     def len(self):
         return len(self.streams.items())
 
@@ -93,10 +92,13 @@ class Streams(Jsonable):
                return self.at(k+1)
         return self.at(0)
 
-    def add(self, name, uri, quality):
-        self.streams[name]=(uri,quality)
-        threading.Thread(target=_player.can_play,
-            args=(uri))
+    def add(self, name, url, quality):
+        resp=session.head(url,allow_redirects=True)
+        url=resp.url
+        if not _player.can_play(url):
+            raise Exception('Cannot play ' + url)
+        self.streams[name]=(url,quality)
+        #threading.Thread(target=_player.can_play,args=(url))
         self.save()
         
     def remove(self,name):
@@ -141,7 +143,7 @@ class Streams(Jsonable):
         _cnt+=1
         html=u''
         for name in self.streams:
-            (uri,quality)=self.streams[name]
+            (url,quality)=self.streams[name]
             row = u"""<tr><td>{}</td><td>{}</td><td>
                 <input type="hidden" name="hidden_{}" value="{}">
                 <button type="submit" name="action" value="play {}">
@@ -155,7 +157,7 @@ class Streams(Jsonable):
                 </button></td>
                 <td><a href="{}" target="_blank"> Show in browser </a></td>
                 </tr>
-                """.format(name,quality,_cnt,name,name,name,name,uri)
+                """.format(name,quality,_cnt,name,name,name,name,url)
             html+=row
         return html
         

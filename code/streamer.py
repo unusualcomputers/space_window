@@ -22,7 +22,7 @@ class Streamer(VideoPlayer):
             player=None,
             player_args=None):
         VideoPlayer.__init__(self,status_func,player,player_args)
-        self.streams_cache=Cache(_cache_size)
+        self.qualities_cache=Cache(_cache_size)
         self.streamlink=Streamlink()
         #check if this works for multiple streams
         self._output=self._create_output()
@@ -88,17 +88,22 @@ class Streamer(VideoPlayer):
                 log.exception('exception while closing streams')
 
     def _get_streams(self, url):
-        streams=self.streams_cache.get(url)
-        if streams is None:
-            self._status('getting stream information.\n'+
+        #streams=self.streams_cache.get(url)
+        #if streams is None:
+        self._status('getting stream information.\n'+
                 'do be patient,\nthis is a true miracle of technology.')
-            streams=self.streamlink.streams(url)
-            self.streams_cache.add(url,streams)
+        streams=self.streamlink.streams(url)
+        #    self.streams_cache.add(url,streams)
         return streams
             
     def get_qualities(self,url):
-        return self._get_streams(url).keys()
-     
+        qualities=self.qualities_cache.get(url)
+        if qualities is None:
+            qualities=self._get_streams(url).keys()
+            self.qualities_cache.add(url,qualities)
+        #return self._get_streams(url).keys()
+        return qualities     
+
     def _play_loop_impl(self,url, quality):
         streams=self._get_streams(url)
         if not streams: return
