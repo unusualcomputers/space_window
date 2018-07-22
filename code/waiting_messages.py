@@ -5,8 +5,9 @@ class WaitingMsgs:
         self._msgs=['','this may take a little while...',
         '...still at it...','...working hard, have some respect...',
         '...do be patient...','...after all, this is a wonder of technology...',
-        '...thank you for your patience :)...','...this is taking time, but...',
         '...few years ago you would have had to go to cinema for this...',
+        '...thank you for your patience ;)...',
+        '...this is taking time, like all good things...',
         '...admire the colors on the screen and wait...']
         self._current=0
         self.delay=10

@@ -9,7 +9,7 @@ import logger
 class ProcessHandling:
     def __init__(self,status_update_func):
         self._current_stream=None
-        self._check_timer_delay=10
+        self._check_timer_delay=20
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
@@ -50,8 +50,16 @@ class ProcessHandling:
 
     def stop_waiting(self):
         self._wait=False
+
+    def _stop_timer(self):
+        if self._check_timer is not None: self._check_timer.cancel()
+
+    def _start_timer(self):
+        self._check_timer=Timer(self._check_timer_delay, self.run_something)
+        self._check_timer.start()
  
     def play_stream(self,name):
+        self._stop_timer()
         self.log.info('starting stream %s' % name)
         if self._current_stream==name and self._streams.is_playing():
             self.log.info('stream %s is aready playing')
@@ -60,13 +68,16 @@ class ProcessHandling:
         self._status_update('starting stream %s' % name)
         self._current_stream=name
         self._streams.play(name)
+        self._start_timer()
 
     def play_apod(self):
+        self._stop_timer()
         self.log.info('stopping streams')
         self._current_stream=None
         self.log.info('playing apod')
         self._streams.stop()
         self._nasa.play()
+        self._start_timer()
      
     def play_next(self):
         if self._current_stream is None:
@@ -82,11 +93,10 @@ class ProcessHandling:
 
     def run_something(self):
         if self._wait: return
-        if self._check_timer is not None: self._check_timer.cancel()
+        self._stop_timer()
         if not (self._streams.is_playing() or self._nasa.is_playing()):
             self.play_next()
-        self._check_timer=Timer(self._check_timer_delay, self.run_something)
-        self._check_timer.start()
+        self._start_timer()
         
     def handle_wifi_change_req(self,params,server):
         wifi_name='noname'
