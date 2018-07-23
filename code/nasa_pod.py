@@ -117,6 +117,7 @@ class NasaPod:
                     #fading out
                     for i in range(0,255,1):
                         if not self._running: 
+                            screen.blit(black,(0,0))
                             return
                         #sleep(0.02)
                         image.set_alpha(255-i)
@@ -149,6 +150,7 @@ class NasaPod:
                 pg.display.flip()
                 prev_p=p
                 p=self._load(randint(1,len(pages)-1),pages,scrw,scrh)
+            screen.blit(black,(0,0))
         except:
             log=logger.get(__name__)
             log.exception('exception in nasa pod slideshow')

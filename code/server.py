@@ -133,10 +133,12 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _processes.stop_waiting()
             #check_running()
         elif 'reboot' in self.path:
-            _status_update('rebooting now')
+            _status_update('rebooting now, see you soon :)')
+            sleep(3)
             os.system('reboot now')
         elif 'shutdown' in self.path:
-            _status_update('shutting down')
+            _status_update('shutting down, goodbye :)')
+            sleep(3)
             os.system('shutdown -h now')
         elif 'kodi' in self.path:
             _processes.wait()

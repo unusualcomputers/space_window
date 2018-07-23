@@ -60,14 +60,15 @@ class ProcessHandling:
  
     def play_stream(self,name):
         self._stop_timer()
-        self.log.info('starting stream %s' % name)
+        self.log.info('starting %s' % name)
         if self._current_stream==name and self._streams.is_playing():
             self.log.info('stream %s is aready playing')
             return
         self.kill_running()   
-        self._status_update('starting stream %s' % name)
+        self._status_update('starting %s' % name)
         self._current_stream=name
         self._streams.play(name)
+        self._status_update('playing %s\ngive me a few seconds' % name)
         self._start_timer()
 
     def play_apod(self):

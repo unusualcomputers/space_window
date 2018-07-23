@@ -75,7 +75,10 @@ class MsgScreenThread:
             else:
                 r.x=(width-r.width)/2.0
         return zip(surfaces,rects)   
-    
+   
+    def blank(self):
+        self.screen.blit(self.black,(0,0))
+         
     def run_msg(self):
         pg.init()
         local_text=''
@@ -129,6 +132,11 @@ class MsgScreen(borg_init_once):
         self._msg.lock.release()
         return t
 
+    def blank(self):
+        self.lock_t()
+        t=self._msg.blank()
+        self._msg.lock.release()
+         
 if __name__=='__main__':
     msg=MsgScreen()
     msg.set_text('Hello World!')
