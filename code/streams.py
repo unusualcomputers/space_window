@@ -92,6 +92,9 @@ class Streams(Jsonable):
                return self.at(k+1)
         return self.at(0)
 
+    def is_playlist(self):
+        return _player.is_playlist()
+
     def add(self, name, url, quality):
         resp=_session.head(url,allow_redirects=True)
         url=resp.url
@@ -164,6 +167,9 @@ class Streams(Jsonable):
     def play(self,name):
         (url,quality)=self.streams[name]
         _player.play(url,quality)
+
+    def playlist_next(self):
+        _player.playlist_next()
 
     def stop(self):
         try:

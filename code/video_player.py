@@ -49,6 +49,12 @@ class Player:
         if p is None: raise Exception('No player found')
         p.play(url,quality)
 
+    def is_playlist(self):
+        return self.yt_player.is_playlist()
+
+    def playlist_next(self):
+        self.yt_player.playlist_next()
+
     def stop(self):
         if self.yt_player.is_playing: self.yt_player.stop()
         elif self.streamer.is_playing: self.streamer.stop()

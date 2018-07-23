@@ -21,6 +21,7 @@ class YouTubePlayer(VideoPlayer):
         self.playlist_cache=Cache(_cache_size)
         self.lock=threading.Lock()
         self.alive_threads=[]
+        self.playing_playlist=False
 
     def can_play(self,url):
         self._status('checking video status')
@@ -126,15 +127,17 @@ class YouTubePlayer(VideoPlayer):
 
     def _get_first_url(self,url,quality,urls):
         pl=self._get_playlist(url)
+        sz=1
         if pl is None:
             pfy=self._get_video(url)
             urls+=self._get_video_url(pfy,quality)
         else:
             sz=len(pl['items'])
-            if sz==0: return
+            if sz==0: return sz
             self._status('getting data for video 1 of %i'%sz)
             urls+=self._get_video_url(pl['items'][0]['pafy'],quality)
-    
+        return sz
+
     def _get_remaining_urls(self,url,quality,urls):
         try:        
             with self.lock:
@@ -159,36 +162,48 @@ class YouTubePlayer(VideoPlayer):
             raise
     
     def _play_loop_impl(self,url,quality):
-        with self.lock:
-            thread_id=thread.get_ident()
-            self.alive_threads.append(thread_id)
-        
-        self._status('retrieving videos...')
-        urls=[]
-        self._get_first_url(url,quality,urls)
-        threading.Thread(target=self._get_remaining_urls,
-            args=(url,quality,urls)).start()
-        prev_sz=1
-        while True:
+        try:
             with self.lock:
-                sz=len(urls)
-            if sz > prev_sz:
-                first=prev_sz
-                prev_sz=sz
-            else:
-                first=0
-            for i in range(first,sz):
-                if not self.playing: return
+                thread_id=thread.get_ident()
+                self.alive_threads.append(thread_id)
+            
+            self._status('retrieving videos...')
+            urls=[]
+            s = self._get_first_url(url,quality,urls)
+            self.playing_playlist=(s > 1)
+            threading.Thread(target=self._get_remaining_urls,
+                args=(url,quality,urls)).start()
+            prev_sz=1
+            while True:
                 with self.lock:
-                    u=urls[i]
-                    if thread_id not in self.alive_threads: return
+                    sz=len(urls)
+                        
+                if sz > prev_sz:
+                    first=prev_sz
+                    prev_sz=sz
+                else:
+                    first=0
+                for i in range(first,sz):
+                    if not self.playing: return
+                    with self.lock:
+                        u=urls[i]
+                        if thread_id not in self.alive_threads: return
 
-                cmd='%s "%s"' % (self._player_cmd,u)
-                os.system(cmd)
+                    cmd='%s "%s"' % (self._player_cmd,u)
+                    os.system(cmd)
+        finally:
+            self.playing_playlist=False
 
     def _stop_threads(self):
         with self.lock:
             self.alive_threds=[]
+
+    def is_playlist(self):
+        return self.playing_playing
+
+    def playlist_next(self):
+        with self.lock:
+            if self.playing_playlist: self._kill_player()
 
     def get_qualities(self,url):
         self._status('getting playlist information for ' + url)
