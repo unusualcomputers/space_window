@@ -199,7 +199,7 @@ class YouTubePlayer(VideoPlayer):
             self.alive_threds=[]
 
     def is_playlist(self):
-        return self.playing_playing
+        return self.playing_playlist
 
     def playlist_next(self):
         with self.lock:

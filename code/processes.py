@@ -81,7 +81,7 @@ class ProcessHandling:
         self._start_timer()
      
     def play_next(self):
-        if self._streams.is_playlist:
+        if self._streams.is_playlist():
             self._streams.playlist_next()
             return
         if self._current_stream is None:
