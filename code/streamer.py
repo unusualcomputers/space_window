@@ -15,6 +15,12 @@ import logger
 _default_res='360p'
 _chunk_size=10240
 _cache_size=50                               
+_thread_id=0
+
+def _next_thred_id():
+    global thread_id
+    thread_id+=1
+    return thread_id
 
 class Streamer(VideoPlayer):
     def __init__(self,
@@ -61,7 +67,7 @@ class Streamer(VideoPlayer):
         stream_fd=None
         try:        
             with self.lock:
-                thread_id=thread.get_ident()
+                thread_id=_next_thread_id()
                 self.alive_threads.append(thread_id)
             stream_fd,prebuff=self._open_stream(stream)
             self._status('preparing player...')

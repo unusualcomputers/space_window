@@ -11,6 +11,10 @@ class Player:
         self.players_cache=Cache(_cache_size)
         self.log=logger.get(__name__)
 
+    def set_status_func(self,status_func):
+        self.yt_player.set_status_func(status_func)
+        self.streamer.set_status_func(status_func)
+        
     def _get_player(self,url):
         c=self.players_cache.get(url)
         if c is not None:

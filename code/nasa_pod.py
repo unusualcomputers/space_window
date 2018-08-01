@@ -117,6 +117,7 @@ class NasaPod:
                     #fading out
                     for i in range(0,255,1):
                         if not self._running: 
+                            black.fill((0,0,0))
                             screen.blit(black,(0,0))
                             return
                         #sleep(0.02)
@@ -139,6 +140,8 @@ class NasaPod:
                 # fading in
                 for i in range(0,255,1):
                     if not self._running: 
+                        black.fill((0,0,0))
+                        screen.blit(black,(0,0))
                         return
                     #sleep(0.02)
                     image.set_alpha(i)
@@ -146,10 +149,12 @@ class NasaPod:
                     pg.display.flip()
                 screen.blit(black,(0,0))
                 image.set_alpha(255)
+                black.fill((0,0,0))
                 screen.blit(image,(x,y))
                 pg.display.flip()
                 prev_p=p
                 p=self._load(randint(1,len(pages)-1),pages,scrw,scrh)
+            black.fill((0,0,0))
             screen.blit(black,(0,0))
         except:
             log=logger.get(__name__)

@@ -16,6 +16,7 @@ class ProcessHandling:
         self._nasa=NasaPod()
         threading.Thread(target=self.launch_mopidy).start()
         self._status_update=status_update_func    
+        self._streams.set_status_func(status_update_func)
         self.log=logger.get(__name__)
 
     def launch_mopidy(self):
@@ -25,11 +26,9 @@ class ProcessHandling:
             self.log.exception('exception while launching mopidy')
             
     def start_mopidy(self):
-        if self._mopidy is not None:
-            self._mopidy.show_updates()
-        else:
+        if self._mopidy is None:
             self._mopidy=MopidyUpdates(self._status_update)
-            self._mopidy.show_updates()
+        self._mopidy.show_updates()
             
     def streams(self):
         return self._streams

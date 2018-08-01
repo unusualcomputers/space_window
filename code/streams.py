@@ -56,13 +56,17 @@ class Streams(Jsonable):
             if l < 2: return
             for i in range(1,l):
                 self.log.info('GETTING: %s',self.streams.items()[i]) 
-                (url,quality)=self.streams.items()[i][1]
-                
+                (url,quality)=self.streams.items()[i][1]                
                 _player.can_play(url)
                 self.log.info('GOT %i %s',i,url)
         except:
             self.log.exception('exception while getting rest of videos')
             raise
+
+    def set_status_func(self,status_func):
+        global _player
+        if _player is not None:
+            _player.set_status_func(status_func)
 
     def refresh_caches(self,threaded=False):
         self.log.info('INITIALISING PLAYER')

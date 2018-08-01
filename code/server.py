@@ -11,7 +11,7 @@ import logger
 from processes import *
 from async_job import Job
 from waiting_messages import WaitingMsgs
-
+from threading import Timer
 
 PORT_NUMBER = 80
 MOPIDY_PORT=6680
@@ -20,6 +20,8 @@ _ip=wifi.get_ip()
 _processes=None
 _streams=None
 _server=None
+
+
 
 _msg=msg.MsgScreen()
 def _status_update(txt):
@@ -68,6 +70,11 @@ def stop_server():
     if _server is not None:
         _server.socket.close()
 
+def _shutdown():
+    os.system('shutdown -h now')
+
+def _reboot():
+    os.system('reboot now')
 
 class SpaceWindowServer(BaseHTTPRequestHandler):
     # send_to redirects to a different address
@@ -133,13 +140,11 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _processes.stop_waiting()
             #check_running()
         elif 'reboot' in self.path:
-            _status_update('rebooting now, see you soon :)')
-            sleep(3)
-            os.system('reboot now')
+            _status_update('rebooting in a few seconds, see you soon :)')
+            Timer(5,_reboot).start()
         elif 'shutdown' in self.path:
-            _status_update('shutting down, goodbye :)')
-            sleep(3)
-            os.system('shutdown -h now')
+            _status_update('shutting down in a few seconds, goodbye :)')
+            Timer(5,_shutdown).start()
         elif 'kodi' in self.path:
             _processes.wait()
             _processes.kill_running()
