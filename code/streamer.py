@@ -17,7 +17,7 @@ _chunk_size=10240
 _cache_size=50                               
 _thread_id=0
 
-def _next_thred_id():
+def _next_thread_id():
     global thread_id
     thread_id+=1
     return thread_id

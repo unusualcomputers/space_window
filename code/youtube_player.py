@@ -12,7 +12,7 @@ _cache_size=100
 _default_res=360
 _thread_id=0
 
-def _next_thred_id():
+def _next_thread_id():
     global thread_id
     thread_id+=1
     return thread_id
