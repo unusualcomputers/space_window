@@ -148,8 +148,6 @@ class YouTubePlayer(VideoPlayer):
 
     def _get_remaining_urls(self,url,quality,urls,thread_id):
         try:        
-            with self.lock:
-                self.alive_threads.append(thread_id)
             pl=self._get_playlist(url)
             if pl is None: 
                 return
@@ -171,6 +169,7 @@ class YouTubePlayer(VideoPlayer):
     def _play_loop_impl(self,url,quality):
         try:
             with self.lock:
+                self.alive_threads=[]
                 thread_id=_next_thread_id()
                 self.alive_threads.append(thread_id)
             
@@ -179,7 +178,7 @@ class YouTubePlayer(VideoPlayer):
             s = self._get_first_url(url,quality,urls)
             self.playing_playlist=(s > 1)
             threading.Thread(target=self._get_remaining_urls,
-                args=(url,quality,urls,_next_thread_id)).start()
+                args=(url,quality,urls,thread_id)).start()
             prev_sz=1
             while True:
                 with self.lock:
@@ -200,11 +199,13 @@ class YouTubePlayer(VideoPlayer):
                     cmd='%s "%s"' % (self._player_cmd,u)
                     os.system(cmd)
         finally:
+            with self.lock:
+                self.alive_threads.remove(thread_id)
             self.playing_playlist=False
 
     def _stop_threads(self):
         with self.lock:
-            self.alive_threds=[]
+            self.alive_threads=[]
 
     def is_playlist(self):
         return self.playing_playlist

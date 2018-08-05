@@ -67,6 +67,7 @@ class Streamer(VideoPlayer):
         stream_fd=None
         try:        
             with self.lock:
+                self.alive_threads=[]
                 thread_id=_next_thread_id()
                 self.alive_threads.append(thread_id)
             stream_fd,prebuff=self._open_stream(stream)
@@ -86,6 +87,8 @@ class Streamer(VideoPlayer):
             log.exception('exception while outputing stream')
         finally:
             try:
+                with self.lock:
+                    self.alive_threads.remove(thread_id)
                 if stream_fd is not None:
                     stream_fd.close()
                 self._output.close()
