@@ -142,7 +142,7 @@ class YouTubePlayer(VideoPlayer):
         else:
             sz=len(pl['items'])
             if sz==0: return sz
-            self._status('getting data for video 1 of %i'%sz)
+            self._status('getting data for your video')
             urls+=self._get_video_url(pl['items'][0]['pafy'],quality)
         return sz
 
@@ -155,7 +155,7 @@ class YouTubePlayer(VideoPlayer):
             sz=len(rest)+1
             j=2
             for i in rest:
-                self._status('getting data for video %i of %i'%(j,sz))
+                #self._status('getting data for video %i of %i'%(j,sz))
                 j+=1
                 u=self._get_video_url(i['pafy'],quality)
                 with self.lock:
@@ -167,10 +167,10 @@ class YouTubePlayer(VideoPlayer):
             raise
     
     def _play_loop_impl(self,url,quality):
+        thread_id=_next_thread_id()
         try:
             with self.lock:
                 self.alive_threads=[]
-                thread_id=_next_thread_id()
                 self.alive_threads.append(thread_id)
             
             self._status('retrieving videos...')

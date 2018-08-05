@@ -64,11 +64,11 @@ class Streamer(VideoPlayer):
         return stream_fd,prebuffer
         
     def _output_stream(self,stream):
+        thread_id=_next_thread_id()
         stream_fd=None
         try:        
             with self.lock:
                 self.alive_threads=[]
-                thread_id=_next_thread_id()
                 self.alive_threads.append(thread_id)
             stream_fd,prebuff=self._open_stream(stream)
             self._status('preparing player...')
