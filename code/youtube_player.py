@@ -14,7 +14,7 @@ _thread_id=0
 
 def _next_thread_id():
     global _thread_id
-    thread_id+=1
+    _thread_id+=1
     return _thread_id
 
 class YouTubePlayer(VideoPlayer):
