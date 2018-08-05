@@ -18,9 +18,9 @@ _cache_size=50
 _thread_id=0
 
 def _next_thread_id():
-    global thread_id
+    global _thread_id
     thread_id+=1
-    return thread_id
+    return _thread_id
 
 class Streamer(VideoPlayer):
     def __init__(self,
