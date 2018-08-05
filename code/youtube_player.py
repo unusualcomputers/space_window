@@ -200,7 +200,8 @@ class YouTubePlayer(VideoPlayer):
                     os.system(cmd)
         finally:
             with self.lock:
-                self.alive_threads.remove(thread_id)
+                if thread_id in self.alive_threads:
+                    self.alive_threads.remove(thread_id)
             self.playing_playlist=False
 
     def _stop_threads(self):

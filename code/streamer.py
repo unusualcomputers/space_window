@@ -88,7 +88,8 @@ class Streamer(VideoPlayer):
         finally:
             try:
                 with self.lock:
-                    self.alive_threads.remove(thread_id)
+                    if thread_id in self.alive_threads:
+                        self.alive_threads.remove(thread_id)
                 if stream_fd is not None:
                     stream_fd.close()
                 self._output.close()
