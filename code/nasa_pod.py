@@ -74,6 +74,13 @@ class NasaPod:
         textrect.centery = screen.get_height()/self._text_height_ratio+y
         return (text,textrect)
 
+    def _end_loop(self,black,screen):
+        black.set_alpha(255)
+        black.fill((0,0,0))
+        screen.blit(black,(0,0))
+        pg.display.flip()
+        self._running=False
+
     def _slideshow(self):    
         try:
             pg.mouse.set_visible(False)	
@@ -117,8 +124,7 @@ class NasaPod:
                     #fading out
                     for i in range(0,255,1):
                         if not self._running: 
-                            black.fill((0,0,0))
-                            screen.blit(black,(0,0))
+                            self._end_loop(black,screen)
                             return
                         #sleep(0.02)
                         image.set_alpha(255-i)
@@ -140,8 +146,7 @@ class NasaPod:
                 # fading in
                 for i in range(0,255,1):
                     if not self._running: 
-                        black.fill((0,0,0))
-                        screen.blit(black,(0,0))
+                        self._end_loop(black,screen)
                         return
                     #sleep(0.02)
                     image.set_alpha(i)
@@ -154,9 +159,9 @@ class NasaPod:
                 pg.display.flip()
                 prev_p=p
                 p=self._load(randint(1,len(pages)-1),pages,scrw,scrh)
-            black.fill((0,0,0))
-            screen.blit(black,(0,0))
+            self._end_loop(black,screen)
         except:
+            self._running=False
             log=logger.get(__name__)
             log.exception('exception in nasa pod slideshow')
             self._place_text('something is wrong with nasa pod :('

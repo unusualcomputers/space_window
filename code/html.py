@@ -55,6 +55,11 @@ _html_template_main=u"""
 <h1>Space Window</h1>
 <br><br>
 HTML_BODY
+<br><br><br>
+<footer>
+Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
+</footer>
+
 </body>
 
 """           
@@ -93,7 +98,7 @@ _main_table=u"""
     <input type="submit" value="Play next">
     </form>
 </td><td>
-    <form action="/rough">
+    <form action="/rough" target="_blank">
     <input type="hidden" name="hiddenrough_CNT" value="ROUGH">
     <input type="submit" value="Radio Rough">
     </form>
@@ -102,18 +107,20 @@ _main_table=u"""
     <input type="hidden" name="hiddenrefresh_CNT" value="REFRESH_CACHES">
     <input type="submit" value="Refresh Caches">
     </form>
-<!--</td><td>
+    </td>
+<!--<td>
     <form action="/kodi">
     <input type="hidden" name="hiddenkodi_CNT" value="KODI">
     <input type="submit" value="kodi :)">
-    </form>-->
-</td>
-<td>
+    </form>
+</td>-->
+<!--<td>
     <form action="/reboot">
     <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
     <input type="submit" value="Reboot">
     </form>
-</td><td>
+</td>-->
+<td>
     <form action="/shutdown">
     <input type="hidden" name="hiddenshutdown_CNT" value="SHUTDOWN">
     <input type="submit" value="Shutdown">

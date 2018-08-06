@@ -75,8 +75,8 @@ class YouTubePlayer(VideoPlayer):
         i=1
         qualities=[]
         for pfy in pfys:
-            self._status('getting video quality data for video %i of %i' \
-                %(i,sz))
+            #self._status('getting video quality data for video %i of %i' \
+            #    %(i,sz))
             i=i+1
             qualities.append(self._get_video_qualities(pfy))
         first=qualities[0]
@@ -142,7 +142,7 @@ class YouTubePlayer(VideoPlayer):
         else:
             sz=len(pl['items'])
             if sz==0: return sz
-            self._status('getting data for your video')
+            #self._status('getting data for your video')
             urls+=self._get_video_url(pl['items'][0]['pafy'],quality)
         return sz
 

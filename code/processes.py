@@ -35,8 +35,8 @@ class ProcessHandling:
             
     def kill_running(self,updates=True):
         self.log.info('stopping running shows')
-        if(updates):
-            self._status_update('stopping running shows')
+        #if(updates):
+        #    self._status_update('stopping running shows')
         if self._check_timer is not None: 
             self._check_timer.cancel()
         self._streams.stop()
