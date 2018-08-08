@@ -4,9 +4,9 @@ from os.path import *
 class Config:
     def __init__(self, filename, caller_file=None):
         if caller_file is None:
-            path=dirname(abspath(__file__))+'/conf/'+filename
+            path=join(dirname(abspath(__file__)),filename)
         else:
-            path=dirname(abspath(caller_file))+'/conf/'+filename
+            path=join(dirname(abspath(caller_file)),filename)
         self.config=ConfigParser.ConfigParser()
         self.config.read(path)
 

@@ -7,23 +7,25 @@ import threading
 import os
 import sys
 import logger
-
+import wifi_setup_ap.config_util.Config as Config
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
 
 class NasaPod:
-    def __init__(self):    
+    def __init__(self):
+        config = Config('nasa_pod.conf',__file__)    
         self._apod_url='https://apod.nasa.gov/apod/'
         self._apod_archive_url='https://apod.nasa.gov/apod/archivepix.html'
-        self._delay=5 # delay between frames in seconds
+        # delay between frames in seconds
+        self._delay=config.getint('behaviour','frame_delay',5) 
         self._running=False
-        self._fontname='comicsansms'
-        self._fontsize=48
+        self._fontname=config.get('font','name','comicsansms')
+        self._fontsize=config.getint('font','size',48)
         pg.init()
         #pg.font.init()
         self._font = pg.font.SysFont(self._fontname,self._fontsize)
-        self._text_col=(100,100,100)
-        self._text_height_ratio=10        
+        self._text_col=config.getcolor('colors','foreground',(100,100,100))
+        self._text_height_ratio=config.getint('behaviour','height_ratio',10)        
 
     def _build_list(self):
         html = requests.get(self._apod_archive_url).content
