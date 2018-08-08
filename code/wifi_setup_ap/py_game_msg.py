@@ -12,18 +12,17 @@ class MsgScreenThread:
     def __init__(self):
         config = Config('py_game_msg.conf')
 
-        self.border=config.getint('position','border',10)
-        self.left=config.getbool('position','left',False)
-        self.top=config.getbool('position','top',False)
-        self.forecol=config.getcolor('colors','foreground',(255,128,0))
-        self.bckcol=config.getcolor('colors','background',(32,0,32))
-        self.fontname=config.get('font','name','comicsansms')
-        self.fontsz=config.getint('font','size',68)
+        self._border=config.getint('position','border',10)
+        self._left=config.getbool('position','left',False)
+        self._top=config.getbool('position','top',False)
+        self._forecol=config.getcolor('colors','foreground',(255,128,0))
+        bckcol=config.getcolor('colors','background',(32,0,32))
+        fontname=config.get('font','name','comicsansms')
+        fontsz=config.getint('font','size',68)
         
-        self.screen = None
         self.running=False
-        self.delay=1
-        self.screen=None
+        self._delay=1
+        self._screen=None
         self.text=None
         self.black=None
         self.font=None
@@ -32,8 +31,8 @@ class MsgScreenThread:
         pg.mouse.set_visible(False)	
         self.screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
         self.black=self.screen.copy()
-        self.black.fill(self.bckcol)
-        self.font = pg.font.SysFont(self.fontname, self.fontsz)
+        self.black.fill(bckcol)
+        self.font = pg.font.SysFont(fontname, fontsz)
         self.lock=threading.Lock()
 
     def lock_t(self):
@@ -54,15 +53,15 @@ class MsgScreenThread:
 
     def place_text(self):
         rows=self.get_text().split('\n')
-        surfaces=[self.font.render(x,True,self.forecol) for x in rows]
+        surfaces=[self.font.render(x,True,self._forecol) for x in rows]
         total_height=sum([s.get_height() for s in surfaces])
-        avail_height=self.screen.get_height()-2*self.border
+        avail_height=self.screen.get_height()-2*self._border
         while((total_height-surfaces[0].get_height())>avail_height):
             total_height-=surfaces[0].get_height()
             surfaces=surfaces[1:]
         rects=[s.get_rect() for s in surfaces]
-        if self.top:
-            top=self.border
+        if self._top:
+            top=self._border
         else:
             top = (self.screen.get_height()-total_height)/2.0
         width=self.screen.get_width()
@@ -70,8 +69,8 @@ class MsgScreenThread:
         for r in rects:
             r.top=current_top
             current_top=r.bottom
-            if self.left:
-                r.x=self.border
+            if self._left:
+                r.x=self._border
             else:
                 r.x=(width-r.width)/2.0
         return zip(surfaces,rects)   
@@ -98,7 +97,7 @@ class MsgScreenThread:
                 for row in rows:
                     self.screen.blit(row[0], row[1])
                 pg.display.flip()
-            sleep(self.delay)
+            sleep(self._delay)
 
 class MsgScreen(borg_init_once):
     def __init__(self):
