@@ -116,6 +116,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 name=params['name'][0].replace(' ','')
                 _streams.add(params['name'][0],params['link'][0],
                     params['quality'][0])
+        elif 'clock' in self.path:
+            _processes.play_clock()
         elif 'slideshow' in self.path:
             _processes.play_apod()
         elif 'wifi' in self.path:

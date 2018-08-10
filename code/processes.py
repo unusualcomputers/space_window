@@ -1,5 +1,6 @@
 import threading
 from nasa_pod import NasaPod
+from clock import Clock
 from threading import Timer
 import wifi_setup_ap.wifi_control as wifi
 from mopidy_listener import MopidyUpdates
@@ -14,6 +15,7 @@ class ProcessHandling:
         self._wait=False
         self._streams=Streams.load()
         self._nasa=NasaPod()
+        self._clock=Clock()
         threading.Thread(target=self.launch_mopidy).start()
         self._status_update=status_update_func    
         self._streams.set_status_func(status_update_func)
@@ -41,6 +43,7 @@ class ProcessHandling:
             self._check_timer.cancel()
         self._streams.stop()
         self._nasa.stop()
+        self._clock.stop()
         self._mopidy.stop()
         #wifi.run('pkill -9 mopidy')
        
@@ -76,7 +79,18 @@ class ProcessHandling:
         self._current_stream=None
         self.log.info('playing apod')
         self._streams.stop()
+        self._clock.stop()
         self._nasa.play()
+        self._start_timer()
+     
+    def play_clock(self):
+        self._stop_timer()
+        self.log.info('stopping streams')
+        self._current_stream=None
+        self.log.info('playing apod')
+        self._streams.stop()
+        self._nasa.stop()
+        self._clock.play()
         self._start_timer()
      
     def play_next(self):
@@ -97,7 +111,8 @@ class ProcessHandling:
     def run_something(self):
         if self._wait: return
         self._stop_timer()
-        if not (self._streams.is_playing() or self._nasa.is_playing()):
+        if not (self._streams.is_playing() or self._nasa.is_playing()\
+            or self._clock.is_playing()):
             self.play_next()
         self._start_timer()
         

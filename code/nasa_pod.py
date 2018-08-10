@@ -7,13 +7,13 @@ import threading
 import os
 import sys
 import logger
-import wifi_setup_ap.config_util.Config as Config
+import wifi_setup_ap.config_util as Config
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
 
 class NasaPod:
     def __init__(self):
-        config = Config('nasa_pod.conf',__file__)    
+        config = Config.Config('clock.conf',__file__)    
         self._apod_url='https://apod.nasa.gov/apod/'
         self._apod_archive_url='https://apod.nasa.gov/apod/archivepix.html'
         # delay between frames in seconds

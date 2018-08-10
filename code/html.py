@@ -108,7 +108,12 @@ _main_table=u"""
     <input type="submit" value="Refresh Caches">
     </form>
     </td>
-<!--<td>
+<td>
+    <form action="/clock">
+    <input type="hidden" name="hiddenclock_CNT" value="CLOCK">
+    <input type="submit" value="clock">
+    </form>
+</td><!--<td>
     <form action="/kodi">
     <input type="hidden" name="hiddenkodi_CNT" value="KODI">
     <input type="submit" value="kodi :)">
