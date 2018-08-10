@@ -1,5 +1,6 @@
 from youtube_player import YouTubePlayer
 from streamer import Streamer
+from file_player import FilePlayer
 from cache import Cache
 import logger
 
@@ -8,6 +9,7 @@ class Player:
     def __init__(self):
         self.yt_player=YouTubePlayer()
         self.streamer=Streamer()
+        self.file_player=FilePlayer()
         self.players_cache=Cache(_cache_size)
         self.log=logger.get(__name__)
 
@@ -18,17 +20,17 @@ class Player:
     def _get_player(self,url):
         c=self.players_cache.get(url)
         if c is not None:
-            self.log.debug('FOUND PLAYER IN CACHE %s',url)
             return c
         
-        if self.yt_player.can_play(url):
+        if self.file_player.can_play(url):
+            c=self.file_player
+        elif self.yt_player.can_play(url):
             c=self.yt_player
         elif self.streamer.can_play(url):
             c=self.streamer
         
         if c is not None:
             self.players_cache.add(url,c)
-            self.log.debug('FOUND PLAYER %s %s',c,url)
             return c
         return None 
 
@@ -46,8 +48,9 @@ class Player:
             return False
 
     def is_playing(self):
-        return self.yt_player.is_playing() or self.streamer.is_playing()
-
+        return self.yt_player.is_playing() or self.streamer.is_playing() \
+             or self.file_player.is_playing()
+    
     def play(self,url,quality):
         p=self._get_player(url)
         if p is None: raise Exception('No player found')
@@ -62,3 +65,4 @@ class Player:
     def stop(self):
         if self.yt_player.is_playing: self.yt_player.stop()
         elif self.streamer.is_playing: self.streamer.stop()
+        elif self.file_player.is_playing: self.file_player.stop()
