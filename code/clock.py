@@ -3,25 +3,22 @@ from pygame.locals import QUIT
 import time
 import threading
 import wifi_setup_ap.config_util as Config 
-
-#pygame.init()
-
-pygame.display.set_caption( "Custom Fonts Example in PyGame" )
-size = width, height = 600, 200
-
+from weather import Weather
 
 class Clock:
     def __init__(self):
         config = Config.Config('clock.conf',__file__)    
         pygame.init()
-        self._screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
+        
+        #size = width, height = 640, 480
         #self._screen = pygame.display.set_mode( size, 0 , 32 )
+        self._screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
         
         self._forecol=config.getcolor('colors','foreground',(255,128,0))
         bckcol=config.getcolor('colors','background',(32,0,32))
         time_sz=config.getint('fonts','time_size',192)
         date_sz=config.getint('fonts','date_size',24)
-        self._border=config.getint('geometry','border',5)
+        self._border=config.getint('geometry','border',10)
         self._separation=config.getint('geometry','separation',8)
 
         fontname = 'digital-7_mono.ttf'
@@ -33,6 +30,7 @@ class Clock:
         width=self._screen.get_width()
         self.running=False    
         self._init_rects()
+        self.weather=''
 
     def is_playing(self):
         return self.running
@@ -45,10 +43,25 @@ class Clock:
         self.running=False
 
     def _time_loop(self):
+        cnt=0
+        weather=Weather()
+        self._update_weather(weather)
         while self.running:
             self._update_time()
             time.sleep(1)
- 
+            cnt+=1
+            if cnt >3600:
+                cnt=0
+                self._update_weather(weather)
+
+    def _update_weather(self,weather):
+        w=weather.get()
+        self._w_surface=self._date_font.render(w,True,self._forecol)
+        self._w_rect=self._w_surface.get_rect()
+        self._w_rect.top=self._d_rect.top
+        screen_w=self._screen.get_rect().width
+        self._w_rect.x=screen_w-self._border-self._w_rect.width
+        
     def _init_rects(self):
         h_surface=self._time_font.render('88',True,self._forecol)
         m_surface=self._time_font.render('88',True,self._forecol)
@@ -79,7 +92,7 @@ class Clock:
         time_width=self._h_rect.width+self._c_rect.width/3.0+\
             self._m_rect.width+self._separation+self._s_rect.width
 
-        self._h_rect.x = (screen_rect.width-time_width)/2.0
+        self._h_rect.x = self._border+(screen_rect.width-time_width)/2.0
         self._c_rect.x=self._h_rect.x+self._h_rect.width-self._c_rect.width/3.0
         self._m_rect.x=self._h_rect.x+self._h_rect.width+self._c_rect.width/3.0
         self._s_rect.x=self._m_rect.x+self._m_rect.width+self._separation        
@@ -105,6 +118,7 @@ class Clock:
         self._screen.blit(m_surface,self._m_rect)
         self._screen.blit(s_surface,self._s_rect)
         self._screen.blit(d_surface,self._d_rect)
+        self._screen.blit(self._w_surface,self._w_rect)
         pygame.display.update()
 
 if __name__=='__main__':
