@@ -12,7 +12,7 @@ class Clock:
         
         #size = width, height = 640, 480
         #self._screen = pygame.display.set_mode( size, 0 , 32 )
-        self._screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
+        #self._screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
         
         self._forecol=config.getcolor('colors','foreground',(255,128,0))
         bckcol=config.getcolor('colors','background',(32,0,32))
