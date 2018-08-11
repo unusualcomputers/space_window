@@ -63,6 +63,6 @@ class Player:
         self.yt_player.playlist_next()
 
     def stop(self):
-        if self.yt_player.is_playing: self.yt_player.stop()
-        elif self.streamer.is_playing: self.streamer.stop()
-        elif self.file_player.is_playing: self.file_player.stop()
+        self.yt_player.stop()
+        self.streamer.stop()
+        self.file_player.stop()
