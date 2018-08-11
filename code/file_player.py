@@ -17,7 +17,7 @@ class FilePlayer(VideoPlayer):
             else:
                 cmd='%s "%s"' % (self._player_cmd,url)
 
-            while True:
+            while self.playing:
                 os.system(cmd)
         finally:
             pass
