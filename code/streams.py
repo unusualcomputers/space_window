@@ -100,8 +100,9 @@ class Streams(Jsonable):
         return _player.is_playlist()
 
     def add(self, name, url, quality):
-        resp=_session.head(url,allow_redirects=True)
-        url=resp.url
+        if not os.path.isfile(url):
+            resp=_session.head(url,allow_redirects=True)
+            url=resp.url
         if not _player.can_play(url):
             raise Exception('Cannot play ' + url)
         self.streams[name]=(url,quality)

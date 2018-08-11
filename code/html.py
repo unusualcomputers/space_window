@@ -111,7 +111,7 @@ _main_table=u"""
 <td>
     <form action="/clock">
     <input type="hidden" name="hiddenclock_CNT" value="CLOCK">
-    <input type="submit" value="clock">
+    <input type="submit" value="Clock">
     </form>
 </td><!--<td>
     <form action="/kodi">
