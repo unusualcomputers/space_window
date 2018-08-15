@@ -2,24 +2,24 @@ import pygame,sys
 from pygame.locals import QUIT
 import time
 import threading
-import config_util as Config 
+from config_util import Config
 from weather import Weather
 
 class Clock:
     def __init__(self):
-        config = Config.Config('clock.conf',__file__)    
+        config = Config('space_window.conf',__file__)    
         pygame.init()
         
         #size = width, height = 640, 480
         #self._screen = pygame.display.set_mode( size, 0 , 32 )
         self._screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN )
         
-        self._forecol=config.getcolor('colors','foreground',(255,128,0))
-        bckcol=config.getcolor('colors','background',(32,0,32))
-        time_sz=config.getint('fonts','time_size',192)
-        date_sz=config.getint('fonts','date_size',24)
-        self._border=config.getint('geometry','border',10)
-        self._separation=config.getint('geometry','separation',8)
+        self._forecol=config.getcolor('clock','foreground',(255,128,0))
+        bckcol=config.getcolor('clock','background',(32,0,32))
+        time_sz=config.getint('clock','time_size',192)
+        date_sz=config.getint('clock','date_size',24)
+        self._border=config.getint('clock','border',10)
+        self._separation=config.getint('clock','separation',8)
 
         fontname = 'digital-7_mono.ttf'
         self._time_font = pygame.font.Font( fontname, time_sz )

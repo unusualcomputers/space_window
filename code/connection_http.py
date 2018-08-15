@@ -4,7 +4,6 @@ from urlparse import urlparse, parse_qs
 import wifi_control as wifi
 import time
 import socket
-from config_util import Config
 from subprocess import Popen
 import shlex
 import py_game_msg as msg

@@ -10,15 +10,15 @@ from borg import borg_init_once
 
 class MsgScreenThread:
     def __init__(self):
-        config = Config('py_game_msg.conf')
+        config = Config('space_window.conf',__file__)    
 
-        self._border=config.getint('position','border',10)
-        self._left=config.getbool('position','left',False)
-        self._top=config.getbool('position','top',False)
-        self._forecol=config.getcolor('colors','foreground',(255,128,0))
-        bckcol=config.getcolor('colors','background',(32,0,32))
+        self._border=config.getint('message','border',10)
+        self._left=config.getbool('message','left',False)
+        self._top=config.getbool('message','top',False)
+        self._forecol=config.getcolor('message','foreground',(255,128,0))
+        bckcol=config.getcolor('message','background',(32,0,32))
         fontname=config.get('font','name','comicsansms')
-        fontsz=config.getint('font','size',68)
+        fontsz=config.getint('message','font_size',68)
         
         self.running=False
         self._delay=1

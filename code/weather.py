@@ -1,10 +1,10 @@
-import config_util as Config 
+from config_util import Config
 import re
 import requests
 
 class Weather:
     def __init__(self):
-        config = Config.Config('weather.conf',__file__)    
+        config = Config('space_window.conf',__file__)    
         location=config.get('weather','location',
             'United_Kingdom/England/London')
         self.url='https://www.yr.no/place/%s/forecast.xml' % location

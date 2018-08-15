@@ -51,7 +51,7 @@ country=GB
 
 """
 
-config = Config('access_point.conf')
+config = Config('space_window.conf',__file__)    
 
 ap_name=config.get('access-point','name','UnusualWiFi')
 _ap_driver=config.get('access-point','driver','nl80211')

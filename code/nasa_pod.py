@@ -13,19 +13,19 @@ import config_util as Config
 
 class NasaPod:
     def __init__(self):
-        config = Config.Config('clock.conf',__file__)    
+        config = Config('space_window.conf',__file__)    
         self._apod_url='https://apod.nasa.gov/apod/'
         self._apod_archive_url='https://apod.nasa.gov/apod/archivepix.html'
         # delay between frames in seconds
-        self._delay=config.getint('behaviour','frame_delay',5) 
+        self._delay=config.getint('nasa','frame_delay',5) 
         self._running=False
         self._fontname=config.get('font','name','comicsansms')
-        self._fontsize=config.getint('font','size',48)
+        self._fontsize=config.getint('nasa','font_size',48)
         pg.init()
         #pg.font.init()
         self._font = pg.font.SysFont(self._fontname,self._fontsize)
-        self._text_col=config.getcolor('colors','foreground',(100,100,100))
-        self._text_height_ratio=config.getint('behaviour','height_ratio',10)        
+        self._text_col=config.getcolor('nasa','foreground',(100,100,100))
+        self._text_height_ratio=config.getint('nasa','height_ratio',10)        
 
     def _build_list(self):
         html = requests.get(self._apod_archive_url).content
