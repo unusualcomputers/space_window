@@ -1,4 +1,4 @@
-import wifi_setup_ap.config_util as Config 
+import config_util as Config 
 import re
 import requests
 

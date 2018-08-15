@@ -11,7 +11,7 @@ class FilePlayer(VideoPlayer):
     
     def _play_loop_impl(self,url,quality):
         try:
-            subs=os.path.join(os.path.splitext(url)[0],'srt')
+            subs=os.path.splitext(url)[0]+'.srt'
             if os.path.isfile(subs):
                 cmd='%s "%s" --subtitles "%s"' % (self._player_cmd,url,subs)
             else:

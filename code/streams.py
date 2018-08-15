@@ -110,8 +110,16 @@ class Streams(Jsonable):
         self.save()
         
     def remove(self,name):
-        self.streams.pop(name,None)
-        self.save()
+        i=self.find(name)
+        if i!=-1:
+            (url,q)=self.at(i)
+            if os.path.isfile(url):
+                srt=os.path.splitext(url)[0]+'.srt'
+                os.path.remove(url)
+                if os.path.isfile(srt):
+                    os.path.remove(srt)
+            self.streams.pop(name,None)
+            self.save()
     
     def find(self,name):
         for i in range(0,self.len()):
@@ -152,20 +160,35 @@ class Streams(Jsonable):
         html=u''
         for name in self.streams:
             (url,quality)=self.streams[name]
-            row = u"""<tr><td>{}</td><td>{}</td><td>
-                <input type="hidden" name="hidden_{}" value="{}">
-                <button type="submit" name="action" value="play {}">
-                    play
-                </button></td><td>
-                <button type="submit" name="action" value="moveup {}">
-                    up</button></td>
-                <td>
-                <button type="submit" name="action" value="remove {}">
-                        remove
-                </button></td>
-                <td><a href="{}" target="_blank"> Show in browser </a></td>
-                </tr>
-                """.format(name,quality,_cnt,name,name,name,name,url)
+            if path.os.isfile(url):
+                row = u"""<tr><td>{}</td><td>{}</td><td>
+                    <input type="hidden" name="hidden_{}" value="{}">
+                    <button type="submit" name="action" value="play {}">
+                        play
+                    </button></td><td>
+                    <button type="submit" name="action" value="moveup {}">
+                        up</button></td>
+                    <td>
+                    <button type="submit" name="action" value="remove {}">
+                            remove
+                    </button></td>
+                    </tr>
+                    """.format(name,quality,_cnt,name,name,name,name)
+            else
+                row = u"""<tr><td>{}</td><td>{}</td><td>
+                    <input type="hidden" name="hidden_{}" value="{}">
+                    <button type="submit" name="action" value="play {}">
+                        play
+                    </button></td><td>
+                    <button type="submit" name="action" value="moveup {}">
+                        up</button></td>
+                    <td>
+                    <button type="submit" name="action" value="remove {}">
+                            remove
+                    </button></td>
+                    <td><a href="{}" target="_blank"> Show in browser </a></td>
+                    </tr>
+                    """.format(name,quality,_cnt,name,name,name,name,url)
             html+=row
         return html
         

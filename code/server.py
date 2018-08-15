@@ -3,10 +3,10 @@ from BaseHTTPServer import BaseHTTPRequestHandler
 from urlparse import urlparse, parse_qs
 import os
 from time import sleep
-import wifi_setup_ap.wifi_control as wifi
-import wifi_setup_ap.connection_http as connection
+import wifi_control as wifi
+import connection_http as connection
 from html import get_main_html
-import wifi_setup_ap.py_game_msg as msg
+import py_game_msg as msg
 import logger
 from processes import *
 from async_job import Job
@@ -87,6 +87,71 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_header('Content-type','text/html')
         self.end_headers()
     
+    def do_POST(self):
+        if 'upload' not in self.path:
+            log.error('Unknonw post request')
+            self._send_to('/')
+        chunk_size=1024*1024
+        self._status('Getting info about files to upload')
+        total_size=int(self.headers['Content-Length'])
+        form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST',
+                     'CONTENT_TYPE':self.headers['Content-Type'],
+                     })
+        p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
+        if not os.path.exists(p):
+            os.makedirs(p)
+        name = form['name'].value
+        if len(name)==0 or name=='NAME':
+            err='Sorry, you must tell me what to call this video'
+            self._status(err)
+            self.respond(get_error_html(err))
+            return
+
+        filename = form['video'].filename
+        if len(filename)==0:
+            err='Sorry, you must tell me a video a file name'
+            self._status(err)
+            self.respond(get_error_html(err))
+            return
+
+        if len(form['subs'].filename)==0: file_cnt=1
+        else: file_cnt=2
+        
+        chunk_percent=float(chunk_size)/total_size
+        total_loaded=0
+        percent=0
+        with file(os.path.join(p,filename), "wb") as videoout:
+            videoin = form['video'].file
+            while True:
+                chunk = videoin.read(chunk_size)
+                total_loaded+= len(chunk)
+                percent=int(float(total_loaded)/total_size*100)
+                self._status('Uploading video file\n%d percent' % percent)
+                if not chunk: break
+                videoout.write(chunk)
+        
+        self._status('Uploaded video file')
+        if file_cnt==2: 
+            subsname=os.path.splitext(filename)[0]+'.srt'
+            with file(os.path.join(p,subsname), "wb") as subsout:
+                subsin = form['subs'].file
+                while True:
+                    chunk = videoin.read(chunk_size)
+                    total_loaded+= len(chunk)
+                    percent=int(float(total_loaded)/total_size*100)
+                    self._status('Uploading subtitles\n%d percent' % percent)
+                    if not chunk: break
+                    subsout.write(chunk)
+        if not os.path.isfile():    
+            self.respond(get_error_html('Something went wrong, sorry :('))
+            self._status('Something went wrong, sorry :(')
+        else:
+            _streams.add(name,os.path.join(p,filenamei),'best')
+            self._send_to('/')
+    
     #Handler for the GET requests
     def do_GET(self):
         _initialise_streams()
@@ -120,6 +185,14 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _processes.play_clock()
         elif 'slideshow' in self.path:
             _processes.play_apod()
+        elif 'upload' in self.path:
+            self.send_response(200)
+            self.send_header('Content-type','text/html')
+            self.end_headers()
+            # Send the html message
+            html = get_upload_html() 
+            self.wfile.write(html)
+            return
         elif 'wifi' in self.path:
             self.send_response(200)
             self.send_header('Content-type','text/html')

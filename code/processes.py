@@ -2,7 +2,7 @@ import threading
 from nasa_pod import NasaPod
 from clock import Clock
 from threading import Timer
-import wifi_setup_ap.wifi_control as wifi
+import wifi_control as wifi
 from mopidy_listener import MopidyUpdates
 from streams import Streams
 import logger

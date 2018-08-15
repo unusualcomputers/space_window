@@ -7,7 +7,7 @@ import threading
 import os
 import sys
 import logger
-import wifi_setup_ap.config_util as Config
+import config_util as Config
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
 

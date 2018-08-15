@@ -54,7 +54,7 @@ _html_template_main=u"""
 <body>
 <h1>Space Window</h1>
 <br><br>
-HTML_BODY
+[%HTML_BODY%]
 <br><br><br>
 <footer>
 Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
@@ -63,6 +63,97 @@ Brought to you by <a href="https://unusualcomputerscollective.org/" target="_bla
 </body>
 
 """           
+html_upload="""
+<!doctype html>
+<html>
+<head>
+    <title>Space Window</title>
+    <meta name="description" content"Space Window">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store,must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="-1"/>
+<style>
+        body {
+            color: #ff8000;
+            background-color: #200020;
+            font-family: "Comic Sans MS";
+            border-radius: 5px; 
+            }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            color: #ff8000;
+            background-color: #200020;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+        }
+        input[type=text]{
+            color: #ff8000;
+            background-color: #200020;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+            }
+        input[type=submit]{
+            color: #ff8000;
+            background-color: #200020;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+            }
+        button[type=submit]{
+            color: #ff8000;
+            background-color: #200020;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+            }
+        input[type=password]{
+            color: #ff8000;
+            background-color: #800080;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+          }
+</style>
+</head>
+<body>
+<h1>Space Window</h1>
+<br><br>
+    <form enctype="multipart/form-data" action="/upload_video" method="post"> 
+    <input type="text" name="name" value="NAME">
+    <br><br>
+    Video file 
+    <label class="custom-file-upload">
+        <input type="hidden" name="hiddenfile_CNT" value="FILE">
+        <input type="file" name = "video"/>
+        <i class="fa fa-cloud-upload"></i> Choose file
+    </label>
+    <br><br>
+    Subtitles 
+    <label class="custom-file-upload">
+        <input type="hidden" name="hiddensrt_CNT" value="SRT">
+        <input type="file" name = "subs"/>
+        <i class="fa fa-cloud-upload"></i> Choose file
+    </label>
+    <p><input type="submit" value="Upload"></p>
+    </form>
+<br><br><br>
+<footer>
+Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
+</footer>
+
+</body>
+
+"""
 _main_table=u"""
 
 <div align="left">
@@ -96,6 +187,11 @@ _main_table=u"""
     <form action="/next">
     <input type="hidden" name="hiddenplay_CNT" value="NEXT">
     <input type="submit" value="Play next">
+    </form>
+</td><td>
+    <form action="/upload" target="_blank">
+    <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
+    <input type="submit" value="Upload Video">
     </form>
 </td><td>
     <form action="/rough" target="_blank">
@@ -140,6 +236,37 @@ _main_table=u"""
 </table>    
 """
 
+html_error="""
+<!doctype html>
+<html>
+<head>
+    <title>Space Window</title>
+    <meta name="description" content"Space Window">
+    <meta name="viewport" content="width=device-width">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store,must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="-1"/>
+<style>
+        body {
+            color: #ff8000;
+            background-color: #200020;
+            font-family: "Comic Sans MS";
+            border-radius: 5px; 
+            }
+</style>
+</head>
+<body>
+<h1>Space Window</h1>
+<br><br>
+[%ERROR_TEXT%]
+<br><br><br>
+<footer>
+Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
+</footer>
+
+</body>
+
+"""           
 _cnt=0
 def build_html(body,refresh_time=None):
     global _cnt
@@ -150,7 +277,7 @@ def build_html(body,refresh_time=None):
             '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
 
     html = _html_template_main.replace('[%REFRESH%]',refresh).\
-        replace('HTML_BODY',body)
+        replace('[%HTML_BODY%]',body)
     _cnt+=1
     cntstr='%i' % _cnt
     return html.replace('CNT',cntstr)
@@ -168,3 +295,11 @@ def get_main_html(rows_html,refresh_time=None):
     _cnt+=1
     cntstr='%i' % _cnt
     return html.replace('CNT',cntstr)
+
+def get_upload_html():
+    _cnt+=1
+    cntstr='%i' % _cnt
+    return html_upload.replace('CNT',cntstr)
+
+def get_error_html(err):
+    return html_error.replace('[%ERROR_TEXT%]',err)

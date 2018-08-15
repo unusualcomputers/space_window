@@ -1,6 +1,6 @@
 from mopidy_json_client import MopidyClient
-import wifi_setup_ap.wifi_control as wifi
-from wifi_setup_ap.wifi_control import run
+import wifi_control as wifi
+from wifi_control import run
 import logger
 import subprocess
 

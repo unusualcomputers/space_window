@@ -2,7 +2,7 @@ import pygame,sys
 from pygame.locals import QUIT
 import time
 import threading
-import wifi_setup_ap.config_util as Config 
+import config_util as Config 
 from weather import Weather
 
 class Clock:

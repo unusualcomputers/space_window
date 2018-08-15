@@ -1,5 +1,5 @@
 from time import sleep
-import wifi_setup_ap.connection_http as connection
+import connection_http as connection
 import pygame
 from server import wait_to_initialise,start_server,stop_server
 import logger
