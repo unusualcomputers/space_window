@@ -108,28 +108,20 @@ class ProcessHandling:
             self.log.info('about to play stream %s' % name)
             self.play_stream(name)
 
-    def run_something(self):
+    def run_something(self,connected):
         if self._wait: return
         self._stop_timer()
+        if not connected:
+            name=self._streams.first()
+            if name is not None:
+                self.log.info('about to play stream %s' % name)
+                self.play_stream(name)
+            return
+
         if not (self._streams.is_playing() or self._nasa.is_playing()\
             or self._clock.is_playing()):
             self.play_next()
         self._start_timer()
         
-    def handle_wifi_change_req(self,params,server):
-        wifi_name='noname'
-        password=None
-        for n in params:
-            v=params[n]
-            if v==['Connect']:
-                wifi_name=n
-            elif n=='password':
-                password=v[0]
-        self._status_update('thanks! trying to connect to %s now' % wifi_name)
-        wifi.set_wifi(wifi_name,password)
-        wifi.restart_wifi()
-        server.return_to_front()
-        return True
-
     def refresh_caches(self):
         self._streams.refresh_caches(True)

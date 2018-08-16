@@ -20,8 +20,11 @@ _ip=wifi.get_ip()
 _processes=None
 _streams=None
 _server=None
+_standalone=False
 
-
+def set_standalone(standalone):
+    global _standalone
+    _standalone=standalone
 
 _msg=msg.MsgScreen()
 def _status_update(txt):
@@ -59,9 +62,10 @@ def wait_to_initialise():
         sleep(1)
     return waiting_job.result
 
-def start_server():
+def start_server(connected):
+    set_standalone(not connected)
     #Wait forever for incoming http requests
-    _processes.run_something()    
+    _processes.run_something(connected)    
     _server.serve_forever()
 
 def stop_server():
@@ -87,12 +91,49 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_header('Content-type','text/html')
         self.end_headers()
     
+    def _handle_wifi_change_req(self,params):
+        wifi_name='noname'
+        password=None
+        for n in params:
+            v=params[n]
+            if v==['connect']:
+                wifi_name=n
+            elif n=='password':
+                password=v[0]
+        self._status_update('thanks! trying to connect to %s now' % wifi_name)
+        wifi.set_wifi(wifi_name,password)
+        wifi.restart_wifi()
+        self.return_to_front()
+        return True
+
+    def _handle_start_wifi_req(self,params):
+        wifi_name='noname'
+        password=None
+        for n in params:
+            v=params[n]
+            if v==['connect']:
+                wifi_name=n
+            elif n=='password':
+                password=v[0]
+        _status_update('thanks! trying to connect to %s now\n' % wifi_name)
+        #server.wfile.write(make_attempting_html())
+        wifi.set_wifi(wifi_name,password)
+        wifi.start_wifi()
+        if test_connection():
+            return True
+
+        _status_update\
+            ('can\'t connect to wifi :(\nbringing access point up again')
+        wifi.start_ap()
+        self._return_to_front()
+        return False
+    
     def do_POST(self):
         if 'upload' not in self.path:
             log.error('Unknonw post request')
             self._send_to('/')
         chunk_size=1024*1024
-        self._status('Getting info about files to upload')
+        self._status_update('Getting info about files to upload')
         total_size=int(self.headers['Content-Length'])
         form = cgi.FieldStorage(
             fp=self.rfile,
@@ -106,14 +147,14 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         name = form['name'].value
         if len(name)==0 or name=='NAME':
             err='Sorry, you must tell me what to call this video'
-            self._status(err)
+            _status_update(err)
             self.respond(get_error_html(err))
             return
 
         filename = form['video'].filename
         if len(filename)==0:
             err='Sorry, you must tell me a video a file name'
-            self._status(err)
+            _status_update(err)
             self.respond(get_error_html(err))
             return
 
@@ -129,11 +170,12 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 chunk = videoin.read(chunk_size)
                 total_loaded+= len(chunk)
                 percent=int(float(total_loaded)/total_size*100)
-                self._status('Uploading video file\n%d percent' % percent)
+                _status_update(\
+                    'Uploading video file\n%d percent' % percent)
                 if not chunk: break
                 videoout.write(chunk)
         
-        self._status('Uploaded video file')
+        _status_update('Uploaded video file')
         if file_cnt==2: 
             subsname=os.path.splitext(filename)[0]+'.srt'
             with file(os.path.join(p,subsname), "wb") as subsout:
@@ -142,12 +184,13 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     chunk = videoin.read(chunk_size)
                     total_loaded+= len(chunk)
                     percent=int(float(total_loaded)/total_size*100)
-                    self._status('Uploading subtitles\n%d percent' % percent)
+                    _status_update(\
+                        'Uploading subtitles\n%d percent' % percent)
                     if not chunk: break
                     subsout.write(chunk)
-        if not os.path.isfile():    
+        if not os.path.isfile(os.path.join(p,filename)):    
             self.respond(get_error_html('Something went wrong, sorry :('))
-            self._status('Something went wrong, sorry :(')
+            _status_update('Something went wrong, sorry :(')
         else:
             _streams.add(name,os.path.join(p,filenamei),'best')
             self._send_to('/')
@@ -168,7 +211,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _streams.up(ps[len('moveup '):])
             else: #if it's not remove, then it's play
                 _processes.play_stream(ps[len('play '):])
-                _processes.run_something()
+                #_processes.run_something()
         elif 'really_remove' in self.path:
             ps=params['action'][0]
             _streams.remove(ps[len('really remove '):])
@@ -201,13 +244,34 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             html = connection.make_wifi_html() 
             self.wfile.write(html)
             return
+        elif 'connect_new' in self.path:
+            _processes.wait()
+            _processes.kill_running()
+            _status_update('changing wifi networks\n'+\
+                'this is a fragile process\n'+\
+                "give it a few minutes\nif it didn't work, reboot")
+            self._handle_start_wifi_req(params):
+            _status_update('testing the new connection')
+            if connection.test_connection():
+                display_connection_details()
+                sleep(20)
+            set_standalone(False)
+            _processes.stop_waiting()
+        elif 'scan' in self.path:
+            self.send_response(200)
+            self.send_header('Content-type','text/html')
+            self.end_headers()
+            # Send the html message
+            html = connection.make_wifi_html() 
+            self.wfile.write(html)
+            return
         elif 'connect' in self.path:
             _processes.wait()
             _processes.kill_running()
             _status_update('changing wifi networks\n'+\
                 'this is a fragile process\n'+\
                 "give it a few minutes\nif it didn't work, reboot")
-            _processes.handle_wifi_change_req(params,self)
+            self.handle_wifi_change_req(params,self)
             _status_update('testing the new connection')
             if connection.test_connection():
                 display_connection_details()
@@ -263,7 +327,10 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             self.send_header('Content-type','text/html')
             self.end_headers()
             # Send the html message
-            html = get_main_html(_streams.make_html())
+            if _standalone:
+                html = get_standalone_html(_streams.make_html())
+            else:
+                html = get_main_html(_streams.make_html())
             self.wfile.write(html)
             return
         # everything that is not changing the address is sent back to start

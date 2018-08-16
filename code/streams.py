@@ -45,9 +45,12 @@ class Streams(Jsonable):
     def _get_data_for_first_video(self):
         if self.len() == 0: return
         (url,quality)=self.streams.items()[0][1]
-        self.log.info('getting data for first video: '+url)
-        _player.can_play(url)
-        self.log.info('got data for first video: ' + url)
+        try:
+            self.log.info('getting data for first video: '+url)
+            _player.can_play(url)
+            self.log.info('got data for first video: ' + url)
+        finally:
+            pass
 
     def _get_data_for_rest(self):
         try:
@@ -154,12 +157,13 @@ class Streams(Jsonable):
         """.format(name,name,name,name)
         return build_html(form)
 
-    def make_html(self):
+    def make_html(self,files_only=False):
         global _cnt
         _cnt+=1
         html=u''
         for name in self.streams:
             (url,quality)=self.streams[name]
+            if files_only and not os.path.isfile(url): continue
             if path.os.isfile(url):
                 row = u"""<tr><td>{}</td><td>{}</td><td>
                     <input type="hidden" name="hidden_{}" value="{}">

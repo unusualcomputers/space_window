@@ -9,14 +9,19 @@ log=logger.get(__name__)
 try:
     log.info('hello :)')
     log.info('configuring wifi')
-    connection.configure_wifi(30,False)
+    connected=connection.test_connection('checking wifi connection\n'+
+            'be patient, this can take a few minutes\n')
+    #connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the
     #incoming request
     wait_to_initialise()
-    connection.display_connection_details()
+    if connected:
+        connection.display_connection_details()
+    else:
+        connection.start_ap()
     sleep(10)
     #Wait forever for incoming http requests
-    start_server()
+    start_server(connected)
 
 except KeyboardInterrupt:
     log.info('space window is shutting down')

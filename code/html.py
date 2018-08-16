@@ -236,6 +236,47 @@ _main_table=u"""
 </table>    
 """
 
+_main_table_standalone=u"""
+
+<div align="left">
+<form align="center" action="/play_remove">
+    <table width=100%>
+    STREAM_ROWS
+    </table>
+    </form></div>
+    <br/>
+    <hr/>
+    <br/>
+<br/>
+<hr/>
+<br/>
+<table width=100%>
+<tr>
+<td>
+    <form action="/scan_wifi">
+    <input type="hidden" name="hiddenscan_CNT" value="SCANWIFI">
+    <input type="submit" value="Scan Wifi">
+    </form>
+</td><td>
+    <form action="/upload" target="_blank">
+    <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
+    <input type="submit" value="Upload Video">
+    </form>
+</td><td>
+    <form action="/reboot">
+    <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
+    <input type="submit" value="Reboot">
+    </form>
+</td>
+<td>
+    <form action="/shutdown">
+    <input type="hidden" name="hiddenshutdown_CNT" value="SHUTDOWN">
+    <input type="submit" value="Shutdown">
+    </form>
+</td></tr>
+</table>    
+"""
+
 html_error="""
 <!doctype html>
 <html>
@@ -278,6 +319,20 @@ def build_html(body,refresh_time=None):
 
     html = _html_template_main.replace('[%REFRESH%]',refresh).\
         replace('[%HTML_BODY%]',body)
+    _cnt+=1
+    cntstr='%i' % _cnt
+    return html.replace('CNT',cntstr)
+
+def get_standalone_html(rows_html,refresh_time=None):
+    global _cnt
+    if refresh_time is None:
+        refresh=''
+    else:
+        refresh_html=\
+            '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
+
+    html = _html_template_main.replace('HTML_BODY',_main_table_standalone).\
+        replace('STREAM_ROWS',rows_html).replace('[%REFRESH%]',refresh)
     _cnt+=1
     cntstr='%i' % _cnt
     return html.replace('CNT',cntstr)

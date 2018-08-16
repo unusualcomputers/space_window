@@ -8,7 +8,10 @@ from subprocess import Popen
 import shlex
 import py_game_msg as msg
 import pygame
-
+from processes import *
+import logger
+import os
+from threading import Timer
 
 _ap_name=wifi.ap_name
 _to_launch=wifi.config.get('access-point','execute_when_connected')
@@ -38,6 +41,7 @@ def _report( s ):
     if _reporting_func: _reporting_func( s ) 
 
 _cnt=0
+
 _attempting_html_template=u"""
     <!doctype html>
     <html>
@@ -77,7 +81,7 @@ _attempting_html_template=u"""
 
     <h1>%s - Wifi</h1>
     <br><br>
-    <big>Now trying to setup wifi, follow the instructions on the screen device.</big>
+    <big>Now trying to setup wifi, follow the instructions on the device screen.</big>
     </body>
     """ % (_ap_name,_ap_name,_ap_name)
 
@@ -130,11 +134,11 @@ _html_template=u"""
     """ % (_ap_name,_ap_name,_ap_name)
 
 _ap_html_public=u"""
-<tr><td>AP_NAME<td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td></td><td><input type="submit" name="AP_NAME" value="Connect"></td></tr>
+<tr><td>AP_NAME<td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td></td><td><input type="submit" name="AP_NAME" value="connect_new"></td></tr>
 """
 
 _ap_html_private=u"""
-<tr><td>AP_NAME</td><td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td><input size="10" type="password" name="password"></td><td><input type="submit" name="AP_NAME" value="Connect"></td></tr>
+<tr><td>AP_NAME</td><td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td><input size="10" type="password" name="password"></td><td><input type="submit" name="AP_NAME" value="connect_new"></td></tr>
 """
     
 def _make_wifi_rows(): 
@@ -159,12 +163,10 @@ def _make_wifi_rows():
 def make_wifi_html():
     return _html_template.replace(u'WIFI_ROWS',_make_wifi_rows())
 
-class WifiServer(BaseHTTPRequestHandler):
+def make_attempting_html():
+    return _attempting_html_template
 
-
-    def _make_attempting_html():
-        return _attempting_html_template
-
+class StandaloneWifiServer(BaseHTTPRequestHandler):
 
     def _handle_start_wifi_req(self,params):
         wifi_name='noname'
@@ -204,9 +206,18 @@ class WifiServer(BaseHTTPRequestHandler):
                 if self._handle_start_wifi_req(params):
                     _keep_running=False
                     return
-            else:
+            elif 'scan' in self.path:
                 html = make_wifi_html()
                 self.wfile.write(html)
+                return
+            # front page
+            self.send_response(200)
+            self.send_header('Content-type','text/html')
+            self.end_headers()
+            # Send the html message
+            html = get_standalone_html('')
+            self.wfile.write(html)
+            return
         except:
             _report('something went very wrong :(\nbest to reboot')
             print sys.exc_info()[0]
@@ -215,7 +226,7 @@ class WifiServer(BaseHTTPRequestHandler):
 
 def start_ap():
     _report('starting access point')
-    start_ap()
+    wifi.start_ap()
     _report('access point is running, I think :)')
     time.sleep(5)
     _report('connect to network %s\n( that\'s me :) )\n' % _ap_name +
@@ -234,7 +245,7 @@ def test_connection(s):
 def run_wifi_server():
     try:
         start_ap()
-        handler=WifiServer
+        handler=StandaloneWifiServer
         server = HTTPServer(('', 80),handler )
         print 'Started httpserver.' 
         while(_keep_running):
@@ -243,6 +254,25 @@ def run_wifi_server():
     except KeyboardInterrupt:
         server.socket.close()
 
+
+def setup_wifi(sleep=_sleep_on_connect,display_details=True):
+    ip=""
+    try:
+        print 'testing connection'
+        if not test_connection('checking wifi connection\n'+
+            'be patient, this can take a few minutes\n'):
+            _report('not connected to wifi, starting access point\n'+
+                'this will take a minute or two')
+            run_wifi_server()
+    except:
+        _report('something went very wrong :(\nbest to reboot')
+        time.sleep(sleep)
+        return  
+    finally:
+        if display_details:
+            print 'displaying connection details in connection module'
+            display_connection_details()
+            time.sleep(sleep)
 
 def configure_wifi(sleep=_sleep_on_connect,display_details=True):
     ip=""
@@ -284,8 +314,8 @@ def display_connection_details():
         else:
             lan=con
     
-    # no wifi, wired connection?
-    if lan is not None:
+        # no wifi, wired connection?
+        if lan is not None:
             ip=con.ip_address
             hostname=socket.gethostname()
             msg=('connected by wire\n'+
