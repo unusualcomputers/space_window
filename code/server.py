@@ -66,7 +66,7 @@ def start_server(connected):
     set_standalone(not connected)
     #Wait forever for incoming http requests
     _processes.connected=connected
-    _processes.run_something(connected)    
+    _processes.run_something()    
     _server.serve_forever()
 
 def stop_server():
