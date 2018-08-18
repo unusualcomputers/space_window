@@ -160,7 +160,7 @@ class Streams(Jsonable):
         html=u''
         for name in self.streams:
             (url,quality)=self.streams[name]
-            if path.os.isfile(url):
+            if os.path.isfile(url):
                 row = u"""<tr><td>{}</td><td>{}</td><td>
                     <input type="hidden" name="hidden_{}" value="{}">
                     <button type="submit" name="action" value="play {}">
@@ -174,7 +174,7 @@ class Streams(Jsonable):
                     </button></td>
                     </tr>
                     """.format(name,quality,_cnt,name,name,name,name)
-            else
+            else:
                 row = u"""<tr><td>{}</td><td>{}</td><td>
                     <input type="hidden" name="hidden_{}" value="{}">
                     <button type="submit" name="action" value="play {}">

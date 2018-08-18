@@ -7,7 +7,7 @@ import threading
 import os
 import sys
 import logger
-import config_util as Config
+from config_util import Config
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
 
