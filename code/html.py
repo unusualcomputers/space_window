@@ -331,7 +331,7 @@ def get_standalone_html(rows_html,refresh_time=None):
         refresh_html=\
             '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
 
-    html = _html_template_main.replace('HTML_BODY',_main_table_standalone).\
+    html = _html_template_main.replace('[%HTML_BODY%]',_main_table_standalone).\
         replace('STREAM_ROWS',rows_html).replace('[%REFRESH%]',refresh)
     _cnt+=1
     cntstr='%i' % _cnt
@@ -345,7 +345,7 @@ def get_main_html(rows_html,refresh_time=None):
         refresh_html=\
             '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
 
-    html = _html_template_main.replace('HTML_BODY',_main_table).\
+    html = _html_template_main.replace('[%HTML_BODY%]',_main_table).\
         replace('STREAM_ROWS',rows_html).replace('[%REFRESH%]',refresh)
     _cnt+=1
     cntstr='%i' % _cnt
