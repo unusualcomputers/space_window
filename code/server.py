@@ -250,7 +250,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _status_update('changing wifi networks\n'+\
                 'this is a fragile process\n'+\
                 "give it a few minutes\nif it didn't work, reboot")
-            self._handle_start_wifi_req(params):
+            self._handle_start_wifi_req(params)
             _status_update('testing the new connection')
             if connection.test_connection():
                 display_connection_details()
