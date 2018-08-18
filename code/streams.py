@@ -84,8 +84,13 @@ class Streams(Jsonable):
     def len(self):
         return len(self.streams.items())
 
-    def first(self):
-        return self.at(0)
+    def first(self,connected):
+        if connected:
+            return self.at(0)
+        else:
+            for name in self.streams:
+                (url,quality)=self.streams[name]
+                if os.path.isfile(url): return name
 
     def at(self,i):
         if i >= self.len():
@@ -93,11 +98,15 @@ class Streams(Jsonable):
         else:
             return self.streams.items()[i][0]
   	
-    def next(self, name):
+    def next(self, name, connected):
+        found=False
         for k in range(self.len()):
            if self.at(k)==name:
-               return self.at(k+1)
-        return self.at(0)
+                if connected: return self.at(k+1)
+                else: found = True
+            else if found:
+                if os.path.isfile(at(k)): return at(k)
+        return self.first(connected)
 
     def is_playlist(self):
         return _player.is_playlist()

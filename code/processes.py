@@ -20,6 +20,7 @@ class ProcessHandling:
         self._status_update=status_update_func    
         self._streams.set_status_func(status_update_func)
         self.log=logger.get(__name__)
+        self.connected=True
 
     def launch_mopidy(self):
         try:
@@ -98,9 +99,9 @@ class ProcessHandling:
             self._streams.playlist_next()
             return
         if self._current_stream is None:
-            name=self._streams.first()
+            name=self._streams.first(self.connected)
         else:
-            name=self._streams.next(self._current_stream) 
+            name=self._streams.next(self._current_stream,self.connected) 
         if name is None: 
             self.log.info('about to play apod')
             self.play_apod()
@@ -108,11 +109,11 @@ class ProcessHandling:
             self.log.info('about to play stream %s' % name)
             self.play_stream(name)
 
-    def run_something(self,connected):
+    def run_something(self):
         if self._wait: return
         self._stop_timer()
-        if not connected:
-            name=self._streams.first()
+        if not self.connected:
+            name=self._streams.first(self.connected)
             if name is not None:
                 self.log.info('about to play stream %s' % name)
                 self.play_stream(name)
