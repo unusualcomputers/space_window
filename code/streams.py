@@ -104,7 +104,7 @@ class Streams(Jsonable):
            if self.at(k)==name:
                 if connected: return self.at(k+1)
                 else: found = True
-            else if found:
+            elif found:
                 if os.path.isfile(at(k)): return at(k)
         return self.first(connected)
 
