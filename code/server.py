@@ -169,7 +169,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             chunk_percent=float(chunk_size)/total_size
             total_loaded=0
             percent=0
-            video_filename=os.path.join(p,filename.replace(' ','_')
+            video_filename=os.path.join(p,filename.replace(' ','_'))
             with file(video_filename, "wb") as videoout:
                 videoin = form['video'].file
                 while True:
