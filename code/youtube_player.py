@@ -52,7 +52,7 @@ class YouTubePlayer(VideoPlayer):
             return v
         try:
             plid=pafy.playlist.extract_playlist_id(url)
-            if not pid:
+            if not plid:
                 return None
             gurl=pafy.g.urls['playlist'] % plid
             allinfo=pafy.fetch_decode(gurl)
