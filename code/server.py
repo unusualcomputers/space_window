@@ -208,7 +208,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _status_update('Something went wrong, sorry :(')
                 sleep(10)
             else:
-                _streams.add(name,video_filename,'best')
+                _streams.add(name,video_filename,'default')
                 self._send_to('/')
                 _processes.play_stream(name)
         except:
