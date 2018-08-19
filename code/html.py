@@ -352,6 +352,7 @@ def get_main_html(rows_html,refresh_time=None):
     return html.replace('CNT',cntstr)
 
 def get_upload_html():
+    global _cnt
     _cnt+=1
     cntstr='%i' % _cnt
     return html_upload.replace('CNT',cntstr)
