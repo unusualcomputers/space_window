@@ -12,6 +12,7 @@ from processes import *
 from async_job import Job
 from waiting_messages import WaitingMsgs
 from threading import Timer
+import cgi
 
 PORT_NUMBER = 80
 MOPIDY_PORT=6680
