@@ -131,6 +131,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     
     def do_POST(self):
         try:
+            log=logger.get(__name__)
             _processes.stop_all() 
             if 'upload' not in self.path:
                 log.error('Unknonw post request')
@@ -201,6 +202,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 self._send_to('/')
                 _processes.play_stream(name)
         except:
+            log.exception('Error while processing upload')
             _processes.run_something()
     
     #Handler for the GET requests
