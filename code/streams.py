@@ -127,9 +127,9 @@ class Streams(Jsonable):
             (url,q)=self.streams[name]
             if os.path.isfile(url):
                 srt=os.path.splitext(url)[0]+'.srt'
-                os.path.remove(url)
+                os.remove(url)
                 if os.path.isfile(srt):
-                    os.path.remove(srt)
+                    os.remove(srt)
             self.streams.pop(name,None)
             self.save()
     
