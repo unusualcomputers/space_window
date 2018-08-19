@@ -101,7 +101,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 wifi_name=n
             elif n=='password':
                 password=v[0]
-        self._status_update('thanks! trying to connect to %s now' % wifi_name)
+        _status_update('thanks! trying to connect to %s now' % wifi_name)
         wifi.set_wifi(wifi_name,password)
         wifi.restart_wifi()
         self.return_to_front()
@@ -137,7 +137,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 log.error('Unknonw post request')
                 self._send_to('/')
             chunk_size=128*1024
-            self._status_update('Getting info about files to upload')
+            _status_update('Getting info about files to upload')
             total_size=int(self.headers['Content-Length'])
             form = cgi.FieldStorage(
                 fp=self.rfile,
