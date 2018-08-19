@@ -93,7 +93,16 @@ class ProcessHandling:
         self._nasa.stop()
         self._clock.play()
         self._start_timer()
-     
+    
+    def stop_all(self):
+        self._stop_timer()
+        self.log.info('stopping streams')
+        self._current_stream=None
+        self.log.info('playing apod')
+        self._streams.stop()
+        self._nasa.stop()
+        self._clock.stop()
+ 
     def play_next(self):
         if self._streams.is_playlist():
             self._streams.playlist_next()

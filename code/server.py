@@ -131,7 +131,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     
     def do_POST(self):
         try:
-            _processes.kill_running() 
+            _processes.stop_all() 
             if 'upload' not in self.path:
                 log.error('Unknonw post request')
                 self._send_to('/')
