@@ -189,7 +189,7 @@ _main_table=u"""
     <input type="submit" value="Play next">
     </form>
 </td><td>
-    <form action="/upload" target="_blank">
+    <form action="/upload">
     <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
     <input type="submit" value="Upload Video">
     </form>
