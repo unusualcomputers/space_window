@@ -187,7 +187,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 with file(os.path.join(p,subsname), "wb") as subsout:
                     subsin = form['subs'].file
                     while True:
-                        chunk = videoin.read(chunk_size)
+                        chunk = subsin.read(chunk_size)
                         total_loaded+= len(chunk)
                         percent=int(float(total_loaded)/total_size*100)
                         _status_update(\

@@ -80,9 +80,9 @@ html_upload="""
             font-family: "Comic Sans MS";
             border-radius: 5px; 
             }
-        input[type="file"] {
+        <!--input[type="file"] {
             display: none;
-        }
+        }-->
         .custom-file-upload {
             color: #ff8000;
             background-color: #200020;
@@ -132,18 +132,20 @@ html_upload="""
     <input type="text" name="name" value="NAME">
     <br><br>
     Video file 
-    <label class="custom-file-upload">
+        <input type="file" name = "video"/>
+    <!--<label class="custom-file-upload">
         <input type="hidden" name="hiddenfile_CNT" value="FILE">
         <input type="file" name = "video"/>
         <i class="fa fa-cloud-upload"></i> Choose file
-    </label>
+    </label>-->
     <br><br>
     Subtitles 
-    <label class="custom-file-upload">
+        <input type="file" name = "subs"/>
+    <!--<label class="custom-file-upload">
         <input type="hidden" name="hiddensrt_CNT" value="SRT">
         <input type="file" name = "subs"/>
         <i class="fa fa-cloud-upload"></i> Choose file
-    </label>
+    </label>-->
     <p><input type="submit" value="Upload"></p>
     </form>
 <br><br><br>
