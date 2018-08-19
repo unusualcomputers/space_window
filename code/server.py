@@ -5,7 +5,7 @@ import os
 from time import sleep
 import wifi_control as wifi
 import connection_http as connection
-from html import get_main_html
+from html import get_main_html,get_upload_html
 import py_game_msg as msg
 import logger
 from processes import *
@@ -130,71 +130,78 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         return False
     
     def do_POST(self):
-        if 'upload' not in self.path:
-            log.error('Unknonw post request')
-            self._send_to('/')
-        chunk_size=1024*1024
-        self._status_update('Getting info about files to upload')
-        total_size=int(self.headers['Content-Length'])
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD':'POST',
-                     'CONTENT_TYPE':self.headers['Content-Type'],
-                     })
-        p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
-        if not os.path.exists(p):
-            os.makedirs(p)
-        name = form['name'].value
-        if len(name)==0 or name=='NAME':
-            err='Sorry, you must tell me what to call this video'
-            _status_update(err)
-            self.respond(get_error_html(err))
-            return
+        try:
+            _processes.kill_running() 
+            if 'upload' not in self.path:
+                log.error('Unknonw post request')
+                self._send_to('/')
+            chunk_size=128*1024
+            self._status_update('Getting info about files to upload')
+            total_size=int(self.headers['Content-Length'])
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST',
+                         'CONTENT_TYPE':self.headers['Content-Type'],
+                         })
+            p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
+            if not os.path.exists(p):
+                os.makedirs(p)
+            name = form['name'].value
+            if len(name)==0 or name=='NAME':
+                err='Sorry, you must tell me what to call this video'
+                _status_update(err)
+                self.respond(get_error_html(err))
+                return
 
-        filename = form['video'].filename
-        if len(filename)==0:
-            err='Sorry, you must tell me a video a file name'
-            _status_update(err)
-            self.respond(get_error_html(err))
-            return
+            filename = form['video'].filename
+            if len(filename)==0:
+                err='Sorry, you must tell me a video a file name'
+                _status_update(err)
+                self.respond(get_error_html(err))
+                return
 
-        if len(form['subs'].filename)==0: file_cnt=1
-        else: file_cnt=2
-        
-        chunk_percent=float(chunk_size)/total_size
-        total_loaded=0
-        percent=0
-        with file(os.path.join(p,filename), "wb") as videoout:
-            videoin = form['video'].file
-            while True:
-                chunk = videoin.read(chunk_size)
-                total_loaded+= len(chunk)
-                percent=int(float(total_loaded)/total_size*100)
-                _status_update(\
-                    'Uploading video file\n%d percent' % percent)
-                if not chunk: break
-                videoout.write(chunk)
-        
-        _status_update('Uploaded video file')
-        if file_cnt==2: 
-            subsname=os.path.splitext(filename)[0]+'.srt'
-            with file(os.path.join(p,subsname), "wb") as subsout:
-                subsin = form['subs'].file
+            if len(form['subs'].filename)==0: file_cnt=1
+            else: file_cnt=2
+            
+            chunk_percent=float(chunk_size)/total_size
+            total_loaded=0
+            percent=0
+            video_filename=os.path.join(p,filename
+            with file(video_filename), "wb") as videoout:
+                videoin = form['video'].file
                 while True:
                     chunk = videoin.read(chunk_size)
                     total_loaded+= len(chunk)
                     percent=int(float(total_loaded)/total_size*100)
                     _status_update(\
-                        'Uploading subtitles\n%d percent' % percent)
+                        'Uploading video file\n%d percent' % percent)
                     if not chunk: break
-                    subsout.write(chunk)
-        if not os.path.isfile(os.path.join(p,filename)):    
-            self.respond(get_error_html('Something went wrong, sorry :('))
-            _status_update('Something went wrong, sorry :(')
-        else:
-            _streams.add(name,os.path.join(p,filenamei),'best')
-            self._send_to('/')
+                    videoout.write(chunk)
+            
+            _status_update('Uploaded video file')
+            if file_cnt==2: 
+                subsname=os.path.splitext(filename)[0]+'.srt'
+                with file(os.path.join(p,subsname), "wb") as subsout:
+                    subsin = form['subs'].file
+                    while True:
+                        chunk = videoin.read(chunk_size)
+                        total_loaded+= len(chunk)
+                        percent=int(float(total_loaded)/total_size*100)
+                        _status_update(\
+                            'Uploading subtitles\n%d percent' % percent)
+                        if not chunk: break
+                        subsout.write(chunk)
+            if not os.path.isfile(video_filename):    
+                self.respond(get_error_html('Something went wrong, sorry :('))
+                _status_update('Something went wrong, sorry :(')
+                sleep(10)
+            else:
+                _streams.add(name,video_filename,'best')
+                self._send_to('/')
+                _processes.play_stream(name)
+        except:
+            _processes.run_something()
     
     #Handler for the GET requests
     def do_GET(self):
