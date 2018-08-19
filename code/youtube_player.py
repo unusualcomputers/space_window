@@ -55,7 +55,7 @@ class YouTubePlayer(VideoPlayer):
             if not plid:
                 return None
             gurl=pafy.g.urls['playlist'] % plid
-            allinfo=pafy.fetch_decode(gurl)
+            allinfo=pafy.pafy.fetch_decode(gurl)
             allinfo=json.loads(allinfo)
             pafys=[]
             for v in allinfo['video']:
