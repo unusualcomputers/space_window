@@ -170,7 +170,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             total_loaded=0
             percent=0
             video_filename=os.path.join(p,filename.replace(' ','_'))
-            with file(video_filename, "wb") as videoout:
+            with file(video_filename, 'wb') as videoout:
                 videoin = form['video'].file
                 while True:
                     chunk = videoin.read(chunk_size)
@@ -183,8 +183,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             
             _status_update('Uploaded video file')
             if file_cnt==2: 
-                subsname=os.path.splitext(filename)[0]+'.srt'
-                with file(os.path.join(p,subsname.replace(' ','_'), "wb") as subsout:
+                subsname=os.path.splitext(filename)[0].replace(' ','_')+'.srt'
+                with file(os.path.join(p,subsname), 'wb') as subsout:
                     subsin = form['subs'].file
                     while True:
                         chunk = subsin.read(chunk_size)
