@@ -91,6 +91,9 @@ class NasaPod:
             scrw=screen.get_width()
             black=screen.copy()
             black.fill((0,0,0))
+            blackalpha=screen.copy()
+            blackalpha.fill((0,0,0))
+
             (text,textrect)=self._place_text(("loading first image",""),
                 screen=screen)
             screen.blit(text, textrect)
@@ -130,7 +133,9 @@ class NasaPod:
                             return
                         #sleep(0.02)
                         image.set_alpha(255-i)
+                        blackalpha.set_alpha(255-i)
                         screen.blit(black,(0,0))
+                        screen.blit(blackalpha,(0,0))
                         screen.blit(image,(x,y))
                         pg.display.flip()
                     black.fill((0,0,0))
@@ -152,6 +157,8 @@ class NasaPod:
                         return
                     #sleep(0.02)
                     image.set_alpha(i)
+                    blackalpha.set_alpha(i)
+                    screen.blit(blackalpha,(0,0))
                     screen.blit(image,(x,y))
                     pg.display.flip()
                 screen.blit(black,(0,0))
