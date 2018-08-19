@@ -84,6 +84,13 @@ def _reboot():
 
 class SpaceWindowServer(BaseHTTPRequestHandler):
     # send_to redirects to a different address
+    def _respond(self,html):
+        self.send_response(200)
+        self.send_header('Content-type','text/html')
+        self.end_headers()
+        # Send the html message
+        self.wfile.write(html)
+    
     def _send_to(self,addr):
         self.send_response(301)
         self.send_header('Location',addr)
@@ -153,14 +160,16 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             if len(name)==0 or name=='NAME':
                 err='Sorry, you must tell me what to call this video'
                 _status_update(err)
-                self.respond(get_error_html(err))
+                self._respond(get_error_html(err))
+                sleep(5)
                 return
 
             filename = form['video'].filename
             if len(filename)==0:
                 err='Sorry, you must tell me a video a file name'
                 _status_update(err)
-                self.respond(get_error_html(err))
+                self._respond(get_error_html(err))
+                sleep(5)
                 return
 
             if len(form['subs'].filename)==0: file_cnt=1
@@ -195,7 +204,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                         if not chunk: break
                         subsout.write(chunk)
             if not os.path.isfile(video_filename):    
-                self.respond(get_error_html('Something went wrong, sorry :('))
+                self._respond(get_error_html('Something went wrong, sorry :('))
                 _status_update('Something went wrong, sorry :(')
                 sleep(10)
             else:
@@ -216,7 +225,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             ps=params['action'][0]
             if u'remove' in ps:
                 html=_streams.make_remove_html(ps[len('remove '):])
-                self.wfile.write(html)
+                self._respond(html)
                 return
             elif 'moveup' in ps:
                 _streams.up(ps[len('moveup '):])
@@ -240,20 +249,12 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         elif 'slideshow' in self.path:
             _processes.play_apod()
         elif 'upload' in self.path:
-            self.send_response(200)
-            self.send_header('Content-type','text/html')
-            self.end_headers()
-            # Send the html message
             html = get_upload_html() 
-            self.wfile.write(html)
+            self._respond(html)
             return
         elif 'wifi' in self.path:
-            self.send_response(200)
-            self.send_header('Content-type','text/html')
-            self.end_headers()
-            # Send the html message
             html = connection.make_wifi_html() 
-            self.wfile.write(html)
+            self._respond(html)
             return
         elif 'connect_new' in self.path:
             _processes.wait()
@@ -269,12 +270,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             set_standalone(False)
             _processes.stop_waiting()
         elif 'scan' in self.path:
-            self.send_response(200)
-            self.send_header('Content-type','text/html')
-            self.end_headers()
-            # Send the html message
             html = connection.make_wifi_html() 
-            self.wfile.write(html)
+            self._respond(html)
             return
         elif 'connect' in self.path:
             _processes.wait()
@@ -333,16 +330,11 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             f.close()
             return
         else:
-            # front page
-            self.send_response(200)
-            self.send_header('Content-type','text/html')
-            self.end_headers()
-            # Send the html message
             if _standalone:
                 html = get_standalone_html(_streams.make_html())
             else:
                 html = get_main_html(_streams.make_html())
-            self.wfile.write(html)
+            self._respond(html)
             return
         # everything that is not changing the address is sent back to start
         self._send_to('/')
