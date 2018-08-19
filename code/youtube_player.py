@@ -44,6 +44,8 @@ class YouTubePlayer(VideoPlayer):
             self.video_cache.add(url,v)
             return v
         except:
+            log=logger.get(__name__)
+            log.exception('exception while getting video for '+url)
             return None
 
     def _get_playlist(self,url):
@@ -59,12 +61,13 @@ class YouTubePlayer(VideoPlayer):
             allinfo=json.loads(allinfo)
             pafys=[]
             for v in allinfo['video']:
-                pfy=pafy.new(v.get('encrypted_id'))
-                pafys.append(pfy)
-            #v=pafy.get_playlist(url)
+                plentry=[v.get('encrypted_id'),None]
+                pafys.append(plentry)
             self.playlist_cache.add(url,pafys)
             return pafys
         except:
+            log=logger.get(__name__)
+            log.exception('exception while playlist for '+url)
             return None
 
     def _get_video_qualities(self,pfy):
@@ -141,6 +144,8 @@ class YouTubePlayer(VideoPlayer):
             # if nothing else worked, get me the best one
             return [(title,author,pfy.getbestvideo('mp4').url)]
         except:
+            log=logger.get(__name__)
+            log.exception('exception while getting video url')
             return []
 
     def _get_first_url(self,url,quality,urls):
@@ -153,7 +158,11 @@ class YouTubePlayer(VideoPlayer):
             sz=len(pl)
             if sz==0: return sz
             #self._status('getting data for your video')
-            urls+=self._get_video_url(pl[0],quality)
+            pfy=pl[0][1]
+            if pfy is None:
+                pfy=pafy.new(pl[0][0])
+                pl[0][1]=pfy
+            urls+=self._get_video_url(pfy,quality)
         return sz
 
     def _get_remaining_urls(self,url,quality,urls,thread_id):
@@ -164,10 +173,15 @@ class YouTubePlayer(VideoPlayer):
             rest=pl[1:]
             sz=len(rest)+1
             j=2
+            new_pfys=[pl[0]]
             for i in rest:
                 #self._status('getting data for video %i of %i'%(j,sz))
                 j+=1
-                u=self._get_video_url(i,quality)
+                pfy=i[1]
+                if pfy is None:
+                    pfy=pafy.new(i[0])
+                    i[1]=pfy
+                u=self._get_video_url(pfy,quality)
                 with self.lock:
                     urls+=u
                     if thread_id not in self.alive_threads: return
@@ -230,7 +244,7 @@ class YouTubePlayer(VideoPlayer):
         v=self._get_playlist(url)
         if v is not None: 
             self._status('getting available video qualities for the playlist')
-            return self._get_playlist_qualities(v)
+            return ['default']#self._get_playlist_qualities(v)
         #self._status('this was not a playlist, getting video information')
         v=self._get_video(url)
         if v is not None: 
