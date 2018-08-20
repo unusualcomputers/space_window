@@ -5,12 +5,13 @@ from collections import OrderedDict
 from video_player import Player
 import threading
 import logger
+import random
 import requests
 
 _streams_data='.space.window'
 _base_path=os.path.join(os.path.expanduser('~'),_streams_data)
 _config_path=os.path.join(_base_path,_streams_data)
-_cnt=0 # global counter, used to make html more responsive
+_cnt=random.randint(0,1000) # global counter, used to make html more responsive
 _session=requests.Session()
 
 _player=None

@@ -12,6 +12,7 @@ from processes import *
 import logger
 import os
 from threading import Timer
+import random
 
 _ap_name=wifi.ap_name
 _to_launch=wifi.config.get('access-point','execute_when_connected')
@@ -40,7 +41,7 @@ def set_reporting_func( f ):
 def _report( s ): 
     if _reporting_func: _reporting_func( s ) 
 
-_cnt=0
+_cnt=random.randint(0,1000)
 
 _attempting_html_template=u"""
     <!doctype html>
