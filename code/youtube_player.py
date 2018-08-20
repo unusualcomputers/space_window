@@ -174,7 +174,7 @@ class YouTubePlayer(VideoPlayer):
             new_pfys=[pl[0]]
             for i in rest:
                 #self._status('getting data for video %i of %i'%(j,sz))
-                log.info('getting data for video %i of %i'%(j,sz))
+                _log.info('getting data for video %i of %i'%(j,sz))
                 j+=1
                 pfy=i[1]
                 if pfy is None:
@@ -218,7 +218,7 @@ class YouTubePlayer(VideoPlayer):
                         if thread_id not in self.alive_threads: return
                     self._status('playing\n%s\n%s' % (name,author))
                     cmd='%s "%s"' % (self._player_cmd,u)
-                    _log.info(cmd)
+                    #_log.info(cmd)
                     os.system(cmd)
                     time.sleep(2) 
                     self._status('')
