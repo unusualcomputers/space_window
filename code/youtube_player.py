@@ -11,6 +11,7 @@ import json
 _cache_size=100
 _default_res=360
 _thread_id=0
+_log=logger.get(__name__)
 
 def _next_thread_id():
     global _thread_id
@@ -44,8 +45,7 @@ class YouTubePlayer(VideoPlayer):
             self.video_cache.add(url,v)
             return v
         except:
-            log=logger.get(__name__)
-            log.exception('exception while getting video for '+url)
+            _log.exception('exception while getting video for '+url)
             return None
 
     def _get_playlist(self,url):
@@ -66,8 +66,7 @@ class YouTubePlayer(VideoPlayer):
             self.playlist_cache.add(url,pafys)
             return pafys
         except:
-            log=logger.get(__name__)
-            log.exception('exception while playlist for '+url)
+            _log.exception('exception while playlist for '+url)
             return None
 
     def _get_video_qualities(self,pfy):
@@ -144,8 +143,7 @@ class YouTubePlayer(VideoPlayer):
             # if nothing else worked, get me the best one
             return [(title,author,pfy.getbestvideo('mp4').url)]
         except:
-            log=logger.get(__name__)
-            log.exception('exception while getting video url')
+            _log.exception('exception while getting video url')
             return []
 
     def _get_first_url(self,url,quality,urls):
@@ -176,6 +174,7 @@ class YouTubePlayer(VideoPlayer):
             new_pfys=[pl[0]]
             for i in rest:
                 #self._status('getting data for video %i of %i'%(j,sz))
+                log.info('getting data for video %i of %i'%(j,sz))
                 j+=1
                 pfy=i[1]
                 if pfy is None:
@@ -186,8 +185,7 @@ class YouTubePlayer(VideoPlayer):
                     urls+=u
                     if thread_id not in self.alive_threads: return
         except:
-            log=logger.get(__name__)
-            log.exception('exception while getting remaining you tube urls')
+            _log.exception('exception while getting remaining you tube urls')
             raise
     
     def _play_loop_impl(self,url,quality):
@@ -219,9 +217,11 @@ class YouTubePlayer(VideoPlayer):
                         (name,author,u)=urls[i]
                         if thread_id not in self.alive_threads: return
                     self._status('playing\n%s\n%s' % (name,author))
-                    print 'playing\n%s\n%s' % (name,author)
                     cmd='%s "%s"' % (self._player_cmd,u)
+                    _log.info(cmd)
                     os.system(cmd)
+                    time.sleep(2) 
+                    self._status('')
         finally:
             with self.lock:
                 if thread_id in self.alive_threads:
