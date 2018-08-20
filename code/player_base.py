@@ -2,9 +2,10 @@ import os
 import time
 import threading
 import logger
+from config_util import Config
 
 _player='omxplayer'
-_player_args='--vol 500 --timeout 60'
+_player_args='-o alsa--vol 500 --timeout 60'
 #_player='mpv'
 #_player_args=''
 _synchronisation_sleep=0.1
@@ -16,15 +17,12 @@ class VideoPlayer:
             player_args=None):
         self._status_func=status_func
         self.playing=False
+        config = Config('space_window.conf',__file__)    
         if player is None:
-            self._player=_player
-        else:
-            self._player=player
+            self._player=config.get('player','player',_player)
        
         if player_args is None:
-            self._player_args=_player_args
-        else: 
-            self._player_args=player_args
+            self._player_args=config.get('player','player_args',_player_args)
         
         self._player_cmd=self._player+' '+self._player_args
         self.log=logger.get(__name__)

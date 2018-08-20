@@ -114,7 +114,7 @@ class YouTubePlayer(VideoPlayer):
             if quality=='worst' or len(mp4s)==1:
                 return [mp4s[0].url]
             if quality=='best':
-                return [pfy.getbestvideo('mp4').url]
+                return [pfy.getbest('mp4').url]
             if quality[-1]=='p': 
                 s='x'+quality[:-1]
                 try:
@@ -141,7 +141,7 @@ class YouTubePlayer(VideoPlayer):
             if len(smaller)>0:
                 return [(title,author,smaller[-1].url)]    
             # if nothing else worked, get me the best one
-            return [(title,author,pfy.getbestvideo('mp4').url)]
+            return [(title,author,pfy.getbest('mp4').url)]
         except:
             _log.exception('exception while getting video url')
             return []
