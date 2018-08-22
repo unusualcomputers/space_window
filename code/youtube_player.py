@@ -31,6 +31,7 @@ class YouTubePlayer(VideoPlayer):
         self.playing_playlist=False
 
     def can_play(self,url):
+        _log.info('checking if can play video')
         self._status('checking video status')
         return (pafy.playlist.extract_playlist_id(url) is not None) or \
             (self._get_video(url) is not None)         
@@ -150,6 +151,7 @@ class YouTubePlayer(VideoPlayer):
         pl=self._get_playlist(url)
         sz=1
         if pl is None:
+            _log.info('getting first url')
             pfy=self._get_video(url)
             urls+=self._get_video_url(pfy,quality)
         else:
@@ -218,10 +220,12 @@ class YouTubePlayer(VideoPlayer):
                         if thread_id not in self.alive_threads: return
                     self._status('playing\n%s\n%s' % (name,author))
                     cmd='%s "%s"' % (self._player_cmd,u)
-                    #_log.info(cmd)
+                    _log.info(cmd)
                     os.system(cmd)
                     time.sleep(2) 
                     self._status('')
+        except:
+            _log.exception('exception while playing '+url)
         finally:
             with self.lock:
                 if thread_id in self.alive_threads:
@@ -246,6 +250,7 @@ class YouTubePlayer(VideoPlayer):
             self._status('getting available video qualities for the playlist')
             return ['default']#self._get_playlist_qualities(v)
         #self._status('this was not a playlist, getting video information')
+        _log.info('getting qualities')
         v=self._get_video(url)
         if v is not None: 
             self._status('getting available video qualities')

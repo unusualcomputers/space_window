@@ -8,15 +8,17 @@ console = logging.StreamHandler(sys.stdout)
 console.setLevel(lvl)
 console.setFormatter(formatter)
 rootLog='SpaceWindow'
-logging.basicConfig(format=logfrmt,level=lvl)
+#logging.basicConfig(format=logfrmt,level=lvl)
+filelogger=logging.FileHandler('/home/pi/space_window/code/space_window.log')
+filelogger.setFormatter(formatter)
 def get(subname):
     global loggers
     name='%s.%s' %(rootLog,subname)
     if name in loggers: return loggers[name]
-    
     l=logging.getLogger(name)
     l.handlers = []
     l.addHandler(console) 
+    l.addHandler(filelogger)
     l.setLevel(lvl)
     loggers[name]=l
     return l

@@ -8,6 +8,9 @@ from borg import borg_init_once
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
 
+pg.display.init()
+pg.font.init()
+
 class MsgScreenThread:
     def __init__(self):
         config = Config('space_window.conf',__file__)    
@@ -26,7 +29,6 @@ class MsgScreenThread:
         self.text=None
         self.black=None
         self.font=None
-        pg.init()
         #sleep(1)
         pg.mouse.set_visible(False)	
         self.screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
@@ -79,7 +81,9 @@ class MsgScreenThread:
         self.screen.blit(self.black,(0,0))
          
     def run_msg(self):
-        pg.init()
+        #pg.init()
+        pg.display.init()
+        pg.font.init()
         local_text=''
         while(self.get_running()):
             for event in pg.event.get():

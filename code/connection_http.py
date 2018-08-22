@@ -17,8 +17,9 @@ _ap_name=wifi.ap_name
 _to_launch=wifi.config.get('access-point','execute_when_connected')
 _sleep_on_connect=wifi.config.getint('access-point','sleep_on_connect',10)
 
+_log=logger.get(__name__)
+
 if wifi.config.getbool('access-point','use_pygame',False):
-    pygame.init()
     _msg=msg.MsgScreen()
 else:
     _msg=None
@@ -38,6 +39,7 @@ def set_reporting_func( f ):
     _reporting_func=f
 
 def _report( s ): 
+    _log.info(s)
     if _reporting_func: _reporting_func( s ) 
 
 _cnt=0
@@ -225,21 +227,27 @@ class StandaloneWifiServer(BaseHTTPRequestHandler):
 
 
 def start_ap():
-    _report('starting access point')
-    wifi.start_ap()
-    _report('access point is running, I think :)')
-    time.sleep(5)
-    _report('connect to network %s\n( that\'s me :) )\n' % _ap_name +
-        'then type %s in a browser' % wifi.ap_ip)
+    try:
+        _report('starting access point')
+        wifi.start_ap()
+        _report('access point is running, I think :)')
+        time.sleep(5)
+        _report('connect to network %s\n( that\'s me :) )\n' % _ap_name +
+            'then type %s in a browser' % wifi.ap_ip)
+        time.sleep(10)
+    except:
+        _log.exception('error starting access point')
+        raise
 
 def test_connection(s):                
     _report(s)
-    for i in range(0,120):
-        msg=s+' . '
-        _report(msg)
+    msg=s
+    for i in range(0,60):
         if wifi.is_connected():
             return True
         time.sleep(1)
+        msg=msg+' . '
+        _report(msg)
     return False
 
 def run_wifi_server():

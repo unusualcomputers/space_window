@@ -1,7 +1,7 @@
 from time import sleep
 import connection_http as connection
 import pygame
-from server import wait_to_initialise,start_server,stop_server
+from server import wait_to_initialise,start_server,stop_server,set_standalone
 import logger
 
 log=logger.get(__name__)
@@ -14,14 +14,19 @@ try:
     #connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the
     #incoming request
-    wait_to_initialise()
     if connected:
+        log.info('connected')
         connection.display_connection_details()
+        sleep(10)
     else:
+        log.info('starting ap')
         connection.start_ap()
-    sleep(10)
+    set_standalone(not connected)
+    log.info('wiating to initialise')
+    wait_to_initialise()
+    log.info('initialised')
     #Wait forever for incoming http requests
-    start_server(connected)
+    start_server()
 
 except KeyboardInterrupt:
     log.info('space window is shutting down')

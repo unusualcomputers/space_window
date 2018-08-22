@@ -5,14 +5,16 @@ import os
 from time import sleep
 import wifi_control as wifi
 import connection_http as connection
-from html import get_main_html,get_upload_html
+from html import get_main_html,get_upload_html,get_standalone_html
 import py_game_msg as msg
 import logger
 from processes import *
+import processes as procmod
 from async_job import Job
 from waiting_messages import WaitingMsgs
 from threading import Timer
 import cgi
+import streams
 
 PORT_NUMBER = 80
 MOPIDY_PORT=6680
@@ -23,14 +25,16 @@ _streams=None
 _server=None
 _standalone=False
 
+_log=logger.get(__name__)
+
 def set_standalone(standalone):
     global _standalone
     _standalone=standalone
+    procmod.set_standalone(standalone)
 
 _msg=msg.MsgScreen()
 def _status_update(txt):
-    log=logger.get(__name__)
-    log.info(txt)
+    _log.info(txt)
     _msg.set_text(txt)
 
 def _initialise_streams():
@@ -42,10 +46,10 @@ def _initialise_streams():
 
 def initialise_server():
     global _server
+    #Wait forever for incoming http requests
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
-    log=logger.get(__name__)
-    log.info('Started httpserver on port %i',PORT_NUMBER)
+    _log.info('Started httpserver on port %i',PORT_NUMBER)
     _initialise_streams()
 
 def wait_to_initialise():
@@ -63,10 +67,7 @@ def wait_to_initialise():
         sleep(1)
     return waiting_job.result
 
-def start_server(connected):
-    set_standalone(not connected)
-    #Wait forever for incoming http requests
-    _processes.connected=connected
+def start_server():
     _processes.run_something()    
     _server.serve_forever()
 
@@ -103,9 +104,10 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     def _handle_wifi_change_req(self,params):
         wifi_name='noname'
         password=None
+        _log.info('wifi connection params ' + str(params)) 
         for n in params:
             v=params[n]
-            if v==['connect']:
+            if v==['connect_new']:
                 wifi_name=n
             elif n=='password':
                 password=v[0]
@@ -118,9 +120,12 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     def _handle_start_wifi_req(self,params):
         wifi_name='noname'
         password=None
+        print params
+        _log.info(params)
+        _log.info('wifi connection params ' + str(params)) 
         for n in params:
             v=params[n]
-            if v==['connect']:
+            if v==['connect_new']:
                 wifi_name=n
             elif n=='password':
                 password=v[0]
@@ -128,7 +133,9 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         #server.wfile.write(make_attempting_html())
         wifi.set_wifi(wifi_name,password)
         wifi.start_wifi()
-        if test_connection():
+        if connection.test_connection():
+            connection.display_connection_details()
+            sleep(10)
             return True
 
         _status_update\
@@ -139,10 +146,9 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     
     def do_POST(self):
         try:
-            log=logger.get(__name__)
             _processes.stop_all() 
             if 'upload' not in self.path:
-                log.error('Unknonw post request')
+                _log.error('Unknonw post request')
                 self._send_to('/')
             chunk_size=128*1024
             _status_update('Getting info about files to upload')
@@ -210,132 +216,136 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             else:
                 _streams.add(name,video_filename,'default')
                 self._send_to('/')
+                _log.info('playing uploaded video')
                 _processes.play_stream(name)
         except:
-            log.exception('Error while processing upload')
+            _log.exception('Error while processing upload')
             _processes.run_something()
     
     #Handler for the GET requests
     def do_GET(self):
-        _initialise_streams()
-        log=logger.get(__name__)
-        params = parse_qs(urlparse(self.path).query)
+        try:
+            _initialise_streams()
+            params = parse_qs(urlparse(self.path).query)
 
-        if 'play_remove' in self.path:
-            ps=params['action'][0]
-            if u'remove' in ps:
-                html=_streams.make_remove_html(ps[len('remove '):])
+            if 'play_remove' in self.path:
+                ps=params['action'][0]
+                if u'remove' in ps:
+                    html=_streams.make_remove_html(ps[len('remove '):])
+                    self._respond(html)
+                    return
+                elif 'moveup' in ps:
+                    _streams.up(ps[len('moveup '):])
+                else: #if it's not remove, then it's play
+                    _log.info('playing as requested')
+                    _processes.play_stream(ps[len('play '):])
+                    #_processes.run_something()
+            elif 'really_remove' in self.path:
+                ps=params['action'][0]
+                _streams.remove(ps[len('really remove '):])
+            elif 'next' in self.path:
+                _processes.play_next()
+            elif 'refresh_caches' in self.path:
+                _processes.refresh_caches()
+            elif 'add' in self.path:
+                if params['name'][0] != 'NAME' and params['link'][0]!='LINK':
+                    name=params['name'][0].replace(' ','')
+                    _streams.add(params['name'][0],params['link'][0],
+                        params['quality'][0])
+            elif 'clock' in self.path:
+                _processes.play_clock()
+            elif 'slideshow' in self.path:
+                _processes.play_apod()
+            elif 'upload' in self.path:
+                html = get_upload_html() 
                 self._respond(html)
                 return
-            elif 'moveup' in ps:
-                _streams.up(ps[len('moveup '):])
-            else: #if it's not remove, then it's play
-                _processes.play_stream(ps[len('play '):])
-                #_processes.run_something()
-        elif 'really_remove' in self.path:
-            ps=params['action'][0]
-            _streams.remove(ps[len('really remove '):])
-        elif 'next' in self.path:
-            _processes.play_next()
-        elif 'refresh_caches' in self.path:
-            _processes.refresh_caches()
-        elif 'add' in self.path:
-            if params['name'][0] != 'NAME' and params['link'][0]!='LINK':
-                name=params['name'][0].replace(' ','')
-                _streams.add(params['name'][0],params['link'][0],
-                    params['quality'][0])
-        elif 'clock' in self.path:
-            _processes.play_clock()
-        elif 'slideshow' in self.path:
-            _processes.play_apod()
-        elif 'upload' in self.path:
-            html = get_upload_html() 
-            self._respond(html)
-            return
-        elif 'wifi' in self.path:
-            html = connection.make_wifi_html() 
-            self._respond(html)
-            return
-        elif 'connect_new' in self.path:
-            _processes.wait()
-            _processes.kill_running()
-            _status_update('changing wifi networks\n'+\
-                'this is a fragile process\n'+\
-                "give it a few minutes\nif it didn't work, reboot")
-            self._handle_start_wifi_req(params)
-            _status_update('testing the new connection')
-            if connection.test_connection():
-                display_connection_details()
-                sleep(20)
-            set_standalone(False)
-            _processes.stop_waiting()
-        elif 'scan' in self.path:
-            html = connection.make_wifi_html() 
-            self._respond(html)
-            return
-        elif 'connect' in self.path:
-            _processes.wait()
-            _processes.kill_running()
-            _status_update('changing wifi networks\n'+\
-                'this is a fragile process\n'+\
-                "give it a few minutes\nif it didn't work, reboot")
-            self.handle_wifi_change_req(params,self)
-            _status_update('testing the new connection')
-            if connection.test_connection():
-                display_connection_details()
-                sleep(20)
-            _processes.stop_waiting()
-            #check_running()
-        elif 'reboot' in self.path:
-            _status_update('rebooting in a few seconds, see you soon :)')
-            Timer(5,_reboot).start()
-        elif 'shutdown' in self.path:
-            _status_update('shutting down in a few seconds, goodbye :)')
-            Timer(5,_shutdown).start()
-        elif 'kodi' in self.path:
-            _processes.wait()
-            _processes.kill_running()
-            _status_update('starting kodi')
-            log.info('starting kodi')
-            os.system('sudo -u pi kodi-standalone')
-            log.info('started kodi')
-            txt='enjoy'
-            _status_update(txt)
-            _processes.stop_waiting()
-        elif 'rough' in self.path:
-            #_processes.wait()
-            #_processes.kill_running()
-            #_status_update('starting radio rough')
-            #print 'starting mopidy'
-            #subprocess.Popen(['mopidy'])
-            #print 'started mopidy'
-            #sleep(40)
-            #print 'slept a bit'
-            txt='mopidy is starting'
-            log.info(txt)
-            #_status_update(txt)
-            self._send_to('http://%s:%i' % (_ip,MOPIDY_PORT))
-            _processes.start_mopidy()
-            #_processes.stop_waiting()            
-            return
-        elif self.path.endswith('.jpg'):
-            # getting pictures for backgrounds and such
-            mimetype='image/jpg'
-            #Open the static file requested and send it
-            f = open('/home/pi/' + self.path) 
-            self.send_response(200)
-            self.send_header('Content-type',mimetype)
-            self.end_headers()
-            self.wfile.write(f.read())
-            f.close()
-            return
-        else:
-            if _standalone:
-                html = get_standalone_html(_streams.make_html())
+            elif 'wifi' in self.path:
+                html = connection.make_wifi_html() 
+                self._respond(html)
+                return
+            elif 'connect_new' in self.path:
+                _processes.wait()
+                _processes.kill_running()
+                _status_update('changing wifi networks\n'+\
+                    'this is a fragile process\n'+\
+                    "give it a few minutes\nif it didn't work, reboot")
+                self._handle_start_wifi_req(params)
+                _status_update('testing the new connection')
+                if connection.test_connection():
+                    connection.display_connection_details()
+                    sleep(10)
+                set_standalone(False)
+                _processes.stop_waiting()
+            elif 'scan' in self.path:
+                html = connection.make_wifi_html() 
+                self._respond(html)
+                return
+            elif 'connect' in self.path:
+                _processes.wait()
+                _processes.kill_running()
+                _status_update('changing wifi networks\n'+\
+                    'this is a fragile process\n'+\
+                    "give it a few minutes\nif it didn't work, reboot")
+                self.handle_wifi_change_req(params,self)
+                _status_update('testing the new connection')
+                if connection.test_connection():
+                    connection.display_connection_details()
+                    sleep(10)
+                _processes.stop_waiting()
+                #check_running()
+            elif 'reboot' in self.path:
+                _status_update('rebooting in a few seconds, see you soon :)')
+                Timer(5,_reboot).start()
+            elif 'shutdown' in self.path:
+                _status_update('shutting down in a few seconds, goodbye :)')
+                Timer(5,_shutdown).start()
+            elif 'kodi' in self.path:
+                _processes.wait()
+                _processes.kill_running()
+                _status_update('starting kodi')
+                _log.info('starting kodi')
+                os.system('sudo -u pi kodi-standalone')
+                _log.info('started kodi')
+                txt='enjoy'
+                _status_update(txt)
+                _processes.stop_waiting()
+            elif 'rough' in self.path:
+                #_processes.wait()
+                #_processes.kill_running()
+                #_status_update('starting radio rough')
+                #print 'starting mopidy'
+                #subprocess.Popen(['mopidy'])
+                #print 'started mopidy'
+                #sleep(40)
+                #print 'slept a bit'
+                txt='mopidy is starting'
+                _log.info(txt)
+                #_status_update(txt)
+                self._send_to('http://%s:%i' % (_ip,MOPIDY_PORT))
+                _processes.start_mopidy()
+                #_processes.stop_waiting()            
+                return
+            elif self.path.endswith('.jpg'):
+                # getting pictures for backgrounds and such
+                mimetype='image/jpg'
+                #Open the static file requested and send it
+                f = open('/home/pi/' + self.path) 
+                self.send_response(200)
+                self.send_header('Content-type',mimetype)
+                self.end_headers()
+                self.wfile.write(f.read())
+                f.close()
+                return
             else:
-                html = get_main_html(_streams.make_html())
-            self._respond(html)
-            return
-        # everything that is not changing the address is sent back to start
-        self._send_to('/')
-
+                if _standalone:
+                    html = get_standalone_html(_streams.make_html())
+                else:
+                    html = get_main_html(_streams.make_html())
+                self._respond(html)
+                return
+            # everything that is not changing the address is sent back to start
+            self._send_to('/')
+        except:
+            _log.exception('Error while dealing with server request')
+            raise

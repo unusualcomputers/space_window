@@ -5,7 +5,15 @@ from threading import Timer
 import wifi_control as wifi
 from mopidy_listener import MopidyUpdates
 from streams import Streams
+import streams as streamsmod
 import logger
+
+_standalone=False
+
+def set_standalone(standalone):
+    global _standalone
+    _standalone=standalone
+    streamsmod.set_standalone(standalone)
 
 class ProcessHandling:
     def __init__(self,status_update_func):
@@ -16,11 +24,11 @@ class ProcessHandling:
         self._streams=Streams.load()
         self._nasa=NasaPod()
         self._clock=Clock()
-        threading.Thread(target=self.launch_mopidy).start()
+        if not _standalone:
+            threading.Thread(target=self.launch_mopidy).start()
         self._status_update=status_update_func    
         self._streams.set_status_func(status_update_func)
         self.log=logger.get(__name__)
-        self.connected=True
 
     def launch_mopidy(self):
         try:
@@ -29,6 +37,7 @@ class ProcessHandling:
             self.log.exception('exception while launching mopidy')
             
     def start_mopidy(self):
+        if _standalone: return
         if self._mopidy is None:
             self._mopidy=MopidyUpdates(self._status_update)
         self._mopidy.show_updates()
@@ -45,7 +54,8 @@ class ProcessHandling:
         self._streams.stop()
         self._nasa.stop()
         self._clock.stop()
-        self._mopidy.stop()
+        if not _standalone and self._mopidy is not None:
+            self._mopidy.stop()
         #wifi.run('pkill -9 mopidy')
        
     def wait(self):
@@ -65,7 +75,7 @@ class ProcessHandling:
         self._stop_timer()
         self.log.info('starting %s' % name)
         if self._current_stream==name and self._streams.is_playing():
-            self.log.info('stream %s is aready playing')
+            self.log.info('stream %s is already playing' % name)
             return
         self.kill_running()   
         self._status_update('starting %s' % name)
@@ -108,9 +118,9 @@ class ProcessHandling:
             self._streams.playlist_next()
             return
         if self._current_stream is None:
-            name=self._streams.first(self.connected)
+            name=self._streams.first()
         else:
-            name=self._streams.next(self._current_stream,self.connected) 
+            name=self._streams.next(self._current_stream) 
         if name is None: 
             self.log.info('about to play apod')
             self.play_apod()
@@ -119,18 +129,21 @@ class ProcessHandling:
             self.play_stream(name)
 
     def run_something(self):
-        if self._wait: return
         self._stop_timer()
-        if not self.connected:
-            name=self._streams.first(self.connected)
-            if name is not None:
-                self.log.info('about to play stream %s' % name)
-                self.play_stream(name)
+        if (self._streams.is_playing() or self._nasa.is_playing()\
+            or self._clock.is_playing() or self._wait):
+            self._start_timer()
             return
 
-        if not (self._streams.is_playing() or self._nasa.is_playing()\
-            or self._clock.is_playing()):
-            self.play_next()
+        if _standalone:
+            name=self._streams.first()
+            if name is not None:
+                self.log.info('about to play %s' % name)
+                self.play_stream(name)
+            self._start_timer()
+            return
+
+        self.play_next()
         self._start_timer()
         
     def refresh_caches(self):

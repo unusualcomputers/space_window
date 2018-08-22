@@ -12,10 +12,16 @@ _base_path=os.path.join(os.path.expanduser('~'),_streams_data)
 _config_path=os.path.join(_base_path,_streams_data)
 _cnt=0 # global counter, used to make html more responsive
 _session=requests.Session()
-
 _player=None
 # streams
 #   main class managing sreams to play
+
+_standalone=False
+
+def set_standalone(standalone):
+    global _standalone
+    _standalone=standalone
+
 class Streams(Jsonable):
 
     @classmethod
@@ -55,13 +61,10 @@ class Streams(Jsonable):
     def _get_data_for_rest(self):
         try:
             l=self.len()
-            self.log.info('GETTING REST %i',l)
             if l < 2: return
             for i in range(1,l):
-                self.log.info('GETTING: %s',self.streams.items()[i]) 
                 (url,quality)=self.streams.items()[i][1]                
                 _player.can_play(url)
-                self.log.info('GOT %i %s',i,url)
         except:
             self.log.exception('exception while getting rest of videos')
             raise
@@ -72,10 +75,10 @@ class Streams(Jsonable):
             _player.set_status_func(status_func)
 
     def refresh_caches(self,threaded=False):
-        self.log.info('INITIALISING PLAYER')
         global _player
         _player=Player()
-        self._get_data_for_first_video()
+        if not _standalone:
+            self._get_data_for_first_video()
         #if threaded:
         #    threading.Thread(target=self._get_data_for_rest).start()        
         #else:
@@ -84,8 +87,8 @@ class Streams(Jsonable):
     def len(self):
         return len(self.streams.items())
 
-    def first(self,connected):
-        if connected:
+    def first(self):
+        if not _standalone:
             return self.at(0)
         else:
             for name in self.streams:
@@ -98,15 +101,15 @@ class Streams(Jsonable):
         else:
             return self.streams.items()[i][0]
   	
-    def next(self, name, connected):
+    def next(self, name):
         found=False
         for k in range(self.len()):
            if self.at(k)==name:
-                if connected: return self.at(k+1)
+                if not _standalone: return self.at(k+1)
                 else: found = True
            elif found:
                 if os.path.isfile(at(k)): return at(k)
-        return self.first(connected)
+        return self.first()
 
     def is_playlist(self):
         return _player.is_playlist()
@@ -166,13 +169,13 @@ class Streams(Jsonable):
         """.format(name,name,name,name)
         return build_html(form)
 
-    def make_html(self,files_only=False):
+    def make_html(self):
         global _cnt
         _cnt+=1
         html=u''
         for name in self.streams:
             (url,quality)=self.streams[name]
-            if files_only and not os.path.isfile(url): continue
+            if _standalone and not os.path.isfile(url): continue
             if os.path.isfile(url):
                 row = u"""<tr><td>{}</td><td>{}</td><td>
                     <input type="hidden" name="hidden_{}" value="{}">

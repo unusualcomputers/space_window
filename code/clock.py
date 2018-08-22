@@ -8,8 +8,8 @@ from weather import Weather
 class Clock:
     def __init__(self):
         config = Config('space_window.conf',__file__)    
-        pygame.init()
-        
+        pygame.display.init()
+        pygame.font.init()
         #size = width, height = 640, 480
         #self._screen = pygame.display.set_mode( size, 0 , 32 )
         self._screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN )

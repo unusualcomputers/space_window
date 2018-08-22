@@ -60,6 +60,9 @@ _ap_interface=config.get('access-point','interface','wlan0')
 ap_ip=config.get('access-point','ip','192.168.4.1')
 _ap_iprange=config.get('access-point','iprange','192.168.4.2,192.168.4.20')
 
+def _get_config_path():
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)),'conf')
+
 # run a program and wait for it to finish
 def run(rcmd):
     cmd = shlex.split(rcmd)
@@ -203,7 +206,7 @@ def list_network_data(iface=_ap_interface):
 
 # get the name of this host
 def get_host_name():
-        return socket.gethostname()
+    return socket.gethostname()
 
 # start access point
 def start_ap():
@@ -211,11 +214,11 @@ def start_ap():
     run('sudo cp /etc/dnsmasq.conf %s/dnsmasq.conf.backup' % p)
     run('sudo cp /etc/default/hostapd %s/hostapd.backup' % p)
     run('sudo cp /etc/dhcpcd.conf %s/dhcpcd.conf.backup' % p)
-    run('sudo cp /etc/wpa_supplicant/wpa_supplicant.conf'+\
+    run('sudo cp /etc/wpa_supplicant/wpa_supplicant.conf '+\
          '%s/wpa_supplicant.conf.backup' % p)
     
     run('sudo cp /etc/hostapd/hostapd.conf %s/hostapd.conf.backup' % p)
-    hostapd_conf=_hostapd_conf.replace('NameOfNetwork',_ap_name).\
+    hostapd_conf=_hostapd_conf.replace('NameOfNetwork',ap_name).\
         replace('DriverName',_ap_driver).replace('wlan0',_ap_interface)
 
     try:
@@ -226,7 +229,7 @@ def start_ap():
 
     f=open('%s/dhcpcd.conf.ap' % p)
     file_text=f.read().replace('wlan0',_ap_interface).\
-        replace('IP_ADDRESS',_ap_ip)
+        replace('IP_ADDRESS',ap_ip)
     f.close()
     f=open('/etc/dhcpcd.conf','w')
     f.write(file_text)
@@ -241,9 +244,9 @@ def start_ap():
     f.close()
     
 
-    run('sudo cp %s/hostapd.ap /etc/default/hostapd' % get_path())
-    run('sudo cp %s/wpa_supplicant.empty '+\
-        '/etc/wpa_supplicant/wpa_supplicant.conf' % p)
+    run('sudo cp %s/hostapd.ap /etc/default/hostapd' % p) 
+    run(\
+    'sudo cp %s/wpa_supplicant.empty /etc/wpa_supplicant/wpa_supplicant.conf' % p)
     
     
     run('sudo ip link set %s down' % _ap_interface)
@@ -266,7 +269,7 @@ def start_ap():
 def start_wifi():
     p=_get_config_path()
     wpa_backp='%s/wpa_supplicant.conf.backup' % p
-    if os.path.is_file(wpa_backp):
+    if os.path.isfile(wpa_backp):
         run('sudo cp %s /etc/wpa_supplicant/wpa_supplicant.conf' % wpa_backp)
     run('cp %s/dhcpcd.conf.backup /etc/dhcpcd.conf' % p)
     run('cp %s/dnsmasq.conf.backup /etc/dnsmasq.conf' % p)
@@ -285,7 +288,7 @@ def start_wifi():
     time.sleep(1)
     run('sudo wpa_cli reconfigure')
 
-def _parse_wpa_file(fname):
+def _read_wpa_file(fname):
     wpa_networks=OrderedDict()
     if os.path.exists(fname):
         wpa_text=open(fname).read()
@@ -327,7 +330,7 @@ def _add_wpa_network(ssid,password,wpa_networks):
             n.replace('priority.*=.*$','')
             wpa_networks[k]=n
 
-    if password is None or password.length==0:
+    if password is None or len(password)==0:
         if ssid in wpa_networks:
             nblock=wpa_networks[ssid]
             nblock=nblock.replace('}','\tpriority=10\n}')
@@ -347,8 +350,9 @@ def _add_wpa_network(ssid,password,wpa_networks):
 # if invoked with an existing network and no password
 # it will just set the priority of the chosen network high
 def set_wifi(ssid,password):
-    wpa_backp='%s/wpa_supplicant.conf.backup' % get_path()
-    if os.path.is_file(wpa_backp):
+    p=_get_config_path()
+    wpa_backp='%s/wpa_supplicant.conf.backup' % p 
+    if os.path.isfile(wpa_backp):
         fname=wpa_backp
     else:
         fname='/etc/wpa_supplicant/wpa_supplicant.conf'

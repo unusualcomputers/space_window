@@ -27,7 +27,7 @@ class Job:
             if self.args is None:
                 self.result=self.target()
             else:
-                self.result=self.target(*args)
+                self.result=self.target(*self.args)
         except Exception as e:
             log.exception('exception in async job')
             self.exception=e

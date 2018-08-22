@@ -21,8 +21,8 @@ class NasaPod:
         self._running=False
         self._fontname=config.get('font','name','comicsansms')
         self._fontsize=config.getint('nasa','font_size',48)
-        pg.init()
-        #pg.font.init()
+        pg.display.init()
+        pg.font.init()
         self._font = pg.font.SysFont(self._fontname,self._fontsize)
         self._text_col=config.getcolor('nasa','foreground',(100,100,100))
         self._text_height_ratio=config.getint('nasa','height_ratio',10)        
