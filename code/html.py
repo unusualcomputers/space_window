@@ -1,3 +1,4 @@
+import random
 
 _html_template_main=u"""
 <!doctype html>
@@ -289,7 +290,7 @@ Brought to you by <a href="https://unusualcomputerscollective.org/" target="_bla
 </body>
 
 """           
-_cnt=0
+_cnt=random.randint(0,1000)
 def build_html(body,refresh_time=None):
     global _cnt
     if refresh_time is None:
