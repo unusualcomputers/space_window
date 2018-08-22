@@ -137,11 +137,11 @@ _html_template=u"""
     """ % (_ap_name,_ap_name,_ap_name)
 
 _ap_html_public=u"""
-<tr><td>AP_NAME<td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td></td><td><input type="submit" name="AP_NAME" value="connect_new"></td></tr>
+<tr><td>AP_NAME<td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td></td><td><input type="submit" name="AP_NAME" value="connect"></td></tr>
 """
 
 _ap_html_private=u"""
-<tr><td>AP_NAME</td><td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td><input size="10" type="password" name="password"></td><td><input type="submit" name="AP_NAME" value="connect_new"></td></tr>
+<tr><td>AP_NAME</td><td><input type="hidden" name="hiddenAP_NAMECNT" value="AP_NAME"></td><td><input size="10" type="password" name="password"></td><td><input type="submit" name="AP_NAME" value="connect"></td></tr>
 """
     
 def _make_wifi_rows(): 

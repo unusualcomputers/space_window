@@ -107,7 +107,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         _log.info('wifi connection params ' + str(params)) 
         for n in params:
             v=params[n]
-            if v==['connect_new']:
+            if v==['connect']:
                 wifi_name=n
             elif n=='password':
                 password=v[0]
@@ -125,7 +125,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         _log.info('wifi connection params ' + str(params)) 
         for n in params:
             v=params[n]
-            if v==['connect_new']:
+            if v==['connect']:
                 wifi_name=n
             elif n=='password':
                 password=v[0]
@@ -264,7 +264,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html = connection.make_wifi_html() 
                 self._respond(html)
                 return
-            elif 'connect_new' in self.path:
+            elif 'connect' in self.path:
                 _processes.wait()
                 _processes.kill_running()
                 _status_update('changing wifi networks\n'+\
@@ -281,19 +281,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html = connection.make_wifi_html() 
                 self._respond(html)
                 return
-            elif 'connect' in self.path:
-                _processes.wait()
-                _processes.kill_running()
-                _status_update('changing wifi networks\n'+\
-                    'this is a fragile process\n'+\
-                    "give it a few minutes\nif it didn't work, reboot")
-                self.handle_wifi_change_req(params,self)
-                _status_update('testing the new connection')
-                if connection.test_connection():
-                    connection.display_connection_details()
-                    sleep(10)
-                _processes.stop_waiting()
-                #check_running()
             elif 'reboot' in self.path:
                 _status_update('rebooting in a few seconds, see you soon :)')
                 Timer(5,_reboot).start()
