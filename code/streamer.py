@@ -75,7 +75,7 @@ class Streamer(VideoPlayer):
                 [prebuff],
                 iter(partial(stream_fd.read, _chunk_size), b"")
             )
-            self._status('playing :)')
+            self._status(':)')
             for data in stream_iterator:
                 with self.lock:
                     if thread_id not in self.alive_threads: break

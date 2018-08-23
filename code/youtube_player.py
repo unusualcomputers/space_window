@@ -1,7 +1,6 @@
 import pafy
 import os
 import threading
-import thread
 import time
 from cache import Cache
 from player_base import VideoPlayer
@@ -220,9 +219,9 @@ class YouTubePlayer(VideoPlayer):
                     else:
                         cmd='%s "%s"' % (self._player_pl_cmd,u)
                     #_log.info(cmd)
+                    self._status(':)')
                     os.system(cmd)
                     #_log.info('Done playing: ' + cmd)
-                    self._status('')
  
                 with self.lock:
                     sz=len(urls)

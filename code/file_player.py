@@ -20,6 +20,7 @@ class FilePlayer(VideoPlayer):
             else:
                 cmd='%s "%s"' % (self._player_cmd,url)
             _log.info('omx command: '+cmd)
+            self._status(':)')
             while self.playing:
                 os.system(cmd)
         finally:

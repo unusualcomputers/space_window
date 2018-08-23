@@ -13,6 +13,7 @@ import logger
 import os
 from threading import Timer
 import random
+from async_job import Job
 
 _ap_name=wifi.ap_name
 _to_launch=wifi.config.get('access-point','execute_when_connected')
@@ -42,6 +43,18 @@ def set_reporting_func( f ):
 def _report( s ): 
     _log.info(s)
     if _reporting_func: _reporting_func( s ) 
+
+def _waiting_status(msg, job, args=None):
+    waiting_job=Job(job,args)
+    waiting_job.start()
+       
+    waiting_msg=msg+'\n'
+    
+    while not waiting_job.done:
+        _report(waiting_msg)
+        time.sleep(1)
+        waiting_msg+='.'
+    return waiting_job.result
 
 _cnt=random.randint(0,1000)
 
@@ -128,6 +141,9 @@ _html_template=u"""
     <h1>%s - Wifi</h1>
     <br><br>
 
+    <h3>Choose a network to connect to.<br/>
+    Once you click "connect" this network will go down.<br/>
+    Please follow instructions on your space window.</h3>
     <form align="left" action="/connect">
     <table width=100%%>
         WIFI_ROWS
@@ -229,25 +245,26 @@ class StandaloneWifiServer(BaseHTTPRequestHandler):
 
 def start_ap():
     try:
-        _report('starting access point')
-        wifi.start_ap()
-        _report('access point is running, I think :)')
-        time.sleep(5)
-        _report('connect to network %s\n( that\'s me :) )\n' % _ap_name +
-            'then type %s in a browser' % wifi.ap_ip)
+        _waiting_status('starting my own network',wifi.start_ap)
+        #wifi.start_ap()
+        hostname=socket.gethostname()
+        _report('connect to network %s\n' % _ap_name +
+            'then type %s.local in a browser\n' % hostname +
+            'or %s if that doesn\'t work' % wifi.ap_ip)
         time.sleep(10)
     except:
         _log.exception('error starting access point')
         raise
 
-def test_connection(s):                
+def test_connection(s='checking wifi connection\n'+
+            'be patient, this can take a few minutes\n'):                
     _report(s)
     msg=s
     for i in range(0,60):
         if wifi.is_connected():
             return True
         time.sleep(1)
-        msg=msg+' . '
+        msg=msg+'.'
         _report(msg)
     return False
 
@@ -267,10 +284,8 @@ def run_wifi_server():
 def setup_wifi(sleep=_sleep_on_connect,display_details=True):
     ip=""
     try:
-        print 'testing connection'
-        if not test_connection('checking wifi connection\n'+
-            'be patient, this can take a few minutes\n'):
-            _report('not connected to wifi, starting access point\n'+
+        if not test_connection():
+            _report('not connected to wifi, starting my own network\n'+
                 'this will take a minute or two')
             run_wifi_server()
     except:
@@ -279,17 +294,14 @@ def setup_wifi(sleep=_sleep_on_connect,display_details=True):
         return  
     finally:
         if display_details:
-            print 'displaying connection details in connection module'
             display_connection_details()
             time.sleep(sleep)
 
 def configure_wifi(sleep=_sleep_on_connect,display_details=True):
     ip=""
     try:
-        print 'testing connection'
-        while not test_connection('checking wifi connection\n'+
-            'be patient, this can take a few minutes\n'):
-            _report('not connected to wifi, starting access point\n'+
+        while not test_connection():
+            _report('not connected to wifi, starting my own network\n'+
                 'this will take a minute or two')
             run_wifi_server()
     except:
@@ -298,7 +310,6 @@ def configure_wifi(sleep=_sleep_on_connect,display_details=True):
         return  
     finally:
         if display_details:
-            print 'displaying connection details in connection module'
             display_connection_details()
             time.sleep(sleep)
 
@@ -327,7 +338,7 @@ def display_connection_details():
         if lan is not None:
             ip=con.ip_address
             hostname=socket.gethostname()
-            msg=('connected by wire\n'+
+            msg=('connected\n'+
                 'my name is %s.local\n'+
                 '(or %s if that fails)') % (hostname,ip)
             _report(msg)

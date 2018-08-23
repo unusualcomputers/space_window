@@ -5,14 +5,14 @@ import os
 from time import sleep
 import wifi_control as wifi
 import connection_http as connection
-from html import get_main_html,get_upload_html,get_standalone_html
+from html import * 
 import py_game_msg as msg
 import logger
 from processes import *
 import processes as procmod
 from async_job import Job
 from waiting_messages import WaitingMsgs
-from threading import Timer
+from threading import Timer,Thread
 import cgi
 import streams
 
@@ -52,6 +52,19 @@ def initialise_server():
     _log.info('Started httpserver on port %i',PORT_NUMBER)
     _initialise_streams()
 
+
+def _waiting_status(msg, job, args=None):
+    waiting_job=Job(job,args)
+    waiting_job.start()
+       
+    waiting_msg=msg+'\n'
+    
+    while not waiting_job.done:
+        _status_update(waiting_msg)
+        sleep(1)
+        waiting_msg+='.'
+    return waiting_job.result
+
 def wait_to_initialise():
     waiting_job=Job(initialise_server)
     waiting_job.start()
@@ -73,7 +86,7 @@ def start_server():
 
 def stop_server():
     if _processes is not None:
-        _processes.kill_running(False)
+        _processes.kill_running()
     if _server is not None:
         _server.socket.close()
 
@@ -82,6 +95,54 @@ def _shutdown():
 
 def _reboot():
     os.system('reboot now')
+
+def _handle_start_wifi_req(params):
+    wifi_name='noname'
+    password=None
+    for n in params:
+        v=params[n]
+        if v==['connect']:
+            wifi_name=n
+        elif n=='password':
+            password=v[0]
+    #_status_update('trying to connect to %s now\n' % wifi_name)
+    _waiting_status(\
+        'trying to connect to %s\nthis network is going down ' % wifi_name,
+        wifi.set_wifi,(wifi_name,password))
+    #server.wfile.write(make_attempting_html())
+    #wifi.set_wifi(wifi_name,password)
+    #_status_update('restarting wifi')
+    _waiting_status('restarting wifi',wifi.start_wifi)
+    _status_update('testing the new connection')
+    if connection.test_connection():
+        connection.display_connection_details()
+        sleep(10)
+        return True
+
+    _status_update\
+        ('can\'t connect to wifi :(\nbringing access point up again')
+    wifi.start_ap()
+    return False
+
+_last_params=None
+_connecting_timer=None
+def _handle_connect_request():
+    try:        
+        _connecting_timer.cancel()
+        params=_last_params
+        _log.info('handling connect request %s' % params)
+        _processes.wait()
+        _processes.kill_running(True)
+        _status_update('changing wifi networks\n'+\
+            'this is a fragile process\n'+\
+            "give it a few minutes\nif it didn't work, reboot")
+        _handle_start_wifi_req(params)
+        set_standalone(False)
+        _processes.stop_waiting()
+        _processes.run_something()
+    finally:
+        global _connecting_timer
+        _connecting_timer=None
 
 class SpaceWindowServer(BaseHTTPRequestHandler):
     # send_to redirects to a different address
@@ -111,42 +172,16 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 wifi_name=n
             elif n=='password':
                 password=v[0]
-        _status_update('thanks! trying to connect to %s now' % wifi_name)
+        _status_update('trying to connect to %s now' % wifi_name)
         wifi.set_wifi(wifi_name,password)
         wifi.restart_wifi()
-        self.return_to_front()
+        self._send_to('/')
         return True
 
-    def _handle_start_wifi_req(self,params):
-        wifi_name='noname'
-        password=None
-        print params
-        _log.info(params)
-        _log.info('wifi connection params ' + str(params)) 
-        for n in params:
-            v=params[n]
-            if v==['connect']:
-                wifi_name=n
-            elif n=='password':
-                password=v[0]
-        _status_update('thanks! trying to connect to %s now\n' % wifi_name)
-        #server.wfile.write(make_attempting_html())
-        wifi.set_wifi(wifi_name,password)
-        wifi.start_wifi()
-        if connection.test_connection():
-            connection.display_connection_details()
-            sleep(10)
-            return True
 
-        _status_update\
-            ('can\'t connect to wifi :(\nbringing access point up again')
-        wifi.start_ap()
-        self._return_to_front()
-        return False
-    
     def do_POST(self):
         try:
-            _processes.stop_all() 
+            _processes.kill_running() 
             if 'upload' not in self.path:
                 _log.error('Unknonw post request')
                 self._send_to('/')
@@ -265,18 +300,24 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 self._respond(html)
                 return
             elif 'connect' in self.path:
-                _processes.wait()
-                _processes.kill_running()
-                _status_update('changing wifi networks\n'+\
-                    'this is a fragile process\n'+\
-                    "give it a few minutes\nif it didn't work, reboot")
-                self._handle_start_wifi_req(params)
-                _status_update('testing the new connection')
-                if connection.test_connection():
-                    connection.display_connection_details()
-                    sleep(10)
-                set_standalone(False)
-                _processes.stop_waiting()
+                global _last_params
+                global _connecting_timer
+                if _connecting_timer is None:
+                    _last_params=params
+                    _connecting_timer=Timer(5, _handle_connect_request)
+                    _connecting_timer.start()
+                    html='<h2>Now trying to connect to new network.<br>'+\
+                        'This network will go down.<br>'+\
+                        'Please follow instructions on your space window.</h2>'
+                    self._respond(get_error_html(html))
+                    return
+                else:
+                    html='<h2>Already trying to connect to a network.<br>'+\
+                        'Please be patient and<br>'+\
+                        'follow instructions on your space window.</h2>'
+                    self._respond(get_error_html(html))
+                    return
+
             elif 'scan' in self.path:
                 html = connection.make_wifi_html() 
                 self._respond(html)
