@@ -29,7 +29,6 @@ class YouTubePlayer(VideoPlayer):
         self.playing_playlist=False
 
     def can_play(self,url):
-        _log.info('checking if can play video')
         self._status('checking video status')
         return (pafy.playlist.extract_playlist_id(url) is not None) or \
             (self._get_video(url) is not None)         
@@ -153,6 +152,8 @@ class YouTubePlayer(VideoPlayer):
             pfy=self._get_video(url)
             urls+=self._get_video_url(pfy,quality)
         else:
+            _log.info('getting first url for playlist')
+            pfy=self._get_video(url)
             sz=len(pl)
             if sz==0: return sz
             #self._status('getting data for your video')
@@ -218,9 +219,9 @@ class YouTubePlayer(VideoPlayer):
                         cmd='%s "%s"' % (self._player_cmd,u)
                     else:
                         cmd='%s "%s"' % (self._player_pl_cmd,u)
-                    _log.info(cmd)
+                    #_log.info(cmd)
                     os.system(cmd)
-                    log.info('Done playing: ' + cmd)
+                    #_log.info('Done playing: ' + cmd)
                     self._status('')
  
                 with self.lock:
