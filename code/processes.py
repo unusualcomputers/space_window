@@ -24,6 +24,7 @@ class ProcessHandling:
         self._streams=Streams.load()
         self._nasa=NasaPod()
         self._clock=Clock()
+        self._mopidy=None
         if not _standalone:
             threading.Thread(target=self.launch_mopidy).start()
         self._status_update=status_update_func    
