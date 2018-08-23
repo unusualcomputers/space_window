@@ -56,7 +56,7 @@ _html_template_main=u"""
 <h1>Space Window</h1>
 <br><br>
 [%HTML_BODY%]
-<br><br><br>
+<br><br>
 <footer>
 Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
 </footer>
@@ -129,7 +129,7 @@ html_upload="""
         <input type="file" name = "subs"/>
     <p><input type="submit" value="Upload"></p>
     </form>
-<br><br><br>
+<br><br>
 <footer>
 Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
 </footer>
@@ -286,7 +286,7 @@ html_error="""
 <h1>Space Window</h1>
 <br><br>
 [%ERROR_TEXT%]
-<br><br><br>
+<br><br>
 <footer>
 Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
 </footer>
