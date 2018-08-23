@@ -20,10 +20,8 @@ def _next_thread_id():
 
 class YouTubePlayer(VideoPlayer):
     def __init__(self,
-            status_func=None,
-            player=None,
-            player_args=None):
-        VideoPlayer.__init__(self,status_func,player,player_args)
+            status_func=None):
+        VideoPlayer.__init__(self,status_func)
         self.video_cache=Cache(_cache_size)
         self.playlist_cache=Cache(_cache_size)
         self.lock=threading.Lock()
@@ -219,7 +217,10 @@ class YouTubePlayer(VideoPlayer):
                         (name,author,u)=urls[i]
                         if thread_id not in self.alive_threads: return
                     self._status('playing\n%s\n%s' % (name,author))
-                    cmd='%s "%s"' % (self._player_cmd,u)
+                    if s==1:
+                        cmd='%s "%s"' % (self._player_cmd,u)
+                    else:
+                        cmd='%s "%s"' % (self._player_pl_cmd,u)
                     _log.info(cmd)
                     os.system(cmd)
                     time.sleep(2) 

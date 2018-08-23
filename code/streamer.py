@@ -24,10 +24,8 @@ def _next_thread_id():
 
 class Streamer(VideoPlayer):
     def __init__(self,
-            status_func=None,
-            player=None,
-            player_args=None):
-        VideoPlayer.__init__(self,status_func,player,player_args)
+            status_func=None):
+        VideoPlayer.__init__(self,status_func)
         self.qualities_cache=Cache(_cache_size)
         self.streamlink=Streamlink()
         #check if this works for multiple streams

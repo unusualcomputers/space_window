@@ -12,19 +12,18 @@ _synchronisation_sleep=0.1
 
 class VideoPlayer:
     def __init__(self,
-            status_func=None,
-            player=None,
-            player_args=None):
+            status_func=None):
         self._status_func=status_func
         self.playing=False
         config = Config('space_window.conf',__file__)    
-        if player is None:
-            self._player=config.get('player','player',_player)
+        self._player=config.get('player','player',_player)
        
-        if player_args is None:
-            self._player_args=config.get('player','player_args',_player_args)
+        self._player_args=config.get('player','player_args',_player_args)
+        self._player_pl_args=config.get('player','playlist_player_args',\
+                _player_args)
         
         self._player_cmd=self._player+' '+self._player_args
+        self._player_pl_cmd=self._player+' '+self._player_pl_args
         self.log=logger.get(__name__)
 
     def set_status_func(self,func):

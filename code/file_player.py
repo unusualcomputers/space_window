@@ -9,10 +9,8 @@ _log=logger.get(__name__)
 
 class FilePlayer(VideoPlayer):
     def __init__(self,
-            status_func=None,
-            player=None,
-            player_args=None):
-        VideoPlayer.__init__(self,status_func,player,player_args)
+            status_func=None):
+        VideoPlayer.__init__(self,status_func)
 
     def _play_loop_impl(self,url,quality):
         try:

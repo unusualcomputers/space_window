@@ -18,7 +18,7 @@ def set_standalone(standalone):
 class ProcessHandling:
     def __init__(self,status_update_func):
         self._current_stream=None
-        self._check_timer_delay=20
+        self._check_timer_delay=30
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
