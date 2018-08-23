@@ -193,12 +193,12 @@ _main_table=u"""
 <td class="center">
     <form action="/upload">
     <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
-    <input type="submit" value="Upload Video">
+    <input type="submit" value="Upload video">
     </form>
 </td><td class="center">
     <form action="/refresh_caches">
     <input type="hidden" name="hiddenrefresh_CNT" value="REFRESH_CACHES">
-    <input type="submit" value="Clear Cache">
+    <input type="submit" value="Clear cache">
     </form>
 </td><td class="center">
     <form action="/reboot">

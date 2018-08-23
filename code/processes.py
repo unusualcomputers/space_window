@@ -144,4 +144,6 @@ class ProcessHandling:
         self._start_timer()
         
     def refresh_caches(self):
+        self.kill_running(True)
         self._streams.refresh_caches(True)
+        self.run_seomthing()
