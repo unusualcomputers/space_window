@@ -339,20 +339,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _status_update(txt)
                 _processes.stop_waiting()
             elif 'rough' in self.path:
-                #_processes.wait()
-                #_processes.kill_running()
-                #_status_update('starting radio rough')
-                #print 'starting mopidy'
-                #subprocess.Popen(['mopidy'])
-                #print 'started mopidy'
-                #sleep(40)
-                #print 'slept a bit'
-                txt='mopidy is starting'
-                _log.info(txt)
-                #_status_update(txt)
                 self._send_to('http://%s:%i' % (_ip,MOPIDY_PORT))
                 _processes.start_mopidy()
-                #_processes.stop_waiting()            
                 return
             elif self.path.endswith('.jpg'):
                 # getting pictures for backgrounds and such
