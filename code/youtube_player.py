@@ -201,18 +201,15 @@ class YouTubePlayer(VideoPlayer):
             urls=[]
             s = self._get_first_url(url,quality,urls)
             self.playing_playlist=(s > 1)
-            threading.Thread(target=self._get_remaining_urls,
-                args=(url,quality,urls,thread_id)).start()
+            if self.playing_playlist:
+                threading.Thread(target=self._get_remaining_urls,
+                    args=(url,quality,urls,thread_id)).start()
             prev_sz=1
-            while True:
-                with self.lock:
-                    sz=len(urls)
+            first=0
+            with self.lock:
+                sz=len(urls)
                         
-                if sz > prev_sz:
-                    first=prev_sz
-                    prev_sz=sz
-                else:
-                    first=0
+            while True:
                 for i in range(first,sz):
                     if not self.playing: return
                     with self.lock:
@@ -222,8 +219,17 @@ class YouTubePlayer(VideoPlayer):
                     cmd='%s "%s"' % (self._player_cmd,u)
                     _log.info(cmd)
                     os.system(cmd)
-                    time.sleep(2) 
+                    log.info('Done playing: ' + cmd)
                     self._status('')
+ 
+                with self.lock:
+                    sz=len(urls)
+                        
+                if sz > prev_sz:
+                    first=prev_sz
+                    prev_sz=sz
+                else:
+                    first=0
         except:
             _log.exception('exception while playing '+url)
         finally:
