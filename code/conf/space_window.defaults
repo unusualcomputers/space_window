@@ -5,9 +5,11 @@ name=comicsansms
 [player]
 # video player configuration
 player=omxplayer
-player_args=--timeout 60  --loop --no-osd 
+player_args= --timeout 60 --loop --no-osd -b 
+playlist_player_args= --timeout 60 --no-osd -b 
 # if you are using a usb audio card or a DAC one, use below arguments
-#player_args= -o alsa --timeout 60 --loop --no-osd 
+#player_args= -o alsa --timeout 60 --loop --no-osd -b 
+#playlist_player_args= -o alsa --timeout 60 --no-osd -b 
 
 [message]
 # parameters for screen messages
