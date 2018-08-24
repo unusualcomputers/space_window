@@ -196,11 +196,18 @@ _main_table=u"""
     <input type="submit" value="Upload video">
     </form>
 </td><td class="center">
+    <form action="/configuration">
+    <input type="hidden" name="hiddenconfig_CNT" value="CONFIGURATION">
+    <input type="submit" value="Configuration">
+    </form>
+</td>
+<!--<td class="center">
     <form action="/refresh_caches">
     <input type="hidden" name="hiddenrefresh_CNT" value="REFRESH_CACHES">
     <input type="submit" value="Clear cache">
     </form>
-</td><td class="center">
+</td>-->
+<td class="center">
     <form action="/reboot">
     <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
     <input type="submit" value="Reboot">
@@ -263,7 +270,7 @@ _main_table_standalone=u"""
 </table>    
 """
 
-html_error="""
+html_empty="""
 <!doctype html>
 <html>
 <head>
@@ -280,6 +287,39 @@ html_error="""
             font-family: "Comic Sans MS";
             border-radius: 5px; 
             }
+        input[type=text]{
+            color: #ff8000;
+            background-color: #200020;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+            }
+        input[type=submit]{
+            color: #ff8000;
+            background-color: #200020;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+            }
+        button[type=submit]{
+            color: #ff8000;
+            background-color: #200020;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+            }
+        input[type=password]{
+            color: #ff8000;
+            background-color: #800080;
+            border-color: #600060;
+            border-radius: 7px; 
+            border-style: solid;
+            font-family: "Comic Sans MS";
+          }
+          .center{text-align:center;}
 </style>
 </head>
 <body>
@@ -343,5 +383,5 @@ def get_upload_html():
     cntstr='%i' % _cnt
     return html_upload.replace('CNT',cntstr)
 
-def get_error_html(err):
-    return html_error.replace('[%ERROR_TEXT%]',err)
+def get_empty_html(err):
+    return html_empty.replace('[%ERROR_TEXT%]',err)

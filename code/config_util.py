@@ -109,7 +109,7 @@ class Config:
 
         html = """ 
         <div align="right">
-        <form align="center" action="/play_remove">
+        <form align="center" action="/config_change">
             <input name="hidden_748" value="config" type="hidden">
             <table width="100%">
             <tbody>

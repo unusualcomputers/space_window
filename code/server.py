@@ -15,6 +15,7 @@ from waiting_messages import WaitingMsgs
 from threading import Timer,Thread
 import cgi
 import streams
+from config_util import Config
 
 PORT_NUMBER = 80
 MOPIDY_PORT=6680
@@ -26,6 +27,7 @@ _server=None
 _standalone=False
 
 _log=logger.get(__name__)
+_config = Config('space_window.conf',__file__)    
 
 def set_standalone(standalone):
     global _standalone
@@ -201,7 +203,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             if len(name)==0 or name=='NAME':
                 err='Sorry, you must tell me what to call this video'
                 _status_update(err)
-                self._respond(get_error_html(err))
+                self._respond(get_empty_html(err))
                 sleep(5)
                 return
 
@@ -209,7 +211,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             if len(filename)==0:
                 err='Sorry, you must tell me a video a file name'
                 _status_update(err)
-                self._respond(get_error_html(err))
+                self._respond(get_empty_html(err))
                 sleep(5)
                 return
 
@@ -245,7 +247,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                         if not chunk: break
                         subsout.write(chunk)
             if not os.path.isfile(video_filename):    
-                self._respond(get_error_html('Something went wrong, sorry :('))
+                self._respond(get_empty_html('Something went wrong, sorry :('))
                 _status_update('Something went wrong, sorry :(')
                 sleep(10)
             else:
@@ -295,6 +297,23 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html = get_upload_html() 
                 self._respond(html)
                 return
+            elif 'configuration' in self.path:
+                html = _config.get_html()
+                self._respond(get_empty_html(html))
+                return
+            elif 'config_change' in self.path:
+                ps=params['action'][0]
+                global _msg
+                if u'apply' in ps:
+                    _config.parse_form_inputs(params)
+                    _config.save()
+                elif u'restore' in ps:
+                    _config.restore_defaults()
+                else:
+                    _log.error('Unknown request for configuration %s' % params)
+                _msg=msg.MsgScreen()
+                _msg.init_once()
+                _processes.reload_config()
             elif 'wifi' in self.path:
                 html = connection.make_wifi_html() 
                 self._respond(html)
@@ -309,13 +328,13 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     html='<h2>Now trying to connect to new network.<br>'+\
                         'This network will go down.<br>'+\
                         'Please follow instructions on your space window.</h2>'
-                    self._respond(get_error_html(html))
+                    self._respond(get_empty_html(html))
                     return
                 else:
                     html='<h2>Already trying to connect to a network.<br>'+\
                         'Please be patient and<br>'+\
                         'follow instructions on your space window.</h2>'
-                    self._respond(get_error_html(html))
+                    self._respond(get_empty_html(html))
                     return
 
             elif 'scan' in self.path:

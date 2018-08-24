@@ -32,6 +32,13 @@ class ProcessHandling:
         self._streams.set_status_func(status_update_func)
         self.log=logger.get(__name__)
 
+    def reload_config(self):
+        self.kill_running()
+        sleep(2)
+        self._nasa=NasaPod()
+        self._clock=Clock()
+        self.run_something()
+
     def launch_mopidy(self):
         try:
             self._mopidy=MopidyUpdates(self._status_update)
