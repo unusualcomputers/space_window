@@ -22,9 +22,32 @@ class Config:
             self.config.write(cf)
 
     def restore_defaults(self):
+        player=self.get('player','player')
+        player_args=self.get('player','player_args')
+        player_playlist_args=self.get('player','playlist_player_args')
+        nasa_height=self.get('nasa', 'height_ratio')
+        ap_name=self.get('access-point','name')
+        ap_ip=self.get('access-point','ip')
+        ap_iprange=self.get('access-point','iprange')
+        ap_driver=self.get('access-point','driver')
+        ap_iface=self.get('access-point','interface')
+        ap_pyg=self.get('access-point','use_pygame')
+        
         path=join(dirname(abspath(__file__)),'conf/space_window.defaults')
         self.config=ConfigParser.ConfigParser()
         self.config.read(path)
+
+        self.set('player','player',player)
+        self.set('player','player_args',player_args)
+        self.set('player','playlist_player_args',player_playlist_args)
+        self.set('nasa', 'height_ratio',nasa_height)
+        self.set('access-point','name',ap_name)
+        self.set('access-point','ip',ap_ip)
+        self.set('access-point','iprange',ap_iprange)
+        self.set('access-point','driver',ap_driver)
+        self.set('access-point','interface',ap_iface)
+        self.set('access-point','use_pygame',ap_pyg)
+
         self.save() 
 
     def has(self, section, option):
