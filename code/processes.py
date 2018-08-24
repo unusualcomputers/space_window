@@ -7,6 +7,7 @@ from mopidy_listener import MopidyUpdates
 from streams import Streams
 import streams as streamsmod
 import logger
+from time import sleep
 
 _standalone=False
 
@@ -18,7 +19,7 @@ def set_standalone(standalone):
 class ProcessHandling:
     def __init__(self,status_update_func):
         self._current_stream=None
-        self._check_timer_delay=20
+        self._check_timer_delay=30
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
@@ -46,7 +47,7 @@ class ProcessHandling:
     def streams(self):
         return self._streams
             
-    def kill_running(self,updates=True):
+    def kill_running(self,reset_current=False):
         self.log.info('stopping running shows')
         #if(updates):
         #    self._status_update('stopping running shows')
@@ -57,6 +58,8 @@ class ProcessHandling:
         self._clock.stop()
         if not _standalone and self._mopidy is not None:
             self._mopidy.stop()
+        if reset_current:
+            self._current_stream=None
         #wifi.run('pkill -9 mopidy')
        
     def wait(self):
@@ -83,6 +86,8 @@ class ProcessHandling:
         self._current_stream=name
         self._streams.play(name)
         self._status_update('playing %s\ngive me a few seconds' % name)
+        sleep(3)
+        self._status_update(name)
         self._start_timer()
 
     def play_apod(self):
@@ -105,15 +110,6 @@ class ProcessHandling:
         self._clock.play()
         self._start_timer()
     
-    def stop_all(self):
-        self._stop_timer()
-        self.log.info('stopping streams')
-        self._current_stream=None
-        self.log.info('playing apod')
-        self._streams.stop()
-        self._nasa.stop()
-        self._clock.stop()
- 
     def play_next(self):
         if self._streams.is_playlist():
             self._streams.playlist_next()
@@ -148,4 +144,6 @@ class ProcessHandling:
         self._start_timer()
         
     def refresh_caches(self):
+        self.kill_running(True)
         self._streams.refresh_caches(True)
+        self.run_seomthing()

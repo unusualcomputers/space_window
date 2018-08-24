@@ -32,7 +32,7 @@ class Job:
             log.exception('exception in async job')
             self.exception=e
         finally:
-            log.info('async job done')
+            log.info('async job done %s ' % self.target)
             self.done=True
 
     def start(self):

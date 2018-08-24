@@ -9,8 +9,7 @@ log=logger.get(__name__)
 try:
     log.info('hello :)')
     log.info('configuring wifi')
-    connected=connection.test_connection('checking wifi connection\n'+
-            'be patient, this can take a few minutes\n')
+    connected=connection.test_connection()
     #connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the
     #incoming request

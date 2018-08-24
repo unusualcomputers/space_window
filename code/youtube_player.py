@@ -1,7 +1,6 @@
 import pafy
 import os
 import threading
-import thread
 import time
 from cache import Cache
 from player_base import VideoPlayer
@@ -20,10 +19,8 @@ def _next_thread_id():
 
 class YouTubePlayer(VideoPlayer):
     def __init__(self,
-            status_func=None,
-            player=None,
-            player_args=None):
-        VideoPlayer.__init__(self,status_func,player,player_args)
+            status_func=None):
+        VideoPlayer.__init__(self,status_func)
         self.video_cache=Cache(_cache_size)
         self.playlist_cache=Cache(_cache_size)
         self.lock=threading.Lock()
@@ -31,7 +28,6 @@ class YouTubePlayer(VideoPlayer):
         self.playing_playlist=False
 
     def can_play(self,url):
-        _log.info('checking if can play video')
         self._status('checking video status')
         return (pafy.playlist.extract_playlist_id(url) is not None) or \
             (self._get_video(url) is not None)         
@@ -155,6 +151,8 @@ class YouTubePlayer(VideoPlayer):
             pfy=self._get_video(url)
             urls+=self._get_video_url(pfy,quality)
         else:
+            _log.info('getting first url for playlist')
+            pfy=self._get_video(url)
             sz=len(pl)
             if sz==0: return sz
             #self._status('getting data for your video')
@@ -216,11 +214,14 @@ class YouTubePlayer(VideoPlayer):
                         (name,author,u)=urls[i]
                         if thread_id not in self.alive_threads: return
                     self._status('playing\n%s\n%s' % (name,author))
-                    cmd='%s "%s"' % (self._player_cmd,u)
-                    _log.info(cmd)
+                    if s==1:
+                        cmd='%s "%s"' % (self._player_cmd,u)
+                    else:
+                        cmd='%s "%s"' % (self._player_pl_cmd,u)
+                    #_log.info(cmd)
+                    self._status(':)')
                     os.system(cmd)
-                    log.info('Done playing: ' + cmd)
-                    self._status('')
+                    #_log.info('Done playing: ' + cmd)
  
                 with self.lock:
                     sz=len(urls)

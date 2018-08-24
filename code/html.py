@@ -56,7 +56,7 @@ _html_template_main=u"""
 <h1>Space Window</h1>
 <br><br>
 [%HTML_BODY%]
-<br><br><br>
+<br><br>
 <footer>
 Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
 </footer>
@@ -113,6 +113,7 @@ html_upload="""
             border-style: solid;
             font-family: "Comic Sans MS";
           }
+          .center{text-align:center;}
 </style>
 </head>
 <body>
@@ -128,7 +129,7 @@ html_upload="""
         <input type="file" name = "subs"/>
     <p><input type="submit" value="Upload"></p>
     </form>
-<br><br><br>
+<br><br>
 <footer>
 Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
 </footer>
@@ -160,60 +161,63 @@ _main_table=u"""
 <br/>
 <table width=100%>
 <tr>
-<td>
+<td class="center">
     <form action="/slideshow">
     <input type="hidden" name="hiddennasa_CNT" value="NASAPOD">
     <input type="submit" value="Nasa POD">
     </form>
-</td><td>
+</td><td class="center">
     <form action="/next">
     <input type="hidden" name="hiddenplay_CNT" value="NEXT">
     <input type="submit" value="Play next">
     </form>
-</td><td>
-    <form action="/upload">
-    <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
-    <input type="submit" value="Upload Video">
-    </form>
-</td><td>
+</td><td class="center">
     <form action="/rough" target="_blank">
     <input type="hidden" name="hiddenrough_CNT" value="ROUGH">
-    <input type="submit" value="Radio Rough">
+    <input type="submit" value="Radio">
     </form>
-</td><td>
-    <form action="/refresh_caches">
-    <input type="hidden" name="hiddenrefresh_CNT" value="REFRESH_CACHES">
-    <input type="submit" value="Refresh Caches">
-    </form>
-    </td>
-<td>
+</td><td class="center">
     <form action="/clock">
     <input type="hidden" name="hiddenclock_CNT" value="CLOCK">
     <input type="submit" value="Clock">
     </form>
-</td><!--<td>
+</td><!--<td class="center">
     <form action="/kodi">
     <input type="hidden" name="hiddenkodi_CNT" value="KODI">
     <input type="submit" value="kodi :)">
     </form>
 </td>-->
-<!--<td>
+</tr>
+<tr><td colspan="4"><br/><br/></td></tr>
+<tr>
+<td class="center">
+    <form action="/upload">
+    <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
+    <input type="submit" value="Upload video">
+    </form>
+</td><td class="center">
+    <form action="/refresh_caches">
+    <input type="hidden" name="hiddenrefresh_CNT" value="REFRESH_CACHES">
+    <input type="submit" value="Clear cache">
+    </form>
+</td><td class="center">
     <form action="/reboot">
     <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
     <input type="submit" value="Reboot">
     </form>
-</td>-->
-<td>
+</td>
+<td class="center">
     <form action="/shutdown">
     <input type="hidden" name="hiddenshutdown_CNT" value="SHUTDOWN">
     <input type="submit" value="Shutdown">
     </form>
-</td><td>
+</td>
+<!--<td class="center">
     <form action="/wifi">
     <input type="hidden" name="hiddenwifi_CNT" value="WIFI">
     <input type="submit" value="Change WiFi">
     </form>
-</td>
+</td>-->
 </tr>
 </table>    
 """
@@ -282,7 +286,7 @@ html_error="""
 <h1>Space Window</h1>
 <br><br>
 [%ERROR_TEXT%]
-<br><br><br>
+<br><br>
 <footer>
 Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
 </footer>

@@ -271,7 +271,10 @@ def start_wifi():
     wpa_backp='%s/wpa_supplicant.conf.backup' % p
     if os.path.isfile(wpa_backp):
         run('sudo cp %s /etc/wpa_supplicant/wpa_supplicant.conf' % wpa_backp)
-    run('cp %s/dhcpcd.conf.backup /etc/dhcpcd.conf' % p)
+    if os.path.isfile('%s/dhcpcd.conf.backup /etc/dhcpcd.conf' % p):
+        run('cp %s/dhcpcd.conf.backup /etc/dhcpcd.conf' % p)
+    else:    
+        run('cp %s/dhcpcd.conf.wifi /etc/dhcpcd.conf' % p)
     run('cp %s/dnsmasq.conf.backup /etc/dnsmasq.conf' % p)
     run('cp %s/hostapd.conf.backup /etc/hostapd/hostapd.conf' % p)
     run('cp %s/hostapd.backup /etc/default/hostapd' % p)
