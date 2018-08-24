@@ -191,6 +191,7 @@ class Config:
         """ %(fontname,fontsize,txtr,txtg,txtb,bckr,bckg,bckb,clkr,clkg,clkb,
                clkbr,clkbg,clkbb,clockfontsize,clockborder,nasafontsize,
                 nasadelay,weatherloc,omxargs )
+        return html
 
     def parse_form_inputs(self,p):
         fontname=p['fontname'][0]
