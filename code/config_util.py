@@ -111,7 +111,7 @@ class Config:
         <div align="right">
         <form align="center" action="/config_change">
             <input name="hidden_748" value="config" type="hidden">
-            <table width="100%">
+            <table width="100%%">
             <tbody>
             <tr>
             <td>font name</td>
@@ -188,8 +188,8 @@ class Config:
             </tr>
             </tbody></table>
             </form></div>
-        """ %(fontname,fontsize,txtr,txtg,txtb,bckr,bckg,bckb,clkr,clkg,clkb,\
-               clkbr,clkbg,clkbb,clockfontsize,clockborder,nasafontsize,\
+        """ %(fontname,fontsize,txtr,txtg,txtb,bckr,bckg,bckb,clkr,clkg,clkb,
+               clkbr,clkbg,clkbb,clockfontsize,clockborder,nasafontsize,
                 nasadelay,weatherloc,omxargs )
 
     def parse_form_inputs(self,p):
