@@ -315,6 +315,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _initialise_streams()
             params = parse_qs(urlparse(self.path).query)
 
+            _log.info('REQ: %s\n%s' %(self.path,params))
             if 'play_remove?' in self.path:
                 ps=params['action'][0]
                 if u'remove' in ps:
@@ -351,6 +352,19 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             elif 'really_remove?' in self.path:
                 ps=params['action'][0]
                 _streams.remove(ps[len('really remove '):])
+            elif 'config_change?' in self.path:
+                ps=params['action'][0]
+                global _msg
+                if u'apply' in ps:
+                    _config.parse_form_inputs(params)
+                    _config.save()
+                elif u'restore' in ps:
+                    _config.restore_defaults()
+                else:
+                    _log.error('Unknown request for configuration %s' % params)
+                _msg=msg.MsgScreen()
+                _msg.init_once()
+                _processes.reload_config()
             elif 'next?' in self.path:
                 _processes.play_next()
             elif 'refresh_caches?' in self.path:
@@ -372,19 +386,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html = _config.get_html()
                 self._respond(get_empty_html(html))
                 return
-            elif 'config_change?' in self.path:
-                ps=params['action'][0]
-                global _msg
-                if u'apply' in ps:
-                    _config.parse_form_inputs(params)
-                    _config.save()
-                elif u'restore' in ps:
-                    _config.restore_defaults()
-                else:
-                    _log.error('Unknown request for configuration %s' % params)
-                _msg=msg.MsgScreen()
-                _msg.init_once()
-                _processes.reload_config()
             elif 'wifi?' in self.path:
                 html = connection.make_wifi_html() 
                 self._respond(html)
@@ -407,7 +408,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                         'follow instructions on your space window.</h2>'
                     self._respond(get_empty_html(html))
                     return
-
             elif 'scan?' in self.path:
                 html = connection.make_wifi_html() 
                 self._respond(html)
