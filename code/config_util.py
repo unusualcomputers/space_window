@@ -1,6 +1,11 @@
 import ConfigParser
 from os.path import *
+import random
+import logger
 
+
+_log=logger.get(__name__)
+_cnt=random.randint(0,1000) # global counter, used to make html more responsive
 class Config:
     def __init__(self, filename, caller_file=None):
         if caller_file is None:
@@ -12,7 +17,9 @@ class Config:
         self.path=path
 
     def save(self):
-        self.config.write(file(self.path))
+        _log.info('saving config to %s' % self.path)        
+        with open(self.path,'w') as cf:
+            self.config.write(cf)
 
     def restore_defaults(self):
         path=join(dirname(abspath(__file__)),'conf/space_window.defaults')
@@ -75,6 +82,8 @@ class Config:
 
 
     def get_html(self):
+        global _cnt
+        _cnt+=1
         fontname=self.get('font','name')
         fontsize=self.get('message','font_size')
         txtcol=self.get('message','foreground').split(',')
@@ -97,7 +106,8 @@ class Config:
         clkbg=clkbck[1]
         clkbb=clkbck[2]
 
-        clockfontsize=self.get('clock','time_size')
+        clocktimesize=self.get('clock','time_size')
+        clockdatesize=self.get('clock','date_size')
         clockborder=self.get('clock','border')
 
         nasafontsize=self.get('nasa','font_size')
@@ -105,12 +115,10 @@ class Config:
         
         weatherloc=self.get('weather','location')
 
-        omxargs=self.get('player','player_args')
-
         html = """ 
         <div align="right">
         <form align="center" action="/config_change">
-            <input name="hidden_748" value="config" type="hidden">
+            <input name="hidden_%s" value="config" type="hidden">
             <table width="100%%">
             <tbody>
             <tr>
@@ -146,8 +154,11 @@ class Config:
             <td><input name="clockbackcolb" value="%s" type="text"></td>
             </tr>
             <tr>
-            <td>clock font size</td>
-            <td><input name="clockfontsize" value="%s" type="text"></td>
+            <td>clock time size</td>
+            <td><input name="clocktimesize" value="%s" type="text"></td>
+            </tr>
+            <td>clock date size</td>
+            <td><input name="clockdatesize" value="%s" type="text"></td>
             </tr>
             <tr>
             <td>clock border</td>
@@ -166,10 +177,6 @@ class Config:
             <td>weather location</td>
             <td><input name="weatherloc" value="%s" type="text"></td>
             </tr>
-            <td>omxplayer arguments</td>
-            <td><input name=
-                "omxargs" value="%s" type="text">
-            </td>
             </tr>
             <tr><td><br/><br/></td></tr>
             <tr>
@@ -188,9 +195,10 @@ class Config:
             </tr>
             </tbody></table>
             </form></div>
-        """ %(fontname,fontsize,txtr,txtg,txtb,bckr,bckg,bckb,clkr,clkg,clkb,
-               clkbr,clkbg,clkbb,clockfontsize,clockborder,nasafontsize,
-                nasadelay,weatherloc,omxargs )
+        """ %(_cnt,fontname,fontsize,txtr,txtg,txtb,bckr,bckg,bckb,
+            clkr,clkg,clkb,clkbr,clkbg,clkbb,
+            clocktimesize,clockdatesize,clockborder,nasafontsize,
+            nasadelay,weatherloc)
         return html
 
     def parse_form_inputs(self,p):
@@ -208,21 +216,19 @@ class Config:
         clkbck='%s,%s,%s' % (\
             p['clockbackcolr'][0],p['clockbackcolg'][0],p['clockbackcolb'][0])
         self.set('clock','background',clkbck)
-        clocktimesize=p['clockfontsize'][0]
+        clocktimesize=p['clocktimesize'][0]
         self.set('clock','time_size',clocktimesize)
-        clockdatesize=str(int(clocktimesize)/8)
+        clockdatesize=p['clockdatesize'][0]
         self.set('clock','date_size',clockdatesize)
         clockborder=p['clockborder'][0]
         self.set('clock','border',clockborder)
         clockseparation=str(int(clockdatesize)/3)
-        self.set('clock','separation',separation)
+        self.set('clock','separation',clockseparation)
         nasafontsize=p['nasafontsize'][0]
         self.set('nasa','font_size',nasafontsize)
         nasadelay=p['nasadelay'][0]
         self.set('nasa','frame_delay',nasadelay)
         weatherloc=p['weatherloc'][0]
         self.set('weather','location',weatherloc)
-        omxargs=p['omxargs'][0]
-        self.set('player','player_args',omxargs)
 
         
