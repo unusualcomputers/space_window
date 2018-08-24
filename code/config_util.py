@@ -102,7 +102,8 @@ class Config:
 
         nasafontsize=self.get('nasa','font_size')
         nasadelay=self.get('nasa','frame_delay')
-        
+
+        gallerydelay=self.get('gallery','frame_delay')        
         weatherloc=self.get('weather','location')
 
         omxargs=self.get('player','player_args')
@@ -162,6 +163,10 @@ class Config:
             <td><input name="nasadelay" value="%s" type="text"></td>
             </tr>
             <tr>
+            <td>gallery picture delay</td>
+            <td><input name="gallerydelay" value="%s" type="text"></td>
+            </tr>
+            <tr>
             <tr>
             <td>weather location</td>
             <td><input name="weatherloc" value="%s" type="text"></td>
@@ -190,7 +195,7 @@ class Config:
             </form></div>
         """ %(fontname,fontsize,txtr,txtg,txtb,bckr,bckg,bckb,clkr,clkg,clkb,
                clkbr,clkbg,clkbb,clockfontsize,clockborder,nasafontsize,
-                nasadelay,weatherloc,omxargs )
+                nasadelay,gallerydelay,weatherloc,omxargs )
         return html
 
     def parse_form_inputs(self,p):
@@ -220,6 +225,8 @@ class Config:
         self.set('nasa','font_size',nasafontsize)
         nasadelay=p['nasadelay'][0]
         self.set('nasa','frame_delay',nasadelay)
+        gallerydelay=p['gallerydelay'][0]
+        self.set('gallery','frame_delay',gallerydelay)
         weatherloc=p['weatherloc'][0]
         self.set('weather','location',weatherloc)
         omxargs=p['omxargs'][0]

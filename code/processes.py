@@ -8,7 +8,7 @@ from streams import Streams
 import streams as streamsmod
 import logger
 from time import sleep
-
+from gallery import Gallery
 _standalone=False
 
 def set_standalone(standalone):
@@ -24,6 +24,7 @@ class ProcessHandling:
         self._wait=False
         self._streams=Streams.load()
         self._nasa=NasaPod()
+        self._gallery=Gallery()
         self._clock=Clock()
         self._mopidy=None
         if not _standalone:
@@ -36,6 +37,7 @@ class ProcessHandling:
         self.kill_running()
         sleep(2)
         self._nasa=NasaPod()
+        self._gallery=Gallery()
         self._clock=Clock()
         self.run_something()
 
@@ -62,6 +64,7 @@ class ProcessHandling:
             self._check_timer.cancel()
         self._streams.stop()
         self._nasa.stop()
+        self._gallery.stop()
         self._clock.stop()
         if not _standalone and self._mopidy is not None:
             self._mopidy.stop()
@@ -97,6 +100,17 @@ class ProcessHandling:
         self._status_update(name)
         self._start_timer()
 
+    def play_gallery(self):
+        self._stop_timer()
+        self.log.info('stopping streams')
+        self._current_stream=None
+        self.log.info('playing apod')
+        self._streams.stop()
+        self._clock.stop()
+        self._nasa.stop()
+        self._gallery.play()
+        self._start_timer()
+    
     def play_apod(self):
         self._stop_timer()
         self.log.info('stopping streams')
@@ -104,6 +118,7 @@ class ProcessHandling:
         self.log.info('playing apod')
         self._streams.stop()
         self._clock.stop()
+        self._gallery.stop()
         self._nasa.play()
         self._start_timer()
      
@@ -114,6 +129,7 @@ class ProcessHandling:
         self.log.info('playing apod')
         self._streams.stop()
         self._nasa.stop()
+        self._gallery.stop()
         self._clock.play()
         self._start_timer()
     
@@ -135,7 +151,8 @@ class ProcessHandling:
     def run_something(self):
         self._stop_timer()
         if (self._streams.is_playing() or self._nasa.is_playing()\
-            or self._clock.is_playing() or self._wait):
+            or self._clock.is_playing() or self._gallery.is_playing() or \
+            self._wait):
             self._start_timer()
             return
 
@@ -144,6 +161,8 @@ class ProcessHandling:
             if name is not None:
                 self.log.info('about to play %s' % name)
                 self.play_stream(name)
+            else:
+                self._gallery.play()
             self._start_timer()
             return
 
@@ -154,3 +173,6 @@ class ProcessHandling:
         self.kill_running(True)
         self._streams.refresh_caches(True)
         self.run_seomthing()
+
+    def gallery(self):
+        return self._gallery

@@ -64,7 +64,7 @@ Brought to you by <a href="https://unusualcomputerscollective.org/" target="_bla
 </body>
 
 """           
-html_upload="""
+_html_upload="""
 <!doctype html>
 <html>
 <head>
@@ -181,6 +181,11 @@ _main_table=u"""
     <input type="hidden" name="hiddenclock_CNT" value="CLOCK">
     <input type="submit" value="Clock">
     </form>
+</td><td class="center">
+    <form action="/gallery">
+    <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
+    <input type="submit" value="Gallery">
+    </form>
 </td><!--<td class="center">
     <form action="/kodi">
     <input type="hidden" name="hiddenkodi_CNT" value="KODI">
@@ -254,6 +259,11 @@ _main_table_standalone=u"""
     <form action="/upload" target="_blank">
     <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
     <input type="submit" value="Upload Video">
+    </form>
+</td><td class="center">
+    <form action="/gallery">
+    <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
+    <input type="submit" value="Gallery">
     </form>
 </td><td>
     <form action="/reboot">
@@ -381,7 +391,7 @@ def get_upload_html():
     global _cnt
     _cnt+=1
     cntstr='%i' % _cnt
-    return html_upload.replace('CNT',cntstr)
+    return _html_upload.replace('CNT',cntstr)
 
 def get_empty_html(err):
     return html_empty.replace('[%ERROR_TEXT%]',err)

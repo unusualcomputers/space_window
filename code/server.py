@@ -23,6 +23,7 @@ MOPIDY_PORT=6680
 _ip=wifi.get_ip()
 _processes=None
 _streams=None
+_gallery=None
 _server=None
 _standalone=False
 
@@ -42,9 +43,11 @@ def _status_update(txt):
 def _initialise_streams():
     global _processes
     global _streams
+    global _gallery
     if _processes is None:
         _processes=ProcessHandling(_status_update)
         _streams=_processes.streams()
+        _gallery=processes.gallery()
 
 def initialise_server():
     global _server
@@ -180,10 +183,57 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self._send_to('/')
         return True
 
+    def _upload_pic(self):
+        chunk_size=128*1024
+        _status_update('Getting info about files to upload')
+        total_size=int(self.headers['Content-Length'])
+        form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST',
+                     'CONTENT_TYPE':self.headers['Content-Type'],
+                     })
+        p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
+        if not os.path.exists(p):
+            os.makedirs(p)
+        filename = form['picture'].filename
+        if len(filename)==0:
+            err='Sorry, you must tell me a picture file name'
+            _status_update(err)
+            self._respond(get_empty_html(err))
+            sleep(5)
+            return
 
+        chunk_percent=float(chunk_size)/total_size
+        total_loaded=0
+        percent=0
+        picture_filename=os.path.join(p,filename.replace(' ','_'))
+        with file(picture_filename, 'wb') as pictureout:
+            picturein = form['picture'].file
+            while True:
+                chunk = picturein.read(chunk_size)
+                total_loaded+= len(chunk)
+                percent=int(float(total_loaded)/total_size*100)
+                _status_update(\
+                    'Uploading picture file\n%d percent' % percent)
+                if not chunk: break
+                pictureout.write(chunk)
+        
+        _status_update('Uploaded picture file')
+        if not os.path.isfile(picture_filename):    
+            self._respond(get_empty_html('Something went wrong, sorry :('))
+            _status_update('Something went wrong, sorry :(')
+            sleep(10)
+        else:
+            _gallery.add(picture_filename)
+            self._send_to('/gallery?dummy=1')
+    
     def do_POST(self):
         try:
             _processes.kill_running() 
+            if 'upload_pic' in self.path:
+                _upload_pic()
+                return
             if 'upload' not in self.path:
                 _log.error('Unknonw post request')
                 self._send_to('/')
@@ -209,7 +259,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
 
             filename = form['video'].filename
             if len(filename)==0:
-                err='Sorry, you must tell me a video a file name'
+                err='Sorry, you must tell me a video file name'
                 _status_update(err)
                 self._respond(get_empty_html(err))
                 sleep(5)
@@ -265,7 +315,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _initialise_streams()
             params = parse_qs(urlparse(self.path).query)
 
-            if 'play_remove' in self.path:
+            if 'play_remove?' in self.path:
                 ps=params['action'][0]
                 if u'remove' in ps:
                     html=_streams.make_remove_html(ps[len('remove '):])
@@ -277,31 +327,52 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     _log.info('playing as requested')
                     _processes.play_stream(ps[len('play '):])
                     #_processes.run_something()
-            elif 'really_remove' in self.path:
+            elif 'gallery?' in self.path:
+                html=_gallery.make_html()
+                self._respond(html)
+                return     
+            elif 'gallery_list?' in self.path:
+                ps=params['action'][0]
+                if u'picremove' in ps:
+                    html=_gallery.make_remove_html(ps[len('picremove '):])
+                    self._respond(html)
+                    return
+                elif 'picup' in ps:
+                    _gallery.move_up(ps[len('picup '):])
+                else: 
+                   raise Exception('Unknown request %s' % self.path)
+                self._send_to('/gallery?dummy=1')
+                return 
+            elif 'really_remove_pic?' in self.path:
+                ps=params['action'][0]
+                _gallery.remove(ps[len('really remove '):])
+                self._send_to('/gallery?dummy=1')
+                return
+            elif 'really_remove?' in self.path:
                 ps=params['action'][0]
                 _streams.remove(ps[len('really remove '):])
-            elif 'next' in self.path:
+            elif 'next?' in self.path:
                 _processes.play_next()
-            elif 'refresh_caches' in self.path:
+            elif 'refresh_caches?' in self.path:
                 _processes.refresh_caches()
-            elif 'add' in self.path:
+            elif 'add?' in self.path:
                 if params['name'][0] != 'NAME' and params['link'][0]!='LINK':
                     name=params['name'][0].replace(' ','')
                     _streams.add(params['name'][0],params['link'][0],
                         params['quality'][0])
-            elif 'clock' in self.path:
+            elif 'clock?' in self.path:
                 _processes.play_clock()
-            elif 'slideshow' in self.path:
+            elif 'slideshow?' in self.path:
                 _processes.play_apod()
-            elif 'upload' in self.path:
+            elif 'upload?' in self.path:
                 html = get_upload_html() 
                 self._respond(html)
                 return
-            elif 'configuration' in self.path:
+            elif 'configuration?' in self.path:
                 html = _config.get_html()
                 self._respond(get_empty_html(html))
                 return
-            elif 'config_change' in self.path:
+            elif 'config_change?' in self.path:
                 ps=params['action'][0]
                 global _msg
                 if u'apply' in ps:
@@ -314,11 +385,11 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _msg=msg.MsgScreen()
                 _msg.init_once()
                 _processes.reload_config()
-            elif 'wifi' in self.path:
+            elif 'wifi?' in self.path:
                 html = connection.make_wifi_html() 
                 self._respond(html)
                 return
-            elif 'connect' in self.path:
+            elif 'connect?' in self.path:
                 global _last_params
                 global _connecting_timer
                 if _connecting_timer is None:
@@ -337,17 +408,17 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     self._respond(get_empty_html(html))
                     return
 
-            elif 'scan' in self.path:
+            elif 'scan?' in self.path:
                 html = connection.make_wifi_html() 
                 self._respond(html)
                 return
-            elif 'reboot' in self.path:
+            elif 'reboot?' in self.path:
                 _status_update('rebooting in a few seconds, see you soon :)')
                 Timer(5,_reboot).start()
-            elif 'shutdown' in self.path:
+            elif 'shutdown?' in self.path:
                 _status_update('shutting down in a few seconds, goodbye :)')
                 Timer(5,_shutdown).start()
-            elif 'kodi' in self.path:
+            elif 'kodi?' in self.path:
                 _processes.wait()
                 _processes.kill_running()
                 _status_update('starting kodi')
@@ -357,20 +428,18 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 txt='enjoy'
                 _status_update(txt)
                 _processes.stop_waiting()
-            elif 'rough' in self.path:
+            elif 'rough?' in self.path:
                 self._send_to('http://%s:%i' % (_ip,MOPIDY_PORT))
                 _processes.start_mopidy()
                 return
-            elif self.path.endswith('.jpg'):
-                # getting pictures for backgrounds and such
+            elif _gallery.is_pic(self.path):
+                pic=_gallery().serve_pic(self.path)
                 mimetype='image/jpg'
                 #Open the static file requested and send it
-                f = open('/home/pi/' + self.path) 
                 self.send_response(200)
                 self.send_header('Content-type',mimetype)
                 self.end_headers()
-                self.wfile.write(f.read())
-                f.close()
+                self.wfile.write(pic)
                 return
             else:
                 if _standalone:
