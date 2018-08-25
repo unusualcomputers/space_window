@@ -181,13 +181,13 @@ class Streams(Jsonable):
                 row = u"""<tr><td>{}</td><td>{}</td><td>
                     <input type="hidden" name="hidden_{}" value="{}">
                     <button type="submit" name="action" value="play {}">
-                        play
+                        Play
                     </button></td><td>
                     <button type="submit" name="action" value="moveup {}">
-                        up</button></td>
+                        Up</button></td>
                     <td>
                     <button type="submit" name="action" value="remove {}">
-                            remove
+                            Remove
                     </button></td>
                     </tr>
                     """.format(name,quality,_cnt,name,name,name,name)

@@ -184,69 +184,77 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         return True
 
     def _upload_pic(self):
-        chunk_size=128*1024
-        _status_update('Getting info about files to upload')
-        total_size=int(self.headers['Content-Length'])
-        form = cgi.FieldStorage(
-            fp=self.rfile,
-            headers=self.headers,
-            environ={'REQUEST_METHOD':'POST',
-                     'CONTENT_TYPE':self.headers['Content-Type'],
-                     })
-        p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
-        if not os.path.exists(p):
-            os.makedirs(p)
-        files = form['picture']
-        if files is None or len(files)==0:
-            err='Sorry, you must tell me a picture file name'
-            _status_update(err)
-            self._respond(get_empty_html(err))
-            sleep(5)
-            return
+        try:
+            _gallery.stop()
+            sleep(1)
+            chunk_size=128*1024
+            _status_update('Getting info about files to upload')
+            total_size=int(self.headers['Content-Length'])
+            form = cgi.FieldStorage(
+                fp=self.rfile,
+                headers=self.headers,
+                environ={'REQUEST_METHOD':'POST',
+                         'CONTENT_TYPE':self.headers['Content-Type'],
+                         })
+            p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
+            if not os.path.exists(p):
+                os.makedirs(p)
+            files = form['picture']
+            if files is None or len(files)==0:
+                err='Sorry, you must tell me a picture file name'
+                _status_update(err)
+                self._respond(get_empty_html(err))
+                sleep(5)
+                return
 
-        chunk_percent=float(chunk_size)/total_size
-        total_loaded=0
-        percent=0
-        not_uploaded=[]
-        for ff in files:
-            filename=ff.filename
-            picture_filename=os.path.join(p,filename.replace(' ','_'))
-            with file(picture_filename, 'wb') as pictureout:
-                picturein = ff.file 
-                while True:
-                    chunk = picturein.read(chunk_size)
-                    total_loaded+= len(chunk)
-                    percent=int(float(total_loaded)/total_size*100)
-                    _status_update(\
-                        'Uploading pictures\n%d percent' % percent)
-                    if not chunk: break
-                    pictureout.write(chunk)
-            
-            _status_update('Uploaded picture file')
-            if not os.path.isfile(picture_filename):    
-                not_uploaded.append(filename)
-            else:
-                _gallery.add(picture_filename)
+            chunk_percent=float(chunk_size)/total_size
+            total_loaded=0
+            percent=0
+            not_uploaded=[]
+            uploaded=[]
+            for ff in files:
+                filename=ff.filename
+                picture_filename=os.path.join(p,filename.replace(' ','_'))
+                with file(picture_filename, 'wb') as pictureout:
+                    picturein = ff.file 
+                    while True:
+                        chunk = picturein.read(chunk_size)
+                        total_loaded+= len(chunk)
+                        percent=int(float(total_loaded)/total_size*100)
+                        _status_update(\
+                            'Uploading pictures\n%d percent' % percent)
+                        if not chunk: break
+                        pictureout.write(chunk)
+                
+                if not os.path.isfile(picture_filename):    
+                    not_uploaded.append(filename)
+                else:
+                    uploaded.append(picture_filename)
+
+            if not len(not_uploaded)==0:
+                s=''.join(not_uploaded)
+                s='Something went wrong, not all fies were uploaded :('
+                _status_update(s)
                 self._send_to('/gallery?dummy=1')
-        if not len(not_uploaded)==0:
-            s=''.join(not_uploaded)
-            s='Something went wrong, not all fies were uploaded :('
-            _status_update(s)
+                return
+            _status_update('Uploaded')
+            _gallery.add_several(uploaded)
             self._send_to('/gallery?dummy=1')
-            sleep(5)
-
+        finally:
+            _gallery.play()
+            
     def do_POST(self):
         try:
             if 'upload' not in self.path:
                 _log.error('Unknonw post request')
                 self._send_to('/')
                 return
-            _processes.kill_running() 
             _processes.wait()
             if 'upload_pic' in self.path:
                 self._upload_pic()
                 _processes.stop_waiting()
                 return
+            _processes.kill_running() 
             chunk_size=128*1024
             _status_update('Getting info about files to upload')
             total_size=int(self.headers['Content-Length'])
@@ -370,7 +378,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 sleep(2)
                 ps=params['action'][0]
                 paths=ps[len('really remove '):].split(',')
-                log.info('REMOVING %s',paths)
                 _gallery.remove_several(paths)
                 self._send_to('/gallery?dummy=1')
                 _gallery.play()

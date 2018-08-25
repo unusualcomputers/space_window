@@ -161,6 +161,15 @@ class Gallery:
                 return
             prev=current
 
+    def add_several(self,fnames):
+        i=len(self.images)
+        for fname in fnames:
+            name=self._make_file_name(fname,i)
+            picpath=join(self.path,name)
+            os.rename(fname,picpath)
+            i+=1
+        self._load_files()
+
     def add(self,fname):
         i=len(self.images)
         name=self._make_file_name(fname,i)
