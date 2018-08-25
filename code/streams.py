@@ -2,7 +2,7 @@ from jsonable import Jsonable
 import os
 from html import build_html
 from collections import OrderedDict
-from video_player import Player
+from video_player import VideoPlayer
 import threading
 import logger
 import random
@@ -14,8 +14,6 @@ _config_path=os.path.join(_base_path,_streams_data)
 _cnt=random.randint(0,1000) # global counter, used to make html more responsive
 _session=requests.Session()
 _player=None
-# streams
-#   main class managing sreams to play
 
 _standalone=False
 
@@ -66,7 +64,7 @@ class Streams(Jsonable):
 
     def refresh_caches(self):
         global _player
-        _player=Player()
+        _player=VideoPlayer()
         if not _standalone:
             self._get_data_for_first_video()
     
@@ -107,7 +105,6 @@ class Streams(Jsonable):
         if not _player.can_play(url):
             raise Exception('Cannot play ' + url)
         self.streams[name]=(url,quality)
-        #threading.Thread(target=_player.can_play,args=(url))
         self.save()
         
     def remove(self,name):

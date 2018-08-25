@@ -61,8 +61,6 @@ class ProcessHandling:
             
     def kill_running(self,reset_current=False):
         self.log.info('stopping running shows')
-        #if(updates):
-        #    self._status_update('stopping running shows')
         if self._check_timer is not None: 
             self._check_timer.cancel()
         self._streams.stop()
@@ -73,7 +71,6 @@ class ProcessHandling:
             self._mopidy.stop()
         if reset_current:
             self._current_stream=None
-        #wifi.run('pkill -9 mopidy')
        
     def wait(self):
         self._wait=True

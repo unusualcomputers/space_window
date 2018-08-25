@@ -110,13 +110,9 @@ def _handle_start_wifi_req(params):
             wifi_name=n
         elif n=='password':
             password=v[0]
-    #_status_update('trying to connect to %s now\n' % wifi_name)
     _waiting_status(\
         'trying to connect to %s\nthis network is going down ' % wifi_name,
         wifi.set_wifi,(wifi_name,password))
-    #server.wfile.write(make_attempting_html())
-    #wifi.set_wifi(wifi_name,password)
-    #_status_update('restarting wifi')
     _waiting_status('restarting wifi',wifi.start_wifi)
     _status_update('testing the new connection')
     if connection.test_connection():
@@ -155,7 +151,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
-        # Send the html message
         self.wfile.write(html)
     
     def _send_to(self,addr):
@@ -328,7 +323,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 else: #if it's not remove, then it's play
                     _log.info('playing as requested')
                     _processes.play_stream(ps[len('play '):])
-                    #_processes.run_something()
             elif 'gallery?' in self.path:
                 _processes.play_gallery()
                 html=_gallery.make_html()

@@ -10,7 +10,7 @@ _player_args='-o alsa--vol 500 --timeout 60'
 #_player_args=''
 _synchronisation_sleep=0.1
 
-class VideoPlayer:
+class PlayerBase:
     def __init__(self,
             status_func=None):
         self._status_func=status_func

@@ -6,7 +6,7 @@ import time
 import os
 from functools import partial
 from itertools import chain
-from player_base import VideoPlayer
+from player_base import PlayerBase
 import threading 
 import logger
 
@@ -21,10 +21,10 @@ def _next_thread_id():
     _thread_id+=1
     return _thread_id
 
-class Streamer(VideoPlayer):
+class Streamer(PlayerBase):
     def __init__(self,
             status_func=None):
-        VideoPlayer.__init__(self,status_func)
+        PlayerBase.__init__(self,status_func)
         self.qualities_cache=Cache(_cache_size)
         self.streamlink=Streamlink()
         #check if this works for multiple streams

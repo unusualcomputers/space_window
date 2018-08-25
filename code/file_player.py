@@ -1,4 +1,4 @@
-from player_base import VideoPlayer
+from player_base import PlayerBase
 import logger
 import os
 from os.path import *
@@ -7,10 +7,10 @@ from wifi_control import run
 
 _log=logger.get(__name__)
 
-class FilePlayer(VideoPlayer):
+class FilePlayer(PlayerBase):
     def __init__(self,
             status_func=None):
-        VideoPlayer.__init__(self,status_func)
+        PlayerBase.__init__(self,status_func)
 
     def _play_loop_impl(self,url,quality):
         try:

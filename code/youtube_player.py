@@ -3,7 +3,7 @@ import os
 import threading
 import time
 from cache import Cache
-from player_base import VideoPlayer
+from player_base import PlayerBase
 import logger
 import json
 
@@ -17,10 +17,10 @@ def _next_thread_id():
     _thread_id+=1
     return _thread_id
 
-class YouTubePlayer(VideoPlayer):
+class YouTubePlayer(PlayerBase):
     def __init__(self,
             status_func=None):
-        VideoPlayer.__init__(self,status_func)
+        PlayerBase.__init__(self,status_func)
         self.video_cache=Cache(_cache_size)
         self.playlist_cache=Cache(_cache_size)
         self.lock=threading.Lock()
@@ -84,8 +84,6 @@ class YouTubePlayer(VideoPlayer):
         i=1
         qualities=[]
         for pfy in pfys:
-            #self._status('getting video quality data for video %i of %i' \
-            #    %(i,sz))
             i=i+1
             qualities.append(self._get_video_qualities(pfy))
         first=qualities[0]
@@ -155,7 +153,6 @@ class YouTubePlayer(VideoPlayer):
             pfy=self._get_video(url)
             sz=len(pl)
             if sz==0: return sz
-            #self._status('getting data for your video')
             pfy=pl[0][1]
             if pfy is None:
                 pfy=pafy.new(pl[0][0])
@@ -172,7 +169,6 @@ class YouTubePlayer(VideoPlayer):
             sz=len(rest)+1
             j=2
             for i in rest:
-                #self._status('getting data for video %i of %i'%(j,sz))
                 _log.info('getting data for video %i of %i'%(j,sz))
                 j+=1
                 pfy=i[1]
@@ -217,10 +213,8 @@ class YouTubePlayer(VideoPlayer):
                         cmd='%s "%s"' % (self._player_cmd,u)
                     else:
                         cmd='%s "%s"' % (self._player_pl_cmd,u)
-                    #_log.info(cmd)
                     self._status(':)')
                     os.system(cmd)
-                    #_log.info('Done playing: ' + cmd)
  
                 with self.lock:
                     sz=len(urls)
@@ -255,7 +249,6 @@ class YouTubePlayer(VideoPlayer):
         if v is not None: 
             self._status('getting available video qualities for the playlist')
             return ['default']#self._get_playlist_qualities(v)
-        #self._status('this was not a playlist, getting video information')
         _log.info('getting qualities')
         v=self._get_video(url)
         if v is not None: 

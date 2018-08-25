@@ -5,7 +5,7 @@ from cache import Cache
 import logger
 
 _cache_size=200
-class Player:
+class VideoPlayer:
     def __init__(self):
         self.yt_player=YouTubePlayer()
         self.streamer=Streamer()

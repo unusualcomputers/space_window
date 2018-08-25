@@ -105,7 +105,7 @@ _main_table=u"""
     <input type="text" name="link" value="LINK">
     <input type="text" name="quality" value="default">
     <input type="hidden" name="hiddenadd_CNT" value="ADDLINK">
-    <input type="submit" value="Add">
+    <input type="submit" value="Add stream">
 </form></div>
 <br/>
 <hr/>
