@@ -128,21 +128,21 @@ class Gallery:
     
     def _rename_files(self):
         sz=len(self.images)
-                
+        renamed=[]        
         for i in range(0,sz):
             curr_name=self.images[i][0]
-            new_name=self._make_file_name(curr_name,i)
+            new_name=join(self.path,self._make_file_name(curr_name,i))
             if curr_name != new_name:
                 os.rename(curr_name,new_name+'.tmp')
+                renamed.append(new_name+'.tmp')
                 curr_th_name=self.images[i][1]
-                new_th_name=self._make_file_name(curr_th_name,i)
+                new_th_name=join(self.thumbspath,
+                        self._make_file_name(curr_th_name,i))
                 os.rename(curr_th_name,new_th_name+'.tmp')
+                renamed.append(new_th_name+'.tmp')
                 ii=self.images[i]
-                self.images[i]=(new_name,new_th_name,ii[2],ii[3])
+                self.images[i]=(new_name,new_th_name,ii[2],ii[3],ii[4],ii[5])
    
-
-        renamed=glob.glob(join(self.path,'*.tmp'))+\
-            glob.glob(join(self.thumbspath,'*.tmp'))
         for r in renamed:
             nr=r[:-4]
             os.rename(r,nr)
@@ -155,9 +155,12 @@ class Gallery:
         for i in range(1,sz):
             current=self.images[i]
             if current[0]==fname:
+                playing=self.is_playing()
+                if playing: self.stop()
                 self.images[i-1]=current
                 self.images[i]=prev
                 self._rename_files()
+                if playing: self.play()
                 return
             prev=current
 
@@ -212,6 +215,8 @@ class Gallery:
 
     
     def make_remove_html(self,fname):
+        global _cnt
+        _cnt+=1
         form = u"""    
             <p style="font-size:45px">Really remove all these pictures?</p>
 
@@ -221,7 +226,7 @@ class Gallery:
                     Yes, really remove them!
             </button></td><td>
             </form>
-        """.format(fname,fname,fname)
+        """.format(_cnt,fname,fname)
         return build_html(form)
     
     def is_playing(self):

@@ -40,7 +40,7 @@ class ProcessHandling:
         self.kill_running()
         sleep(2)
         self._nasa=NasaPod()
-        self._gallery=Gallery()
+        self._gallery=Gallery(status_update_func)
         self._clock=Clock()
         self.run_something()
 
@@ -105,9 +105,8 @@ class ProcessHandling:
 
     def play_gallery(self):
         self._stop_timer()
-        self.log.info('stopping streams')
         self._current_stream=None
-        self.log.info('playing apod')
+        self.log.info('playing gallery')
         self._streams.stop()
         self._clock.stop()
         self._nasa.stop()
@@ -116,7 +115,6 @@ class ProcessHandling:
     
     def play_apod(self):
         self._stop_timer()
-        self.log.info('stopping streams')
         self._current_stream=None
         self.log.info('playing apod')
         self._streams.stop()
@@ -127,9 +125,8 @@ class ProcessHandling:
      
     def play_clock(self):
         self._stop_timer()
-        self.log.info('stopping streams')
         self._current_stream=None
-        self.log.info('playing apod')
+        self.log.info('playing clock')
         self._streams.stop()
         self._nasa.stop()
         self._gallery.stop()
