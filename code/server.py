@@ -86,7 +86,7 @@ def wait_to_initialise():
     return waiting_job.result
 
 def start_server():
-    _processes.run_something()    
+    _processes.run_first_time()    
     _server.serve_forever()
 
 def stop_server():
@@ -347,10 +347,17 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             elif 'gallery_list?' in self.path:
                 ps=params['action'][0]
                 if u'picremove' in ps:
-                    log.info("PICREMOVE: %s" % params)
-                    #html=_gallery.make_remove_html(ps[len('picremove '):])
-                    #self._respond(html)
-                    #return
+                    to_remove=[]
+                    for p in params:
+                        if 'remove_pic' in p:
+                            to_remove.append(params[p][0])
+                    if len(to_remove)==0:
+                        self._send_to('/gallery?dummy=1')
+                        return
+                    paths=','.join(to_remove)
+                    html=_gallery.make_remove_html(paths)
+                    self._respond(html)
+                    return
                 elif 'picup' in ps:
                     _gallery.move_up(ps[len('picup '):])
                 else: 
@@ -358,9 +365,15 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 self._send_to('/gallery?dummy=1')
                 return 
             elif 'really_remove_pic?' in self.path:
+                _gallery.stop()
+                _status_update('Removing pictures, please wait')
+                sleep(2)
                 ps=params['action'][0]
-                _gallery.remove(ps[len('really remove '):])
+                paths=ps[len('really remove '):].split(',')
+                log.info('REMOVING %s',paths)
+                _gallery.remove_several(paths)
                 self._send_to('/gallery?dummy=1')
+                _gallery.play()
                 return
             elif 'really_remove?' in self.path:
                 ps=params['action'][0]

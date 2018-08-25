@@ -140,21 +140,21 @@ class Config:
         gallerydelay=self.get('gallery','frame_delay')        
         weatherloc=self.get('weather','location')
 
-        if startswith=='nasa':
+        if startwith=='nasa':
             html_start_with="""
             <input type="radio" name="startwith" value="streams" ><br/>
             <input type="radio" name="startwith" value="nasa" checked><br/>
             <input type="radio" name="startwith" value="clock" ><br/>
             <input type="radio" name="startwith" value="gallery" ><br/>
             """ 
-        elif startswith=='clock':
+        elif startwith=='clock':
             html_start_with="""
             <input type="radio" name="startwith" value="streams" ><br/>
             <input type="radio" name="startwith" value="nasa" ><br/>
             <input type="radio" name="startwith" value="clock" checked><br/>
             <input type="radio" name="startwith" value="gallery" ><br/>
             """ 
-        elif strtswith=='gallery':
+        elif startwith=='gallery':
             html_start_with="""
             <input type="radio" name="startwith" value="streams" ><br/>
             <input type="radio" name="startwith" value="nasa" ><br/>

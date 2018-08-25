@@ -102,6 +102,14 @@ class Gallery:
                 thumb_read= tf.read()
             self.images.append((p,thumb_path,pic,thumb,pic_read,thumb_read))
    
+    def remove_several(self,picpaths):
+        for picpath in picpaths:
+            if exists(picpath): os.remove(picpath)
+            tpath=self._make_thumb_path(picpath)
+            if exists(tpath):os.remove(tpath)
+        self._load_files()
+        self._rename_files()
+    
     def remove(self,picpath):
         if exists(picpath): os.remove(picpath)
         tpath=self._make_thumb_path(picpath)
@@ -196,15 +204,15 @@ class Gallery:
     
     def make_remove_html(self,fname):
         form = u"""    
-            <p style="font-size:45px">Really, really remove {}?</p>
+            <p style="font-size:45px">Really remove all these pictures?</p>
 
             <form action="/really_remove_pic">
             <input type="hidden" name="hidden_{}" value="{}">
             <button type="submit" name="action" value="really remove {}">
-                    Yes, really remove it!
+                    Yes, really remove them!
             </button></td><td>
             </form>
-        """.format(fname,fname,fname,fname)
+        """.format(fname,fname,fname)
         return build_html(form)
     
     def is_playing(self):
