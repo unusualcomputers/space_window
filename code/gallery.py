@@ -42,7 +42,6 @@ class Gallery:
         self.thumb_sz=64
         
         self._status_update=status_update_func    
-        self.filnumre=re.compile('[0-9]{5}')
         self.path=join(dirname(abspath(__file__)),'photos')
         self.thumbspath=join(self.path,'thumbnails')
         if not isdir(self.path): os.mkdir(self.path)
@@ -121,11 +120,6 @@ class Gallery:
         nm,ext=splitext(basename(fname))
         return ('%05d_IMG%s' % (i,ext))               
 
-    def _get_filenum(self,fname):
-        f=self.filenumre.findall(fname)
-        if len(f) != 1: raise Exception("Can't parse path %s" % fname)
-        return int(f[0])
-    
     def _rename_files(self):
         sz=len(self.images)
         renamed=[]        

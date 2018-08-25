@@ -30,7 +30,6 @@ class Clock:
         width=self._screen.get_width()
         self.running=False    
         self._init_rects()
-        self.weather=''
 
     def is_playing(self):
         return self.running

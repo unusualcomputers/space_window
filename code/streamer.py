@@ -8,7 +8,6 @@ from functools import partial
 from itertools import chain
 from player_base import VideoPlayer
 import threading 
-import thread
 import logger
 
 

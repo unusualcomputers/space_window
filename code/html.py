@@ -1,6 +1,6 @@
 import random
 
-_html_template_main=u"""
+_html_header=u"""
 <!doctype html>
 <html>
 <head>
@@ -10,8 +10,10 @@ _html_template_main=u"""
     <meta http-equiv="Cache-Control" content="no-cache, no-store,must-revalidate"/>
     <meta http-equiv="Pragma" content="no-cache"/>
     <meta http-equiv="Expires" content="-1"/>
-    [%REFRESH%]
 <style>
+        a {
+            color: #ff8000;
+        }
         body {
             color: #ff8000;
             background-color: #200020;
@@ -50,92 +52,41 @@ _html_template_main=u"""
             border-style: solid;
             font-family: "Comic Sans MS";
           }
+        .center{text-align:center;}
 </style>
 </head>
 <body>
-<h1>Space Window</h1>
+<a href="/"><h1>Space Window</h1></a>
 <br><br>
-[%HTML_BODY%]
+"""
+
+_html_footer=u"""
 <br><br>
 <footer>
-Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
+Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank">unusual computers collective</a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank">github</a>)
 </footer>
 
 </body>
 
+"""
+_html_template_main=u"""
+[%HEADER%]
+[%HTML_BODY%]
+[%FOOTER%]
 """           
 _html_upload="""
-<!doctype html>
-<html>
-<head>
-    <title>Space Window</title>
-    <meta name="description" content"Space Window">
-    <meta name="viewport" content="width=device-width">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store,must-revalidate"/>
-    <meta http-equiv="Pragma" content="no-cache"/>
-    <meta http-equiv="Expires" content="-1"/>
-<style>
-        body {
-            color: #ff8000;
-            background-color: #200020;
-            font-family: "Comic Sans MS";
-            border-radius: 5px; 
-            }
-        input[type=text]{
-            color: #ff8000;
-            background-color: #200020;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-            }
-        input[type=submit]{
-            color: #ff8000;
-            background-color: #200020;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-            }
-        button[type=submit]{
-            color: #ff8000;
-            background-color: #200020;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-            }
-        input[type=password]{
-            color: #ff8000;
-            background-color: #800080;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-          }
-          .center{text-align:center;}
-</style>
-</head>
-<body>
-<h1>Space Window</h1>
+[%HEADER%]
+<form enctype="multipart/form-data" action="/upload_video" method="post"> 
+<input type="text" name="name" value="NAME">
 <br><br>
-    <form enctype="multipart/form-data" action="/upload_video" method="post"> 
-    <input type="text" name="name" value="NAME">
-    <br><br>
-    Video file 
-        <input type="file" name = "video"/>
-    <br><br>
-    Subtitles 
-        <input type="file" name = "subs"/>
-    <p><input type="submit" value="Upload"></p>
-    </form>
+Video file 
+    <input type="file" name = "video"/>
 <br><br>
-<footer>
-Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
-</footer>
-
-</body>
-
+Subtitles 
+    <input type="file" name = "subs"/>
+<p><input type="submit" value="Upload"></p>
+</form>
+[%FOOTER%]
 """
 _main_table=u"""
 
@@ -280,118 +231,33 @@ _main_table_standalone=u"""
 </table>    
 """
 
-html_empty="""
-<!doctype html>
-<html>
-<head>
-    <title>Space Window</title>
-    <meta name="description" content"Space Window">
-    <meta name="viewport" content="width=device-width">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store,must-revalidate"/>
-    <meta http-equiv="Pragma" content="no-cache"/>
-    <meta http-equiv="Expires" content="-1"/>
-<style>
-        body {
-            color: #ff8000;
-            background-color: #200020;
-            font-family: "Comic Sans MS";
-            border-radius: 5px; 
-            }
-        input[type=text]{
-            color: #ff8000;
-            background-color: #200020;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-            }
-        input[type=submit]{
-            color: #ff8000;
-            background-color: #200020;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-            }
-        button[type=submit]{
-            color: #ff8000;
-            background-color: #200020;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-            }
-        input[type=password]{
-            color: #ff8000;
-            background-color: #800080;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-          }
-          .center{text-align:center;}
-</style>
-</head>
-<body>
-<h1>Space Window</h1>
-<br><br>
-[%ERROR_TEXT%]
-<br><br>
-<footer>
-Brought to you by <a href="https://unusualcomputerscollective.org/" target="_blank"> unusual computers collective </a> (also on <a href="https://github.com/unusualcomputers/unusualcomputers/blob/master/README.md#unusual-computers-collective" target="_blank"> github </a>)
-</footer>
-
-</body>
-
-"""           
 _cnt=random.randint(0,1000)
-def build_html(body,refresh_time=None):
-    global _cnt
-    if refresh_time is None:
-        refresh=''
-    else:
-        refresh_html=\
-            '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
+def _head_foot(html):
+    return html.replace('[%HEADER%]',_html_header).replace('[%FOOTER%]',_html_footer)
 
-    html = _html_template_main.replace('[%REFRESH%]',refresh).\
-        replace('[%HTML_BODY%]',body)
+def _count(html):
+    global _cnt
     _cnt+=1
     cntstr='%i' % _cnt
     return html.replace('CNT',cntstr)
 
-def get_standalone_html(rows_html,refresh_time=None):
-    global _cnt
-    if refresh_time is None:
-        refresh=''
-    else:
-        refresh_html=\
-            '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
+def build_html(body):
+    html = _head_foot(_html_template_main).replace('[%HTML_BODY%]',body)
+    return _count(html)
 
-    html = _html_template_main.replace('[%HTML_BODY%]',_main_table_standalone).\
-        replace('STREAM_ROWS',rows_html).replace('[%REFRESH%]',refresh)
-    _cnt+=1
-    cntstr='%i' % _cnt
-    return html.replace('CNT',cntstr)
+def get_standalone_html(rows_html):
+    html = _head_foot(_html_template_main).\
+        replace('[%HTML_BODY%]',_main_table_standaloney).\
+        replace('STREAM_ROWS',rows_html)
+    return _count(html)
 
-def get_main_html(rows_html,refresh_time=None):
-    global _cnt
-    if refresh_time is None:
-        refresh=''
-    else:
-        refresh_html=\
-            '<meta http-equiv="refresh" content="{}" >'.format(refresh_time)
-
-    html = _html_template_main.replace('[%HTML_BODY%]',_main_table).\
-        replace('STREAM_ROWS',rows_html).replace('[%REFRESH%]',refresh)
-    _cnt+=1
-    cntstr='%i' % _cnt
-    return html.replace('CNT',cntstr)
+def get_main_html(rows_html):
+    html = _head_foot(_html_template_main).replace('[%HTML_BODY%]',_main_table).\
+        replace('STREAM_ROWS',rows_html)
+    return _count(html)
 
 def get_upload_html():
-    global _cnt
-    _cnt+=1
-    cntstr='%i' % _cnt
-    return _html_upload.replace('CNT',cntstr)
+    return _count(_head_foot(_html_upload))
 
 def get_empty_html(err):
-    return html_empty.replace('[%ERROR_TEXT%]',err)
+    return build_html(err)

@@ -59,31 +59,16 @@ class Streams(Jsonable):
         finally:
             pass
 
-    def _get_data_for_rest(self):
-        try:
-            l=self.len()
-            if l < 2: return
-            for i in range(1,l):
-                (url,quality)=self.streams.items()[i][1]                
-                _player.can_play(url)
-        except:
-            self.log.exception('exception while getting rest of videos')
-            raise
-
     def set_status_func(self,status_func):
         global _player
         if _player is not None:
             _player.set_status_func(status_func)
 
-    def refresh_caches(self,threaded=False):
+    def refresh_caches(self):
         global _player
         _player=Player()
         if not _standalone:
             self._get_data_for_first_video()
-        #if threaded:
-        #    threading.Thread(target=self._get_data_for_rest).start()        
-        #else:
-        #    self._get_data_for_rest()
     
     def len(self):
         return len(self.streams.items())

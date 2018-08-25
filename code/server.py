@@ -167,22 +167,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_header('Content-type','text/html')
         self.end_headers()
     
-    def _handle_wifi_change_req(self,params):
-        wifi_name='noname'
-        password=None
-        _log.info('wifi connection params ' + str(params)) 
-        for n in params:
-            v=params[n]
-            if v==['connect']:
-                wifi_name=n
-            elif n=='password':
-                password=v[0]
-        _status_update('trying to connect to %s now' % wifi_name)
-        wifi.set_wifi(wifi_name,password)
-        wifi.restart_wifi()
-        self._send_to('/')
-        return True
-
     def _upload_pic(self):
         try:
             _gallery.stop()
@@ -207,7 +191,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 sleep(5)
                 return
 
-            chunk_percent=float(chunk_size)/total_size
             total_loaded=0
             percent=0
             not_uploaded=[]
@@ -286,7 +269,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             if len(form['subs'].filename)==0: file_cnt=1
             else: file_cnt=2
             
-            chunk_percent=float(chunk_size)/total_size
             total_loaded=0
             percent=0
             video_filename=os.path.join(p,filename.replace(' ','_'))

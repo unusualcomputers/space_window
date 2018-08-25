@@ -1,5 +1,5 @@
 import os
-from subprocess import Popen, call, PIPE
+from subprocess import Popen, PIPE
 import errno
 from types import *
 import sys

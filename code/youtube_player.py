@@ -171,7 +171,6 @@ class YouTubePlayer(VideoPlayer):
             rest=pl[1:]
             sz=len(rest)+1
             j=2
-            new_pfys=[pl[0]]
             for i in rest:
                 #self._status('getting data for video %i of %i'%(j,sz))
                 _log.info('getting data for video %i of %i'%(j,sz))

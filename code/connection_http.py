@@ -58,48 +58,6 @@ def _waiting_status(msg, job, args=None):
 
 _cnt=random.randint(0,1000)
 
-_attempting_html_template=u"""
-    <!doctype html>
-    <html>
-    <head>
-        <title>%s - Wifi</title>
-        <meta name="description" content"%s - WiFi">
-        <meta name="viewport" content="width=device-width">
-        <meta http-equiv="Cache-Control" content="no-cache, no-store,must-revalidate"/>
-        <meta http-equiv="Pragma" content="no-cache"/>
-        <meta http-equiv="Expires" content="-1"/>
-    <style>
-        body {
-            color: #ff8000;
-            background-color: #200020;
-            font-family: "Comic Sans MS";
-            border-radius: 5px; 
-            }
-        input[type=submit]{
-            color: #ff8000;
-            background-color: #200020;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-            }
-        input[type=password]{
-            color: #ff8000;
-            background-color: #800080;
-            border-color: #600060;
-            border-radius: 7px; 
-            border-style: solid;
-            font-family: "Comic Sans MS";
-          }
-    </style>
-    </head>
-    <body>
-
-    <h1>%s - Wifi</h1>
-    <br><br>
-    <big>Now trying to setup wifi, follow the instructions on the device screen.</big>
-    </body>
-    """ % (_ap_name,_ap_name,_ap_name)
 
 _html_template=u"""
     <!doctype html>
@@ -181,9 +139,6 @@ def _make_wifi_rows():
 
 def make_wifi_html():
     return _html_template.replace(u'WIFI_ROWS',_make_wifi_rows())
-
-def make_attempting_html():
-    return _attempting_html_template
 
 class StandaloneWifiServer(BaseHTTPRequestHandler):
 
