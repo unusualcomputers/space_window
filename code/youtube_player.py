@@ -63,7 +63,7 @@ class YouTubePlayer(VideoPlayer):
             self.playlist_cache.add(url,pafys)
             return pafys
         except:
-            _log.exception('exception while playlist for '+url)
+            _log.info('%s is not a playlist' % url)
             return None
 
     def _get_video_qualities(self,pfy):

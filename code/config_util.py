@@ -107,6 +107,7 @@ class Config:
     def get_html(self):
         global _cnt
         _cnt+=1
+        startwith=self.get('global','start_with')
         fontname=self.get('font','name')
         fontsize=self.get('message','font_size')
         txtcol=self.get('message','foreground').split(',')
@@ -139,12 +140,45 @@ class Config:
         gallerydelay=self.get('gallery','frame_delay')        
         weatherloc=self.get('weather','location')
 
+        if startswith=='nasa':
+            html_start_with="""
+            <input type="radio" name="startwith" value="streams" ><br/>
+            <input type="radio" name="startwith" value="nasa" checked><br/>
+            <input type="radio" name="startwith" value="clock" ><br/>
+            <input type="radio" name="startwith" value="gallery" ><br/>
+            """ 
+        elif startswith=='clock':
+            html_start_with="""
+            <input type="radio" name="startwith" value="streams" ><br/>
+            <input type="radio" name="startwith" value="nasa" ><br/>
+            <input type="radio" name="startwith" value="clock" checked><br/>
+            <input type="radio" name="startwith" value="gallery" ><br/>
+            """ 
+        elif strtswith=='gallery':
+            html_start_with="""
+            <input type="radio" name="startwith" value="streams" ><br/>
+            <input type="radio" name="startwith" value="nasa" ><br/>
+            <input type="radio" name="startwith" value="clock" ><br/>
+            <input type="radio" name="startwith" value="gallery" checked><br/>
+            """ 
+        else:
+            html_start_with="""
+            <input type="radio" name="startwith" value="streams" checked><br/>
+            <input type="radio" name="startwith" value="nasa" ><br/>
+            <input type="radio" name="startwith" value="clock" ><br/>
+            <input type="radio" name="startwith" value="gallery" ><br/>
+            """ 
+
         html = """ 
         <div align="right">
         <form align="center" action="/config_change">
             <input name="hidden_%s" value="config" type="hidden">
             <table width="100%%">
             <tbody>
+            <tr>
+            <td>start with </td>
+            <td>%s</td>
+            </tr>
             <tr>
             <td>font name</td>
             <td><input name="fontname" value="%s" type="text"></td>
@@ -223,13 +257,15 @@ class Config:
             </tr>
             </tbody></table>
             </form></div>
-        """ %(_cnt,fontname,fontsize,txtr,txtg,txtb,bckr,bckg,bckb,
-            clkr,clkg,clkb,clkbr,clkbg,clkbb,
+        """ %(_cnt,html_start_with,fontname,fontsize,txtr,txtg,txtb,
+            bckr,bckg,bckb,clkr,clkg,clkb,clkbr,clkbg,clkbb,
             clocktimesize,clockdatesize,clockborder,nasafontsize,
             nasadelay,gallerydelay,weatherloc)
         return html
 
     def parse_form_inputs(self,p):
+        startwith=p['startwith'][0]
+        self.set('global','start_with',startwith)
         fontname=p['fontname'][0]
         self.set('font','name',fontname)
         fontsize=p['fontsize'][0]

@@ -9,6 +9,7 @@ import streams as streamsmod
 import logger
 from time import sleep
 from gallery import Gallery
+from config_util import Config
 _standalone=False
 
 def set_standalone(standalone):
@@ -18,13 +19,15 @@ def set_standalone(standalone):
 
 class ProcessHandling:
     def __init__(self,status_update_func):
+        config = Config('space_window.conf',__file__)    
+        self._start_with=config.get('global','start_with','streams')
         self._current_stream=None
         self._check_timer_delay=30
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
         self._nasa=NasaPod()
-        self._gallery=Gallery()
+        self._gallery=Gallery(status_update_func)
         self._clock=Clock()
         self._mopidy=None
         if not _standalone:
@@ -148,21 +151,46 @@ class ProcessHandling:
             self.log.info('about to play stream %s' % name)
             self.play_stream(name)
 
+    def _something_playing(self):
+        return (self._streams.is_playing() or self._nasa.is_playing()\
+            or self._clock.is_playing() or self._gallery.is_playing() or \
+            self._wait)
+
+    def run_first_time(self):
+        if _standalone:
+            self.run_something()
+            return
+        self._stop_timer()
+        if self._something_playing():
+            self._start_timer()
+            return
+
+        if self._start_with=='clock':
+            self.play_clock()
+        elif self._start_with=='nasa':
+            self.play_nasa()
+        elif self._start_with=='gallery':
+            self.play_gallery()
+        else:
+            self.play_next()
+        self._start_timer()
+
     def run_something(self):
         self._stop_timer()
-        if (self._streams.is_playing() or self._nasa.is_playing()\
-            or self._clock.is_playing() or self._gallery.is_playing() or \
-            self._wait):
+        if self._something_playing():
             self._start_timer()
             return
 
         if _standalone:
-            name=self._streams.first()
-            if name is not None:
-                self.log.info('about to play %s' % name)
-                self.play_stream(name)
-            else:
-                self._gallery.play()
+            if self._start_with=='gallery':
+                self.play_gallery()
+            else:    
+                name=self._streams.first()
+                if name is not None:
+                    self.log.info('about to play %s' % name)
+                    self.play_stream(name)
+                else:
+                    self.play_gallery()
             self._start_timer()
             return
 

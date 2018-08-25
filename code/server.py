@@ -47,7 +47,7 @@ def _initialise_streams():
     if _processes is None:
         _processes=ProcessHandling(_status_update)
         _streams=_processes.streams()
-        _gallery=processes.gallery()
+        _gallery=_processes.gallery()
 
 def initialise_server():
     global _server
@@ -196,8 +196,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
         if not os.path.exists(p):
             os.makedirs(p)
-        filename = form['picture'].filename
-        if len(filename)==0:
+        files = form['picture']
+        if files is None or len(files)==0:
             err='Sorry, you must tell me a picture file name'
             _status_update(err)
             self._respond(get_empty_html(err))
@@ -207,36 +207,46 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         chunk_percent=float(chunk_size)/total_size
         total_loaded=0
         percent=0
-        picture_filename=os.path.join(p,filename.replace(' ','_'))
-        with file(picture_filename, 'wb') as pictureout:
-            picturein = form['picture'].file
-            while True:
-                chunk = picturein.read(chunk_size)
-                total_loaded+= len(chunk)
-                percent=int(float(total_loaded)/total_size*100)
-                _status_update(\
-                    'Uploading picture file\n%d percent' % percent)
-                if not chunk: break
-                pictureout.write(chunk)
-        
-        _status_update('Uploaded picture file')
-        if not os.path.isfile(picture_filename):    
-            self._respond(get_empty_html('Something went wrong, sorry :('))
-            _status_update('Something went wrong, sorry :(')
-            sleep(10)
-        else:
-            _gallery.add(picture_filename)
+        not_uploaded=[]
+        for ff in files:
+            filename=ff.filename
+            picture_filename=os.path.join(p,filename.replace(' ','_'))
+            with file(picture_filename, 'wb') as pictureout:
+                picturein = ff.file 
+                while True:
+                    chunk = picturein.read(chunk_size)
+                    total_loaded+= len(chunk)
+                    percent=int(float(total_loaded)/total_size*100)
+                    _status_update(\
+                        'Uploading pictures\n%d percent' % percent)
+                    if not chunk: break
+                    pictureout.write(chunk)
+            
+            _status_update('Uploaded picture file')
+            if not os.path.isfile(picture_filename):    
+                not_uploaded.append(filename)
+            else:
+                _gallery.add(picture_filename)
+                self._send_to('/gallery?dummy=1')
+        if not len(not_uploaded)==0:
+            s=''.join(not_uploaded)
+            s='Something went wrong, not all fies were uploaded :('
+            _status_update(s)
             self._send_to('/gallery?dummy=1')
-    
+            sleep(5)
+
     def do_POST(self):
         try:
-            _processes.kill_running() 
-            if 'upload_pic' in self.path:
-                _upload_pic()
-                return
             if 'upload' not in self.path:
                 _log.error('Unknonw post request')
                 self._send_to('/')
+                return
+            _processes.kill_running() 
+            _processes.wait()
+            if 'upload_pic' in self.path:
+                self._upload_pic()
+                _processes.stop_waiting()
+                return
             chunk_size=128*1024
             _status_update('Getting info about files to upload')
             total_size=int(self.headers['Content-Length'])
@@ -307,15 +317,16 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _processes.play_stream(name)
         except:
             _log.exception('Error while processing upload')
+            _processes.stop_waiting()
             _processes.run_something()
-    
+        finally: 
+            _processes.stop_waiting()
     #Handler for the GET requests
     def do_GET(self):
         try:
             _initialise_streams()
             params = parse_qs(urlparse(self.path).query)
 
-            _log.info('REQ: %s\n%s' %(self.path,params))
             if 'play_remove?' in self.path:
                 ps=params['action'][0]
                 if u'remove' in ps:
@@ -329,15 +340,17 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     _processes.play_stream(ps[len('play '):])
                     #_processes.run_something()
             elif 'gallery?' in self.path:
+                _processes.play_gallery()
                 html=_gallery.make_html()
                 self._respond(html)
                 return     
             elif 'gallery_list?' in self.path:
                 ps=params['action'][0]
                 if u'picremove' in ps:
-                    html=_gallery.make_remove_html(ps[len('picremove '):])
-                    self._respond(html)
-                    return
+                    log.info("PICREMOVE: %s" % params)
+                    #html=_gallery.make_remove_html(ps[len('picremove '):])
+                    #self._respond(html)
+                    #return
                 elif 'picup' in ps:
                     _gallery.move_up(ps[len('picup '):])
                 else: 
@@ -432,8 +445,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 self._send_to('http://%s:%i' % (_ip,MOPIDY_PORT))
                 _processes.start_mopidy()
                 return
-            elif _gallery.is_pic(self.path):
-                pic=_gallery().serve_pic(self.path)
+            elif self.path != '/' and _gallery.is_pic(self.path):
+                pic=_gallery.serve_pic(self.path)
                 mimetype='image/jpg'
                 #Open the static file requested and send it
                 self.send_response(200)

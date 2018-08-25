@@ -9,6 +9,7 @@ from time import *
 import threading
 import logger
 from html import build_html,get_empty_html
+from time import sleep
 
 _log=logger.get(__name__)
 _cnt=random.randint(0,1000)
@@ -16,7 +17,13 @@ _pic_form="""
         <div align="left">
         <form align="center" action="/gallery_list">
         <table width=100%>
-        [%PIC_ROWS&]
+        [%PIC_ROWS%]
+        <tr>
+        <td></td><td>
+        <button type="submit" name="action" value="picremove">
+                        Remove selected
+        </button>
+        </td>
         </table>
         </form></div>
         <br/>
@@ -24,16 +31,17 @@ _pic_form="""
         <br/>
         <form enctype="multipart/form-data" action="/upload_pic" method="post"> 
         Picture 
-        <input type="file" accept="image/jpeg" name = "picture"/>
+        <input type="file" accept="image/jpeg" name = "picture" multiple/>
         <p><input type="submit" value="Upload"></p>
         </form>
         """
 class Gallery:
-    def __init__(self):
+    def __init__(self,status_update_func):
         config = Config('space_window.conf',__file__)    
         self._delay=config.getint('gallery','frame_delay',10) 
         self.thumb_sz=64
         
+        self._status_update=status_update_func    
         self.filnumre=re.compile('[0-9]{5}')
         self.path=join(dirname(abspath(__file__)),'photos')
         self.thumbspath=join(self.path,'thumbnails')
@@ -62,16 +70,33 @@ class Gallery:
         thumb=pg.transform.scale(pic,(w,h)).convert()
         pg.image.save(thumb,thumb_path)
         return thumb
+
+    def _resize_pic(self,pic,scrw, scrh):
+        w=pic.get_width()
+        h=pic.get_height()
+        sw=w/float(scrw)
+        sh=h/float(scrh)
+        s=max(sw,sh)
+        h=int(h/s)
+        w=int(w/s)
+        return pg.transform.scale(pic,(w,h)).convert()
     
     def _load_files(self):
+        screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
+        scrh=screen.get_height()
+        scrw=screen.get_width()
         pictures=glob.glob(join(self.path,'*.*'))
         pictures.sort()
         self.images=[]
         for p in pictures:
-            pic=pg.image.load(p)
+            try:
+                pic=pg.image.load(p)
+            except:
+                continue
+            pic=self._resize_pic(pic,scrw,scrh)
             thumb=self._make_thumb(p,pic)
             thumb_path=self._make_thumb_path(p)
-            with open(p) as pf
+            with open(p) as pf:
                 pic_read=pf.read()
             with open(thumb_path) as tf:
                 thumb_read= tf.read()
@@ -84,9 +109,9 @@ class Gallery:
         self._load_files()
         self._rename_files()
  
-    def _make_file_name(self,i,fname):
-        nm,ext=splitext(basename(picpath))
-        return ('%05d_IMG%ext' % (i,ext))               
+    def _make_file_name(self,fname,i):
+        nm,ext=splitext(basename(fname))
+        return ('%05d_IMG%s' % (i,ext))               
 
     def _get_filenum(self,fname):
         f=self.filenumre.findall(fname)
@@ -95,17 +120,25 @@ class Gallery:
     
     def _rename_files(self):
         sz=len(self.images)
+                
         for i in range(0,sz):
             curr_name=self.images[i][0]
-            new_name=self._make_file_name(curr_name)
+            new_name=self._make_file_name(curr_name,i)
             if curr_name != new_name:
-                os.rename(curr_name,new_name)
-                curr_th_name=images[i][1]
-                new_th_name=self._make_file_name(curr_th_name)
-                os.rename(curr_th_name,new_th_name)
+                os.rename(curr_name,new_name+'.tmp')
+                curr_th_name=self.images[i][1]
+                new_th_name=self._make_file_name(curr_th_name,i)
+                os.rename(curr_th_name,new_th_name+'.tmp')
                 ii=self.images[i]
                 self.images[i]=(new_name,new_th_name,ii[2],ii[3])
-    
+   
+
+        renamed=glob.glob(join(self.path,'*.tmp'))+\
+            glob.glob(join(self.thumbspath,'*.tmp'))
+        for r in renamed:
+            nr=r[:-4]
+            os.rename(r,nr)
+
     def move_up(self, fname):
         sz=len(self.images)
         if sz < 2: return
@@ -120,9 +153,9 @@ class Gallery:
                 return
             prev=current
 
-    def add_file(self,fname):
+    def add(self,fname):
         i=len(self.images)
-        name=self._make_file_name(i,fname)
+        name=self._make_file_name(fname,i)
         picpath=join(self.path,name)
         os.rename(fname,picpath)
         self._load_files()
@@ -140,19 +173,20 @@ class Gallery:
         return None
  
     def _make_html_row(self,picpath,thumb_path):
+        global _cnt
         _cnt+=1
         return """
+        <tr>
         <td><a href="%s"><img src=%s></a></td>
         <td>
         <input type="hidden" name="hidden_%s" value="%s">
-        <button type="submit" name="action" value="picremove %s">
-                        remove
-        </button></td>
+        <input type="checkbox" name="remove_pic_%s" value="%s">
         <td>
         <button type="submit" name="action" value="picup %s">
                         up
         </button></td>
-        """ % (picpath,thumb_path,_cnt,picpath,picpath,picpath)
+        </tr>
+        """ % (picpath,thumb_path,_cnt,picpath,picpath,picpath,picpath)
 
     def make_html(self):
         rows=[self._make_html_row(p[0],p[1]) for p in self.images]
@@ -172,10 +206,14 @@ class Gallery:
             </form>
         """.format(fname,fname,fname,fname)
         return build_html(form)
+    
     def is_playing(self):
         return self._running
 
     def play(self):
+        if len(self.images)<1:
+            self._status_update('Please upload some pictures to the gallery')
+            return
         if self._running: return
         self._running=True
         threading.Thread(target=self._slideshow).start()
@@ -208,16 +246,16 @@ class Gallery:
             t0=time()-self._delay
             screen.blit(black,(0,0))
             pg.display.flip()
-            i=0
+            idx=0
             while self._running:
                 t1=time()
                 if t1-t0 < self._delay: 
                     sleep(0.5)
                     continue
                 t0=t1
-                p=self.images[i][2]
-                i+=1
-                if i==len(self.images): i=0
+                p=self.images[idx][2]
+                idx+=1
+                if idx==len(self.images): idx=0
                 if prev_p is not None:
                     image = prev_p
                     ih=image.get_height()
