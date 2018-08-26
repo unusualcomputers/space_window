@@ -373,8 +373,13 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     _config.restore_defaults()
                 else:
                     _log.error('Unknown request for configuration %s' % params)
+                _log.info('saved new config')
+                _processes.pause()
+                _log.info('updating msg screen')
                 _msg=msg.MsgScreen()
+                _log.info('init msg screen')
                 _msg.init_once()
+                _log.info('reloading conf')
                 _processes.reload_config()
             elif 'next?' in self.path:
                 _processes.play_next()
@@ -388,7 +393,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             elif 'clock?' in self.path:
                 _processes.play_clock()
             elif 'slideshow?' in self.path:
-                _processes.play_apod()
+                _processes.play_nasa()
             elif 'upload?' in self.path:
                 html = get_upload_html() 
                 self._respond(html)

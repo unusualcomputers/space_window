@@ -81,6 +81,7 @@ class Gallery:
         return pg.transform.scale(pic,(w,h)).convert()
     
     def _load_files(self):
+        self._status_update('Loading gallery images')
         screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
         scrh=screen.get_height()
         scrw=screen.get_width()
@@ -285,9 +286,9 @@ class Gallery:
                             return
                         #sleep(0.02)
                         image.set_alpha(255-i)
-                        blackalpha.set_alpha(255-i)
+                        #blackalpha.set_alpha(255-i)
                         screen.blit(black,(0,0))
-                        screen.blit(blackalpha,(0,0))
+                        #screen.blit(blackalpha,(0,0))
                         screen.blit(image,(x,y))
                         pg.display.flip()
                     black.fill((0,0,0))
@@ -310,7 +311,7 @@ class Gallery:
                     pg.display.flip()
                 screen.blit(black,(0,0))
                 image.set_alpha(255)
-                black.fill((0,0,0))
+                #black.fill((0,0,0))
                 screen.blit(image,(x,y))
                 pg.display.flip()
                 prev_p=p

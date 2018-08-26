@@ -43,7 +43,7 @@ class ProcessHandling:
         if self._streams.is_playing():
             self._resume_func=self._play_current_stream
         elif self._nasa.is_playing():
-            self._resume_func=self.play_apod
+            self._resume_func=self.play_nasa
         elif self._clock.is_playing():
             self._resume_func=self.play_clock
         elif self._gallery.is_playing():
@@ -52,14 +52,15 @@ class ProcessHandling:
         
     def resume(self):
         self.stop_waiting()
+        _log.info('resume func is %s' % self._resume_func)
         self._resume_func()
         self._resume_func=self.run_something
 
     def reload_config(self):
         self.pause()
-        sleep(2)
+        sleep(5)
         self._nasa=NasaPod()
-        self._gallery=Gallery(status_update_func)
+        self._gallery=Gallery(self._status_update)
         self._clock=Clock()
         self.resume()
 
@@ -122,7 +123,7 @@ class ProcessHandling:
         self._gallery.play()
         self._start_timer()
     
-    def play_apod(self):
+    def play_nasa(self):
         if self._nasa.is_playing(): return
         self.kill_running()
         self._nasa.play()
@@ -144,7 +145,7 @@ class ProcessHandling:
             name=self._streams.next(self._current_stream) 
         if name is None: 
             _log.info('about to play apod')
-            self.play_apod()
+            self.play_nasa()
         else: 
             _log.info('about to play stream %s' % name)
             self.play_stream(name)

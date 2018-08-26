@@ -86,6 +86,8 @@ class NasaPod:
 
     def _slideshow(self):    
         try:
+            pg.display.init()
+            pg.font.init()
             pg.mouse.set_visible(False)	
             screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
             scrh=screen.get_height()
