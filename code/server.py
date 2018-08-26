@@ -156,6 +156,54 @@ def _handle_connect_request():
         _connecting_timer=None
         _processes.resume()
 
+def _upload_pic_job(server):
+    try:
+        server=_current_server
+        _processes.pause() 
+        sleep(1)
+        chunk_size=128*1024
+        _status_update('Uploading')
+        total_size=int(server.headers['Content-Length'])
+        form=server.get_post_form()
+        p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
+        if not os.path.exists(p):
+            os.makedirs(p)
+        files = form['picture']
+        if files is None or len(files)==0:
+            return
+
+        total_loaded=0
+        percent=0
+        not_uploaded=[]
+        uploaded=[]
+        for ff in files:
+            filename=ff.filename
+            picture_filename=os.path.join(p,filename.replace(' ','_'))
+            with file(picture_filename, 'wb') as pictureout:
+                picturein = ff.file 
+                while True:
+                    chunk = picturein.read(chunk_size)
+                    total_loaded+= len(chunk)
+                    percent=int(float(total_loaded)/total_size*100)
+                    _status_update(\
+                        'Uploading pictures\n%d percent' % percent)
+                    if not chunk: break
+                    pictureout.write(chunk)
+            
+            if not os.path.isfile(picture_filename):    
+                not_uploaded.append(filename)
+            else:
+                uploaded.append(picture_filename)
+
+        if not len(not_uploaded)==0:
+            s=''.join(not_uploaded)
+            s='Something went wrong, not all fies were uploaded :('
+            _status_update(s)
+            return
+        _gallery.add_several(uploaded)
+    finally:
+        _processes.resume() 
+
 class SpaceWindowServer(BaseHTTPRequestHandler):
     # send_to redirects to a different address
     def _respond(self,html):
@@ -173,7 +221,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_header('Content-type','text/html')
         self.end_headers()
    
-    def _get_post_form(self):
+    def get_post_form(self):
         return cgi.FieldStorage(
             fp=self.rfile,
             headers=self.headers,
@@ -182,58 +230,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                      })
  
     def _upload_pic(self):
-        try:
-            _processes.pause() 
-            sleep(1)
-            chunk_size=128*1024
-            _status_update('Uploading')
-            total_size=int(self.headers['Content-Length'])
-            form=self._get_post_form()
-            p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
-            if not os.path.exists(p):
-                os.makedirs(p)
-            files = form['picture']
-            if files is None or len(files)==0:
-                err='Sorry, you must tell me a picture file name'
-                _status_update(err)
-                self._respond(get_empty_html(err))
-                sleep(5)
-                return
-
-            total_loaded=0
-            percent=0
-            not_uploaded=[]
-            uploaded=[]
-            for ff in files:
-                filename=ff.filename
-                picture_filename=os.path.join(p,filename.replace(' ','_'))
-                with file(picture_filename, 'wb') as pictureout:
-                    picturein = ff.file 
-                    while True:
-                        chunk = picturein.read(chunk_size)
-                        total_loaded+= len(chunk)
-                        percent=int(float(total_loaded)/total_size*100)
-                        _status_update(\
-                            'Uploading pictures\n%d percent' % percent)
-                        if not chunk: break
-                        pictureout.write(chunk)
-                
-                if not os.path.isfile(picture_filename):    
-                    not_uploaded.append(filename)
-                else:
-                    uploaded.append(picture_filename)
-
-            if not len(not_uploaded)==0:
-                s=''.join(not_uploaded)
-                s='Something went wrong, not all fies were uploaded :('
-                _status_update(s)
-                self._send_to('/gallery?dummy=1')
-                return
-            _status_update('Uploaded')
-            _gallery.add_several(uploaded)
-            self._send_to('/gallery?dummy=1')
-        finally:
-            _processes.resume() 
+        _waiting_status('Uploading',_upload_pic_job,(self))      
+        self._send_to('/gallery?dummy=1')
     
     def _upload_video(self):
         try:
@@ -241,7 +239,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             chunk_size=128*1024
             _status_update('Uploading')
             total_size=int(self.headers['Content-Length'])
-            form=self._get_post_form()
+            form=self.get_post_form()
             p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
             if not os.path.exists(p):
                 os.makedirs(p)
