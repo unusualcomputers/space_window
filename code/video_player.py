@@ -4,6 +4,7 @@ from file_player import FilePlayer
 from cache import Cache
 import logger
 
+_log=logger.get(__name__)
 _cache_size=200
 class VideoPlayer:
     def __init__(self):
@@ -11,7 +12,6 @@ class VideoPlayer:
         self.streamer=Streamer()
         self.file_player=FilePlayer()
         self.players_cache=Cache(_cache_size)
-        self.log=logger.get(__name__)
 
     def set_status_func(self,status_func):
         self.yt_player.set_status_func(status_func)
@@ -43,8 +43,6 @@ class VideoPlayer:
         try:
             return self._get_player(url) is not None
         except:
-            #TODO: once debugging is done we don't need traces here
-            self.log.exception('exception while checkin if can play: ' + url)
             return False
 
     def is_playing(self):

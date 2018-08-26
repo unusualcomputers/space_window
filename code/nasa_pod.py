@@ -11,6 +11,7 @@ from config_util import Config
 #os.putenv('SDL_VIDEODRIVER','fbcon')
 #os.putenv('SDL_FBDEV','/dev/fb0')
 
+_log=logger.get(__name__)
 class NasaPod:
     def __init__(self):
         config = Config('space_window.conf',__file__)    
@@ -171,8 +172,7 @@ class NasaPod:
             self._end_loop(black,screen)
         except:
             self._running=False
-            log=logger.get(__name__)
-            log.exception('exception in nasa pod slideshow')
+            _log.exception('exception in nasa pod slideshow')
             self._place_text('something is wrong with nasa pod :('
                 ,screen=screen)
             raise
@@ -193,8 +193,7 @@ if __name__=="__main__":
         apod=NasaPod()
         apod.play()
     except:
-        log=logger.get(__name__)
-        log.exception('nasa pod main')
+        _log.exception('nasa pod main')
     finally:
         pg.quit()
 

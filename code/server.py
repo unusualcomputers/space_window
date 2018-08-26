@@ -37,10 +37,11 @@ def set_standalone(standalone):
 
 _msg=msg.MsgScreen()
 def _status_update(txt):
-    _log.info(txt)
     _msg.set_text(txt)
 
-def _initialise_streams():
+def initialise_server():
+    global _server
+    #Wait forever for incoming http requests
     global _processes
     global _streams
     global _gallery
@@ -48,14 +49,9 @@ def _initialise_streams():
         _processes=ProcessHandling(_status_update)
         _streams=_processes.streams()
         _gallery=_processes.gallery()
-
-def initialise_server():
-    global _server
-    #Wait forever for incoming http requests
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
     _log.info('Started httpserver on port %i',PORT_NUMBER)
-    _initialise_streams()
 
 
 def _waiting_status(msg, job, args=None):
@@ -132,18 +128,16 @@ def _handle_connect_request():
         _connecting_timer.cancel()
         params=_last_params
         _log.info('handling connect request %s' % params)
-        _processes.wait()
-        _processes.kill_running(True)
+        _processes.pause()
         _status_update('changing wifi networks\n'+\
             'this is a fragile process\n'+\
             "give it a few minutes\nif it didn't work, reboot")
         _handle_start_wifi_req(params)
         set_standalone(False)
-        _processes.stop_waiting()
-        _processes.run_something()
     finally:
         global _connecting_timer
         _connecting_timer=None
+        _processes.resume()
 
 class SpaceWindowServer(BaseHTTPRequestHandler):
     # send_to redirects to a different address
@@ -161,20 +155,23 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
-    
+   
+    def _get_post_form(self):
+        return cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST',
+                     'CONTENT_TYPE':self.headers['Content-Type'],
+                     })
+ 
     def _upload_pic(self):
         try:
-            _gallery.stop()
+            _processes.pause() 
             sleep(1)
             chunk_size=128*1024
-            _status_update('Getting info about files to upload')
+            _status_update('Uploading')
             total_size=int(self.headers['Content-Length'])
-            form = cgi.FieldStorage(
-                fp=self.rfile,
-                headers=self.headers,
-                environ={'REQUEST_METHOD':'POST',
-                         'CONTENT_TYPE':self.headers['Content-Type'],
-                         })
+            form=self._get_post_form()
             p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
             if not os.path.exists(p):
                 os.makedirs(p)
@@ -219,29 +216,15 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             _gallery.add_several(uploaded)
             self._send_to('/gallery?dummy=1')
         finally:
-            _gallery.play()
-            
-    def do_POST(self):
+            _processes.resume() 
+    
+    def _upload_video(self):
         try:
-            if 'upload' not in self.path:
-                _log.error('Unknonw post request')
-                self._send_to('/')
-                return
-            _processes.wait()
-            if 'upload_pic' in self.path:
-                self._upload_pic()
-                _processes.stop_waiting()
-                return
-            _processes.kill_running() 
+            _processes.pause() 
             chunk_size=128*1024
-            _status_update('Getting info about files to upload')
+            _status_update('Uploading')
             total_size=int(self.headers['Content-Length'])
-            form = cgi.FieldStorage(
-                fp=self.rfile,
-                headers=self.headers,
-                environ={'REQUEST_METHOD':'POST',
-                         'CONTENT_TYPE':self.headers['Content-Type'],
-                         })
+            form=self._get_post_form()
             p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
             if not os.path.exists(p):
                 os.makedirs(p)
@@ -251,6 +234,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _status_update(err)
                 self._respond(get_empty_html(err))
                 sleep(5)
+                _processes.resume() 
                 return
 
             filename = form['video'].filename
@@ -259,6 +243,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _status_update(err)
                 self._respond(get_empty_html(err))
                 sleep(5)
+                _processes.resume() 
                 return
 
             if len(form['subs'].filename)==0: file_cnt=1
@@ -295,6 +280,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 self._respond(get_empty_html('Something went wrong, sorry :('))
                 _status_update('Something went wrong, sorry :(')
                 sleep(10)
+                _processes.resume()
             else:
                 _streams.add(name,video_filename,'default')
                 self._send_to('/')
@@ -302,14 +288,21 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _processes.play_stream(name)
         except:
             _log.exception('Error while processing upload')
-            _processes.stop_waiting()
-            _processes.run_something()
-        finally: 
-            _processes.stop_waiting()
+            _processes.resume()
+                
+    def do_POST(self):
+        if 'upload' not in self.path:
+            _log.error('Unknonw post request')
+            self._send_to('/')
+            return
+        if 'upload_pic' in self.path:
+            self._upload_pic()
+        else:
+            self._upload_video()
+ 
     #Handler for the GET requests
     def do_GET(self):
         try:
-            _initialise_streams()
             params = parse_qs(urlparse(self.path).query)
 
             if 'play_remove?' in self.path:
@@ -431,7 +424,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _processes.stop_waiting()
             elif 'rough?' in self.path:
                 self._send_to('http://%s:%i' % (_ip,MOPIDY_PORT))
-                _processes.start_mopidy()
                 return
             elif self.path != '/' and _gallery.is_pic(self.path):
                 pic=_gallery.serve_pic(self.path)

@@ -16,6 +16,7 @@ _chunk_size=10240
 _cache_size=50                               
 _thread_id=0
 
+_log=logger.get(__name__)
 def _next_thread_id():
     global _thread_id
     _thread_id+=1
@@ -80,8 +81,7 @@ class Streamer(PlayerBase):
                     if thread_id not in self.alive_threads: break
                 self._output.write(data)
         except:
-            log=logger.get(__name__)
-            log.exception('exception while outputing stream')
+            _log.exception('exception while outputing stream')
         finally:
             try:
                 with self.lock:
@@ -91,8 +91,7 @@ class Streamer(PlayerBase):
                     stream_fd.close()
                 self._output.close()
             except:
-                log=logger.get(__name__)
-                log.exception('exception while closing streams')
+                _log.exception('exception while closing streams')
 
     def _get_streams(self, url):
         #streams=self.streams_cache.get(url)

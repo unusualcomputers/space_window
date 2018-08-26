@@ -9,6 +9,7 @@ _player_args='-o alsa--vol 500 --timeout 60'
 #_player='mpv'
 #_player_args=''
 _synchronisation_sleep=0.1
+_log=logger.get(__name__)
 
 class PlayerBase:
     def __init__(self,
@@ -24,7 +25,7 @@ class PlayerBase:
         
         self._player_cmd=self._player+' '+self._player_args
         self._player_pl_cmd=self._player+' '+self._player_pl_args
-        self.log=logger.get(__name__)
+        _log=logger.get(__name__)
 
     def set_status_func(self,func):
          self._status_func=func
@@ -33,17 +34,17 @@ class PlayerBase:
         if self._status_func is not None:
             self._status_func(msg)
         else:
-            self.log.info(msg)
+            _log.info(msg)
 
     def _play_loop_impl(self,url,quality):
         raise Exception('play loop is not implemented')
     
     def _play_loop(self,url,quality):
         try:
-            self.log.debug('STARTING PLAYER LOOP')
+            _log.debug('STARTING PLAYER LOOP')
             self._play_loop_impl(url,quality)
         except:
-            self.log.exception('player loop exception')
+            _log.exception('player loop exception')
         finally:
             self.playing=False
 

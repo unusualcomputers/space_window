@@ -14,6 +14,7 @@ _config_path=os.path.join(_base_path,_streams_data)
 _cnt=random.randint(0,1000) # global counter, used to make html more responsive
 _session=requests.Session()
 _player=None
+_log=logger.get(__name__)
 
 _standalone=False
 
@@ -40,7 +41,6 @@ class Streams(Jsonable):
         self.to_file(_config_path)
      
     def _initialise(self):
-        self.log=logger.get(__name__)
         self.refresh_caches(True)
     
     def __init__(self,streams=OrderedDict()):
@@ -51,9 +51,9 @@ class Streams(Jsonable):
         if self.len() == 0: return
         (url,quality)=self.streams.items()[0][1]
         try:
-            self.log.info('getting data for first video: '+url)
+            _log.info('getting data for first video: '+url)
             _player.can_play(url)
-            self.log.info('got data for first video: ' + url)
+            _log.info('got data for first video: ' + url)
         finally:
             pass
 
@@ -202,7 +202,7 @@ class Streams(Jsonable):
         try:
             _player.stop()
         except:
-            self.log.exception('exception while stopping streams')
+            _log.exception('exception while stopping streams')
             
 
     def is_playing(self):

@@ -4,6 +4,7 @@ from wifi_control import run
 import logger
 import subprocess
 
+_log=logger.get(__name__)
 class MopidyUpdates:
     def __init__(self,updates_func):
         ps=run('ps -e')
@@ -16,7 +17,6 @@ class MopidyUpdates:
         self._mopidy.bind_event('track_playback_started', self.playback_started)
         self._mopidy.bind_event('stream_title_changed', self.title_changed)
         self._show_updates=False
-        self.log=logger.get(__name__)
 
     def update(self,msg):
         if self._show_updates:
@@ -36,14 +36,14 @@ class MopidyUpdates:
             txt = u'{artists}\n{name}'.format(**trackinfo)
             self.update(txt)
         except: 
-            self.log.exception('in playback started')
+            _log.exception('in playback started')
             pass
 
     def title_changed(self,title):
         try:
             self.update(title)
         except:
-            self.log.exception('in title changed')
+            _log.exception('in title changed')
             pass
 
     def show_updates(self):
@@ -53,6 +53,6 @@ class MopidyUpdates:
         try:
             self._mopidy.playback.stop()
         except:
-            self.log.exception('error stopping mopidy')
+            _log.exception('error stopping mopidy')
         finally:
             self._show_updates=False
