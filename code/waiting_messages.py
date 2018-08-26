@@ -5,7 +5,7 @@ class WaitingMsgs:
         self._msgs=['','this may take a little while...',
         '...still at it...','...working hard, have some respect...',
         '...do be patient...','...after all, this is a little wonder...',
-        '...if you prefer you can go to cinema instead...',
+        '...you can always go to a cinema instead...',
         '...thank you for your patience ;)...',
         '...this is taking time, like all good things...',
         '...admire the colors on the screen and wait...']
