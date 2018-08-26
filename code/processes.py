@@ -32,9 +32,9 @@ class ProcessHandling:
         self._gallery=Gallery(status_update_func)
         self._clock=Clock()
         self._mopidy=None
+        self._status_update=status_update_func    
         if not _standalone:
             threading.Thread(target=self.launch_mopidy).start()
-        self._status_update=status_update_func    
         self._streams.set_status_func(status_update_func)
         self._resume_func=self.run_something
 
