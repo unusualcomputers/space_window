@@ -197,7 +197,7 @@ class ProcessHandling:
         
     def refresh_caches(self):
         self.pause()
-        self._streams.refresh_caches(True)
+        self._streams.refresh_caches()
         self.resume()
 
     def gallery(self):

@@ -21,7 +21,7 @@ try:
         _log.info('starting ap')
         connection.start_ap()
     set_standalone(not connected)
-    _log.info('wiating to initialise')
+    _log.info('waiting to initialise')
     wait_to_initialise()
     _log.info('initialised')
     #Wait forever for incoming http requests

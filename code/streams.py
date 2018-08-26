@@ -41,7 +41,7 @@ class Streams(Jsonable):
         self.to_file(_config_path)
      
     def _initialise(self):
-        self.refresh_caches(True)
+        self.refresh_caches()
     
     def __init__(self,streams=OrderedDict()):
         self.streams=streams
