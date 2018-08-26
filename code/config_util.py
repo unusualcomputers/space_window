@@ -175,13 +175,13 @@ class Config:
             <input name="hidden_%s" value="config" type="hidden">
             <table width="100%%">
             <tbody>
-            <tr colspan="4"><td><hr/></td></tr>
+            <tr><td colspan="4"><hr/></td></tr>
             <tr>
             <td>start with </td>
             <td>%s</td>
             <td colspan="2"> what to play first when booting up </td>
             </tr>
-            <tr colspan="4"><td><hr/></td></tr>
+            <tr><td colspan="4"><hr/></td></tr>
             <tr>
             <td>font name</td>
             <td><input name="fontname" value="%s" type="text"></td>
@@ -202,7 +202,7 @@ class Config:
             <td><input name="backcolg" value="%s" type="text"></td>
             <td><input name="backcolb" value="%s" type="text"></td>
             </tr>
-            <tr colspan="4"><td><hr/></td></tr>
+            <tr><td colspan="4"><hr/></td></tr>
             <tr>
             <td>clock text color</td>
             <td><input name="clocktextcolr" value="%s" type="text"></td>
@@ -228,7 +228,7 @@ class Config:
             <td>clock border</td>
             <td><input name="clockborder" value="%s" type="text"></td>
             </tr>
-            <tr colspan="4"><td><hr/></td></tr>
+            <tr><td colspan="4"><hr/></td></tr>
             <tr>
             <td>nasa font size</td>
             <td><input name="nasafontsize" value="%s" type="text"></td>
@@ -238,14 +238,14 @@ class Config:
             <td><input name="nasadelay" value="%s" type="text"></td>
             <td colspan="2">how long in seconds before changing to next picture</td>
             </tr>
-            <tr colspan="4"><td><hr/></td></tr>
+            <tr><td colspan="4"><hr/></td></tr>
             <tr>
             <td>gallery picture delay</td>
             <td><input name="gallerydelay" value="%s" type="text"></td>
             <td colspan="2">how long in seconds before changing to next picture</td>
             </tr>
             <tr>
-            <tr colspan="4"><td><hr/></td></tr>
+            <tr><td colspan="4"><hr/></td></tr>
             <tr>
             <td>weather location</td>
             <td><input name="weatherloc" value="%s" type="text"></td>
