@@ -4,6 +4,14 @@
 # space window
 git clone https://github.com/unusualcomputers/space_window.git
 
+# access point stuff
+apt-get install dnsmasq hostapd
+systemctl stop dnsmasq
+systemctl stop hostapd
+systemctl disable dnsmasq
+systemctl disable hostapd
+
+
 # pygame 
 apt-get install python-pygame
 
