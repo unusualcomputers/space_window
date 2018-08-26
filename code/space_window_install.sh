@@ -13,9 +13,10 @@ systemctl stop hostapd
 systemctl disable dnsmasq
 systemctl disable hostapd
 
-
+# omx player
+apt-get install -y omxplayer
 # pygame 
-apt-get install python-pygame
+apt-get install -y python-pygame
 
 # radio rough - this installs mopidy and a bunch of its dependencies
 wget https://raw.githubusercontent.com/unusualcomputers/unusualcomputers/master/code/mopidy/mopidyradioroughhtml/rasp_radio_rough_install_lite.sh
