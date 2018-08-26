@@ -23,6 +23,7 @@ class ProcessHandling:
         config = Config('space_window.conf',__file__)    
         self._start_with=config.get('global','start_with','streams')
         self._current_stream=None
+        self._resume_stream=None
         self._check_timer_delay=20
         self._check_timer=None
         self._wait=False
@@ -41,6 +42,7 @@ class ProcessHandling:
         self._stop_timer()
         self.wait()
         if self._streams.is_playing():
+            self._resume_stream=self._current_stream
             self._resume_func=self._play_current_stream
         elif self._nasa.is_playing():
             self._resume_func=self.play_nasa
@@ -53,6 +55,8 @@ class ProcessHandling:
     def resume(self):
         self.stop_waiting()
         _log.info('resume func is %s' % self._resume_func)
+        self._current_stream=self._resume_stream
+        self._resume_stream=None
         self._resume_func()
         self._resume_func=self.run_something
 
@@ -100,7 +104,10 @@ class ProcessHandling:
         self._check_timer.start()
  
     def _play_current_stream(self):
-        self.play_stream(self._current_stream)
+        if self._current_stream is None:
+            self.play_next()
+        else:
+            self.play_stream(self._current_stream)
 
     def play_stream(self,name):
         self._stop_timer()
@@ -143,10 +150,12 @@ class ProcessHandling:
             name=self._streams.first()
         else:
             name=self._streams.next(self._current_stream) 
+        
         if name is None: 
             _log.info('about to play apod')
             self.play_nasa()
         else: 
+            self._current_stream=name
             _log.info('about to play stream %s' % name)
             self.play_stream(name)
 

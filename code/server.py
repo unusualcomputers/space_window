@@ -158,7 +158,6 @@ def _handle_connect_request():
 
 def _upload_pic_job(server):
     try:
-        server=_current_server
         _processes.pause() 
         sleep(1)
         chunk_size=128*1024
@@ -230,7 +229,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                      })
  
     def _upload_pic(self):
-        _waiting_status('Uploading',_upload_pic_job,(self))      
+        _waiting_status('Uploading',_upload_pic_job,(self,))      
         self._send_to('/gallery?dummy=1')
     
     def _upload_video(self):
