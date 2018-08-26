@@ -107,7 +107,7 @@ class Clock:
         s = time.strftime('%S',lt)
         c = ':'
        
-         if len(h)==0: return # when internet is poor, miss a beat
+        if len(h)==0: return # when internet is poor, miss a beat
         h_surface=self._time_font.render(h,True,self._forecol)
         m_surface=self._time_font.render(m,True,self._forecol)
         c_surface=self._time_font.render(c,True,self._forecol)
