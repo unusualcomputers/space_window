@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+apt-get install -y git
+
 # space window
 git clone https://github.com/unusualcomputers/space_window.git
 
