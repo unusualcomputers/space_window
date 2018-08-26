@@ -66,9 +66,9 @@ def _update():
     os.system('git pull')
     parser = ConfigParser.SafeConfigParser()
     
-    parser.read(new_path)
     parser.read(old_path)
-    with open(new_path,'w') as cf:
+    parser.read(new_path)
+    with open(old_path,'w') as cf:
         parser.write(cf)
 
 def _waiting_status(msg, job, args=None):
