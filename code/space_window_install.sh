@@ -7,7 +7,7 @@ apt-get install -y git
 git clone https://github.com/unusualcomputers/space_window.git
 
 # access point stuff
-apt-get install dnsmasq hostapd
+apt-get install -y dnsmasq hostapd
 systemctl stop dnsmasq
 systemctl stop hostapd
 systemctl disable dnsmasq
