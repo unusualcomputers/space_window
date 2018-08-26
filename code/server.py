@@ -395,7 +395,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _processes.play_next()
             elif 'refresh_caches?' in self.path:
                 _processes.refresh_caches()
-            elif 'add?' in self.path:
+            elif 'add_link?' in self.path:
                 if params['name'][0] != 'NAME' and params['link'][0]!='LINK':
                     name=params['name'][0].replace(' ','')
                     _streams.add(params['name'][0],params['link'][0],
