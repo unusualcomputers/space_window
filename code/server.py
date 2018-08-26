@@ -17,6 +17,7 @@ from threading import Timer,Thread
 import cgi
 import streams
 from config_util import Config
+from shutil import copyfile
 
 PORT_NUMBER = 80
 MOPIDY_PORT=6680
@@ -60,7 +61,7 @@ def _update():
     old_path=os.path.join(this_path,'space_window.conf')
     new_path=os.path.join(this_path,'space_window.localconf')
    
-    os.rename(old_path,new_path)
+    copyfile(old_path,new_path)
     os.system('git checkout -- %s' % old_path)
     os.system('git pull')
     parser = ConfigParser.SafeConfigParser()
