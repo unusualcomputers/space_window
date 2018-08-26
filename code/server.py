@@ -1,5 +1,6 @@
 from BaseHTTPServer import HTTPServer
 from BaseHTTPServer import BaseHTTPRequestHandler
+import ConfigParser
 from urlparse import urlparse, parse_qs
 import os
 from time import sleep
@@ -53,6 +54,21 @@ def initialise_server():
     _server = HTTPServer(('', PORT_NUMBER),handler )
     _log.info('Started httpserver on port %i',PORT_NUMBER)
 
+
+def _update():
+    this_path=os.path.dirname(os.path.abspath(__file__))
+    old_path=os.path.join(this_path,'space_window.conf')
+    new_path=os.path.join(this_path,'space_window.localconf')
+   
+    os.rename(old_path,new_path)
+    os.system('git checkout -- %s' % old_path)
+    os.system('git pull')
+    parser = ConfigParser.SafeConfigParser()
+    
+    parser.read(new_path)
+    parser.read(old_path)
+    with open(new_path,'w') as cf:
+        parser.write(cf)
 
 def _waiting_status(msg, job, args=None):
     waiting_job=Job(job,args)
@@ -376,6 +392,15 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html = get_upload_html() 
                 self._respond(html)
                 return
+            elif 'update_sw?' in self.path:
+                _processes.pause()
+                _status_update('Downloading updated fies\n' +\
+                    'Updates will happen when you reboot next')
+                _update()
+                _status_update('Updated fies\n' +\
+                    'Updates will happen when you reboot next')
+                sleep(10)
+                _processes.resume()
             elif 'configuration?' in self.path:
                 html = _config.get_html()
                 self._respond(get_empty_html(html))

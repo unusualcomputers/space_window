@@ -164,6 +164,12 @@ _main_table=u"""
     </form>
 </td>-->
 <td class="center">
+    <form action="/update_sw">
+    <input type="hidden" name="hiddenupdate_CNT" value="UPDATE">
+    <input type="submit" value="Update">
+    </form>
+</td>
+<td class="center">
     <form action="/reboot">
     <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
     <input type="submit" value="Reboot">
