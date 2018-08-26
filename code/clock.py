@@ -4,6 +4,7 @@ import time
 import threading
 from config_util import Config
 from weather import Weather
+import os
 
 class Clock:
     def __init__(self):
@@ -21,7 +22,8 @@ class Clock:
         self._border=config.getint('clock','border',10)
         self._separation=config.getint('clock','separation',8)
 
-        fontname = 'digital-7_mono.ttf'
+        path=os.path.dirname(os.path.abspath(__file__))
+        fontname = os.path.join(path,'digital-7_mono.ttf')
         self._time_font = pygame.font.Font( fontname, time_sz )
         self._secs_font = pygame.font.Font( fontname, time_sz/3 )
         self._date_font = pygame.font.Font( fontname, date_sz )
