@@ -141,6 +141,7 @@ def _handle_start_wifi_req(params):
 _last_params=None
 _connecting_timer=None
 def _handle_connect_request():
+    global _connecting_timer
     try:        
         _connecting_timer.cancel()
         params=_last_params
@@ -152,7 +153,6 @@ def _handle_connect_request():
         _handle_start_wifi_req(params)
         set_standalone(False)
     finally:
-        global _connecting_timer
         _connecting_timer=None
         _processes.resume()
 
