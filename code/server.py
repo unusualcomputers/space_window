@@ -337,25 +337,38 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 return     
             elif 'gallery_list?' in self.path:
                 ps=params['action'][0]
-                if 'picup' in ps:
-                    _processes.wait()
+                if 'picremove' in ps:
+                    to_remove=[]
+                    for p in params:
+                        if 'remove_pic' in p:
+                            to_remove.append(params[p][0])
+                    
+                    if len(to_remove)==0:
+                        self._send_to('/gallery?dummy=1')
+                        return
+                    paths=','.join(to_remove)
+                    html=_gallery.make_remove_html(paths)
+                    self._respond(html)
+                    return
+                elif 'picup' in ps:
+                    _processes.pause()
+                    _status_update('Moving pictures, please wait')
+                    sleep(2)
                     _gallery.move_up(ps[len('picup '):])
-                    _processes.stop_waiting()
+                    _processes.resume()
                 else: 
                    raise Exception('Unknown request %s' % self.path)
                 self._send_to('/gallery?dummy=1')
                 return 
             elif 'really_remove_pic?' in self.path:
-                _processes.wait()
-                _gallery.stop()
+                _processes.pause()
                 _status_update('Removing pictures, please wait')
                 sleep(2)
                 ps=params['action'][0]
                 paths=ps[len('really remove '):].split(',')
                 _gallery.remove_several(paths)
                 self._send_to('/gallery?dummy=1')
-                _gallery.play()
-                _processes.stop_waiting()
+                _processes.resume()
                 return
             elif 'really_remove?' in self.path:
                 ps=params['action'][0]
