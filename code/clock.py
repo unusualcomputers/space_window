@@ -101,13 +101,13 @@ class Clock:
     def _update_time(self):
         lt = time.localtime()
         d = time.strftime('%a, %d %b %Y')
-        #now = time.strftime('%H:%M',lt)
         
         h = time.strftime('%H',lt)
         m = time.strftime('%M',lt)
         s = time.strftime('%S',lt)
         c = ':'
-        #time_surface=self.time_font.render(now,True,self._forecol)
+       
+         if len(h)==0: return # when internet is poor, miss a beat
         h_surface=self._time_font.render(h,True,self._forecol)
         m_surface=self._time_font.render(m,True,self._forecol)
         c_surface=self._time_font.render(c,True,self._forecol)
