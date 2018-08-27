@@ -172,7 +172,10 @@ class YouTubePlayer(PlayerBase):
                 j+=1
                 pfy=i[1]
                 if pfy is None:
-                    pfy=pafy.new(i[0])
+                    try:
+                        pfy=pafy.new(i[0])
+                    except:
+                        continue
                     i[1]=pfy
                 u=self._get_video_url(pfy,quality)
                 with self.lock:
