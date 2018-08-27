@@ -125,8 +125,8 @@ class Gallery:
                 tpath=self._make_thumb_path(picpath)
                 if exists(tpath):os.remove(tpath)
                 for i in range(0,len(self.images)):
-                    if self.imagines[i][0]==picpath
-                    to_remove.append(i)
+                    if self.imagines[i][0]==picpath:
+                        to_remove.append(i)
             to_remove.reverse()
             for i in to_remove:
                 del self.images[i]
