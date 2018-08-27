@@ -156,6 +156,62 @@ def _handle_connect_request():
         _connecting_timer=None
         _processes.resume()
 
+def _upload_videoi_job(server):
+    try:
+        _processes.pause() 
+        chunk_size=128*1024
+        total_size=int(server.headers['Content-Length'])
+        form=server.get_post_form()
+        p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
+        if not os.path.exists(p):
+            os.makedirs(p)
+        name = form['name'].value
+        if len(name)==0 or name=='NAME':
+            return
+
+        filename = form['video'].filename
+        if len(filename)==0:
+            return
+
+        if len(form['subs'].filename)==0: file_cnt=1
+        else: file_cnt=2
+        
+        total_loaded=0
+        percent=0
+        video_filename=os.path.join(p,filename.replace(' ','_'))
+        with file(video_filename, 'wb') as videoout:
+            videoin = form['video'].file
+            while True:
+                chunk = videoin.read(chunk_size)
+                total_loaded+= len(chunk)
+                percent=int(float(total_loaded)/total_size*100)
+                if not chunk: break
+                videoout.write(chunk)
+        
+        _status_update('Uploaded video file')
+        if file_cnt==2: 
+            subsname=os.path.splitext(filename)[0].replace(' ','_')+'.srt'
+            with file(os.path.join(p,subsname), 'wb') as subsout:
+                subsin = form['subs'].file
+                while True:
+                    chunk = subsin.read(chunk_size)
+                    total_loaded+= len(chunk)
+                    percent=int(float(total_loaded)/total_size*100)
+                    if not chunk: break
+                    subsout.write(chunk)
+        if not os.path.isfile(video_filename):    
+            _status_update('Something went wrong, sorry :(')
+            sleep(10)
+            _processes.resume()
+        else:
+            _streams.add(name,video_filename,'default')
+            server._send_to('/')
+            _log.info('playing uploaded video')
+            _processes.play_stream(name)
+    except:
+        _log.exception('Error while processing upload')
+        _processes.resume()
+
 def _upload_pic_job(server):
     try:
         _processes.pause() 
@@ -196,7 +252,7 @@ def _upload_pic_job(server):
 
         if not len(not_uploaded)==0:
             s=''.join(not_uploaded)
-            s='Something went wrong, not all fies were uploaded :('
+            s='Something went wrong, not all files were uploaded :('
             _status_update(s)
             return
         _gallery.add_several(uploaded)
@@ -233,76 +289,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self._send_to('/gallery?dummy=1')
     
     def _upload_video(self):
-        try:
-            _processes.pause() 
-            chunk_size=128*1024
-            _status_update('Uploading')
-            total_size=int(self.headers['Content-Length'])
-            form=self.get_post_form()
-            p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
-            if not os.path.exists(p):
-                os.makedirs(p)
-            name = form['name'].value
-            if len(name)==0 or name=='NAME':
-                err='Sorry, you must tell me what to call this video'
-                _status_update(err)
-                self._respond(get_empty_html(err))
-                sleep(5)
-                _processes.resume() 
-                return
-
-            filename = form['video'].filename
-            if len(filename)==0:
-                err='Sorry, you must tell me a video file name'
-                _status_update(err)
-                self._respond(get_empty_html(err))
-                sleep(5)
-                _processes.resume() 
-                return
-
-            if len(form['subs'].filename)==0: file_cnt=1
-            else: file_cnt=2
-            
-            total_loaded=0
-            percent=0
-            video_filename=os.path.join(p,filename.replace(' ','_'))
-            with file(video_filename, 'wb') as videoout:
-                videoin = form['video'].file
-                while True:
-                    chunk = videoin.read(chunk_size)
-                    total_loaded+= len(chunk)
-                    percent=int(float(total_loaded)/total_size*100)
-                    _status_update(\
-                        'Uploading video file\n%d percent' % percent)
-                    if not chunk: break
-                    videoout.write(chunk)
-            
-            _status_update('Uploaded video file')
-            if file_cnt==2: 
-                subsname=os.path.splitext(filename)[0].replace(' ','_')+'.srt'
-                with file(os.path.join(p,subsname), 'wb') as subsout:
-                    subsin = form['subs'].file
-                    while True:
-                        chunk = subsin.read(chunk_size)
-                        total_loaded+= len(chunk)
-                        percent=int(float(total_loaded)/total_size*100)
-                        _status_update(\
-                            'Uploading subtitles\n%d percent' % percent)
-                        if not chunk: break
-                        subsout.write(chunk)
-            if not os.path.isfile(video_filename):    
-                self._respond(get_empty_html('Something went wrong, sorry :('))
-                _status_update('Something went wrong, sorry :(')
-                sleep(10)
-                _processes.resume()
-            else:
-                _streams.add(name,video_filename,'default')
-                self._send_to('/')
-                _log.info('playing uploaded video')
-                _processes.play_stream(name)
-        except:
-            _log.exception('Error while processing upload')
-            _processes.resume()
+        _waiting_status('Uploading',_upload_vide_job,(self,))      
+        self._send_to('/')
                 
     def do_POST(self):
         if 'upload' not in self.path:
@@ -410,11 +398,10 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 return
             elif 'update_sw?' in self.path:
                 _processes.pause()
-                _status_update('Downloading updated fies\n' +\
-                    'Updates will happen when you reboot next')
+                _status_update('Downloading updated files')
                 _update()
                 _status_update('Updated fies\n' +\
-                    'Updates will happen when you reboot next')
+                    'Updates will happen when you reboot')
                 sleep(10)
                 _processes.resume()
             elif 'configuration?' in self.path:
