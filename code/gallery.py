@@ -127,8 +127,10 @@ class Gallery:
                 
             new_images=[] 
             for i in range(0,len(self.images)):
-                    if self.images[i][0] not in picpaths:
-                        new_images.append(i)
+                    ii=self.images[i]
+                    if ii[0] not in picpaths:
+                        new_images.append(ii)
+            self.images=new_images
             self._rename_files()
         finally:
             self._resume()
