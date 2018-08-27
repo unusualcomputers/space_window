@@ -42,7 +42,6 @@ class YouTubePlayer(PlayerBase):
             self.video_cache.add(url,v)
             return v
         except:
-            _log.exception('exception while getting video for '+url)
             return None
 
     def _get_playlist(self,url):
