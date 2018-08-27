@@ -469,7 +469,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                         'follow instructions on your space window.</h2>'
                     self._respond(get_empty_html(html))
                     return
-            elif 'scan?' in self.path:
+            elif 'scan_wifi?' in self.path:
                 html = connection.make_wifi_html() 
                 self._respond(html)
                 return
