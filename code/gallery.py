@@ -47,18 +47,18 @@ class Gallery:
         pg.display.init()
         self._load_files()
         self._running=False
-        self._resume=False
+        self._do_resume=False
    
     def load_config(self):
         config = Config('space_window.conf',__file__)    
         self._delay=config.getint('gallery','frame_delay',10) 
  
     def _pause(self):
-        self._resume=self.is_playing()
-        if self._resume: self.stop()
+        self._do_resume=self.is_playing()
+        if self._do_resume: self.stop()
 
     def _resume(self):
-        if self._resume: self.stop()
+        if self._do_resume: self.stop()
     
     def _make_thumb_path(self,picpath):
         picfile,picext = splitext(basename(picpath))
