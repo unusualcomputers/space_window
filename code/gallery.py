@@ -37,10 +37,8 @@ _pic_form="""
         """
 class Gallery:
     def __init__(self,status_update_func):
-        config = Config('space_window.conf',__file__)    
-        self._delay=config.getint('gallery','frame_delay',10) 
         self.thumb_sz=64
-        
+        self.load_config() 
         self._status_update=status_update_func    
         self.path=join(dirname(abspath(__file__)),'photos')
         self.thumbspath=join(self.path,'thumbnails')
@@ -49,6 +47,18 @@ class Gallery:
         pg.display.init()
         self._load_files()
         self._running=False
+        self._resume=False
+   
+    def load_config(self):
+        config = Config('space_window.conf',__file__)    
+        self._delay=config.getint('gallery','frame_delay',10) 
+ 
+    def _pause(self):
+        self._resume=self.is_playing()
+        if self._resume: self.stop()
+
+    def _resume(self):
+        if self._resume: self.stop()
     
     def _make_thumb_path(self,picpath):
         picfile,picext = splitext(basename(picpath))
@@ -80,6 +90,21 @@ class Gallery:
         w=int(w/s)
         return pg.transform.scale(pic,(w,h)).convert()
     
+    def _append_file(self,p,scrh,scrw):
+        try:
+            pic=pg.image.load(p)
+        except:
+            return False
+        pic=self._resize_pic(pic,scrw,scrh)
+        thumb=self._make_thumb(p,pic)
+        thumb_path=self._make_thumb_path(p)
+        with open(p) as pf:
+            pic_read=pf.read()
+        with open(thumb_path) as tf:
+            thumb_read= tf.read()
+        self.images.append((p,thumb_path,pic,thumb,pic_read,thumb_read))
+        return True
+
     def _load_files(self):
         self._status_update('Loading gallery images')
         screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
@@ -89,33 +114,25 @@ class Gallery:
         pictures.sort()
         self.images=[]
         for p in pictures:
-            try:
-                pic=pg.image.load(p)
-            except:
-                continue
-            pic=self._resize_pic(pic,scrw,scrh)
-            thumb=self._make_thumb(p,pic)
-            thumb_path=self._make_thumb_path(p)
-            with open(p) as pf:
-                pic_read=pf.read()
-            with open(thumb_path) as tf:
-                thumb_read= tf.read()
-            self.images.append((p,thumb_path,pic,thumb,pic_read,thumb_read))
+            self._append_file(p, scrh,scrw)
    
     def remove_several(self,picpaths):
-        for picpath in picpaths:
-            if exists(picpath): os.remove(picpath)
-            tpath=self._make_thumb_path(picpath)
-            if exists(tpath):os.remove(tpath)
-        self._load_files()
-        self._rename_files()
-    
-    def remove(self,picpath):
-        if exists(picpath): os.remove(picpath)
-        tpath=self._make_thumb_path(picpath)
-        if exists(tpath):os.remove(tpath)
-        self._load_files()
-        self._rename_files()
+        self._pause()
+        try:
+            to_remove=[]
+            for picpath in picpaths:
+                if exists(picpath): os.remove(picpath)
+                tpath=self._make_thumb_path(picpath)
+                if exists(tpath):os.remove(tpath)
+                for i in range(0,len(self.images)):
+                    if self.imagines[i][0]==picpath
+                    to_remove.append(i)
+            to_remove.reverse()
+            for i in to_remove:
+                del self.images[i]
+            self._rename_files()
+        finally:
+            self._resume()
  
     def _make_file_name(self,fname,i):
         nm,ext=splitext(basename(fname))
@@ -150,30 +167,48 @@ class Gallery:
         for i in range(1,sz):
             current=self.images[i]
             if current[0]==fname:
-                playing=self.is_playing()
-                if playing: self.stop()
-                self.images[i-1]=current
-                self.images[i]=prev
-                self._rename_files()
-                if playing: self.play()
-                return
+                self._pause()
+                try:
+                    self.images[i-1]=current
+                    self.images[i]=prev
+            
+                    name_1=current[0]
+                    name_th_1=surrent[1]
+                    name_2=prev[0]
+                    name_th_2=prev[1]
+        
+                    os.rename(name_1,name_1+'.tmp')
+                    os.rename(name_th_1,name__th_1+'.tmp')
+                    os.rename(name_2,name_1)
+                    os.rename(name_th_2,name__th_2)
+                    os.rename(name_1+'.tmp',name_1)
+                    os.rename(name_th_1+'.tmp',name__th_1)
+                    
+                    self.images[i-1]=(name_2,name_th_2,current[2],current[3],
+                        current[4],current[5])
+                    self.images[i]=(name_1,name_th_1,prev[2],prev[3],
+                        prev[4],prev[5])
+                finally:
+                    self._resume()
+                    return
             prev=current
 
     def add_several(self,fnames):
-        i=len(self.images)
-        for fname in fnames:
-            name=self._make_file_name(fname,i)
-            picpath=join(self.path,name)
-            os.rename(fname,picpath)
-            i+=1
-        self._load_files()
+        self._pause()
+        try:
+            screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
+            scrh=screen.get_height()
+            scrw=screen.get_width()
+            i=len(self.images)
+            for fname in fnames:
+                name=self._make_file_name(fname,i)
+                picpath=join(self.path,name)
+                os.rename(fname,picpath)
+                i+=1
+                self._append_file(picpath, scrh,scrw)
+        finally:
+            self._resume()
 
-    def add(self,fname):
-        i=len(self.images)
-        name=self._make_file_name(fname,i)
-        picpath=join(self.path,name)
-        os.rename(fname,picpath)
-        self._load_files()
 
     def is_pic(self,fpath):
         for i in self.images:
@@ -237,7 +272,7 @@ class Gallery:
 
     def stop(self):
         self._running=False
-
+        sleep(1)
 
     def _end_loop(self,black,screen):
         black.set_alpha(255)

@@ -63,9 +63,9 @@ class ProcessHandling:
     def reload_config(self):
         self.pause()
         sleep(5)
-        self._nasa=NasaPod()
-        self._gallery=Gallery(self._status_update)
-        self._clock=Clock()
+        self._nasa.load_config()
+        self._gallery.load_config()
+        self._clock.load_config()
         self.resume()
 
     def launch_mopidy(self):

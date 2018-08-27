@@ -8,29 +8,29 @@ import os
 
 class Clock:
     def __init__(self):
-        config = Config('space_window.conf',__file__)    
         pygame.display.init()
         pygame.font.init()
         #size = width, height = 640, 480
         #self._screen = pygame.display.set_mode( size, 0 , 32 )
         self._screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN )
-        
+        self._black=self._screen.copy()
+        self.running=False    
+        self.load_config()
+
+    def load_config(self):
+        config = Config('space_window.conf',__file__)    
         self._forecol=config.getcolor('clock','foreground',(255,128,0))
         bckcol=config.getcolor('clock','background',(32,0,32))
         time_sz=config.getint('clock','time_size',192)
         date_sz=config.getint('clock','date_size',24)
         self._border=config.getint('clock','border',10)
         self._separation=config.getint('clock','separation',8)
-
         path=os.path.dirname(os.path.abspath(__file__))
         fontname = os.path.join(path,'digital-7_mono.ttf')
         self._time_font = pygame.font.Font( fontname, time_sz )
         self._secs_font = pygame.font.Font( fontname, time_sz/3 )
         self._date_font = pygame.font.Font( fontname, date_sz )
-        self._black=self._screen.copy()
         self._black.fill(bckcol)
-        width=self._screen.get_width()
-        self.running=False    
         self._init_rects()
 
     def is_playing(self):

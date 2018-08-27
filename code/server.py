@@ -214,7 +214,7 @@ def _upload_videoi_job(server):
 
 def _upload_pic_job(server):
     try:
-        _processes.pause() 
+        _processes.wait() 
         sleep(1)
         chunk_size=128*1024
         _status_update('Uploading')
@@ -257,7 +257,7 @@ def _upload_pic_job(server):
             return
         _gallery.add_several(uploaded)
     finally:
-        _processes.resume() 
+        _processes.stop_waiting() 
 
 class SpaceWindowServer(BaseHTTPRequestHandler):
     # send_to redirects to a different address
@@ -339,24 +339,24 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     self._respond(html)
                     return
                 elif 'picup' in ps:
-                    _processes.pause()
+                    _processes.wait()
                     _status_update('Moving pictures, please wait')
                     sleep(2)
                     _gallery.move_up(ps[len('picup '):])
-                    _processes.resume()
+                    _processes.stop_waiting()
                 else: 
                    raise Exception('Unknown request %s' % self.path)
                 self._send_to('/gallery?dummy=1')
                 return 
             elif 'really_remove_pic?' in self.path:
-                _processes.pause()
+                _processes.wait()
                 _status_update('Removing pictures, please wait')
                 sleep(2)
                 ps=params['action'][0]
                 paths=ps[len('really remove '):].split(',')
                 _gallery.remove_several(paths)
                 self._send_to('/gallery?dummy=1')
-                _processes.resume()
+                _processes.stop_waiting()
                 return
             elif 'really_remove?' in self.path:
                 ps=params['action'][0]
