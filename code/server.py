@@ -398,11 +398,9 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 return
             elif 'update_sw?' in self.path:
                 _processes.pause()
-                _status_update('Downloading updated files')
+                _status_update('Downloading updates\n'+\
+                    'They will take effect when you reboot')
                 _update()
-                _status_update('Updated fies\n' +\
-                    'Updates will happen when you reboot')
-                sleep(10)
                 _processes.resume()
             elif 'configuration?' in self.path:
                 html = _config.get_html()
