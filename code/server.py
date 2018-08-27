@@ -139,7 +139,7 @@ def _handle_start_wifi_req(params):
 
     _status_update\
         ('can\'t connect to wifi :(\nbringing access point up again')
-    wifi.start_ap()
+    connection.start_ap()
     return False
 
 _last_params=None
