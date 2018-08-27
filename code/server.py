@@ -110,9 +110,11 @@ def stop_server():
 
 def _shutdown():
     os.system('shutdown -h now')
+    os.system('pkill -9 python')
 
 def _reboot():
     os.system('reboot now')
+    os.system('pkill -9 python')
 
 def _handle_start_wifi_req(params):
     wifi_name='noname'
