@@ -135,7 +135,12 @@ _main_table=u"""
 </td><td class="center">
     <form action="/gallery">
     <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
-    <input type="submit" value="Gallery">
+    <input type="submit" value="Photo gallery">
+    </form>
+</td><td class="center">
+    <form action="/upload">
+    <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
+    <input type="submit" value="Upload video">
     </form>
 </td><!--<td class="center">
     <form action="/kodi">
@@ -147,11 +152,6 @@ _main_table=u"""
 <tr><td colspan="4"><br/><br/></td></tr>
 <tr>
 <td class="center">
-    <form action="/upload">
-    <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
-    <input type="submit" value="Upload video">
-    </form>
-</td><td class="center">
     <form action="/configuration">
     <input type="hidden" name="hiddenconfig_CNT" value="CONFIGURATION">
     <input type="submit" value="Configuration">
