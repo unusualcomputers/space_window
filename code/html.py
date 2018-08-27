@@ -220,7 +220,7 @@ _main_table_standalone=u"""
 </td><td class="center">
     <form action="/gallery">
     <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
-    <input type="submit" value="Gallery">
+    <input type="submit" value="Photo gallery">
     </form>
 </td><td>
     <form action="/reboot">
