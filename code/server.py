@@ -425,10 +425,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html = _config.get_html()
                 self._respond(get_empty_html(html))
                 return
-            elif 'wifi?' in self.path:
-                html = connection.make_wifi_html() 
-                self._respond(html)
-                return
             elif 'reset_wifi?' in self.path:        
                 html=self.make_clear_wifi_html()
                 self._respond(html)
