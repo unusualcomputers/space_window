@@ -18,6 +18,7 @@ import cgi
 import streams
 from config_util import Config
 from shutil import copyfile
+import random
 
 PORT_NUMBER = 80
 MOPIDY_PORT=6680
@@ -28,6 +29,7 @@ _streams=None
 _gallery=None
 _server=None
 _standalone=False
+_cnt=random.randint(0,1000)
 
 _log=logger.get(__name__)
 _config = Config('space_window.conf',__file__)    
@@ -300,6 +302,24 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         else:
             self._upload_video()
  
+    
+    def make_clear_wifi_html(self):
+        global _cnt
+        _cnt+=1
+        form = u"""    
+            <p style="font-size:45px">
+            This will delete all your wifi settings and reboot, are you sure?
+            </p>
+
+            <form action="/really_reset_wifi">
+            <input type="hidden" name="hidden_{}" value="{}">
+            <button type="submit" name="action" value="really reset {}">
+                    Yes, I do know what I'm doing.
+            </button></td><td>
+            </form>
+        """.format(_cnt,_cnt,_cnt)
+        return build_html(form)
+
     #Handler for the GET requests
     def do_GET(self):
         try:
@@ -409,6 +429,16 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html = connection.make_wifi_html() 
                 self._respond(html)
                 return
+            elif 'reset_wifi?' in self.path:        
+                html=self.make_clear_wifi_html()
+                self._respond(html)
+                return
+            elif 'really_reset_wifi?' in self.path:
+                wifi.clear_wifi()
+                _processes.kill_running()
+                _processes.wait()
+                _status_update('rebooting in a few seconds, see you soon :)')
+                Timer(5,_reboot).start()
             elif 'connect?' in self.path:
                 global _last_params
                 global _connecting_timer

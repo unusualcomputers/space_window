@@ -208,6 +208,12 @@ def list_network_data(iface=_ap_interface):
 def get_host_name():
     return socket.gethostname()
 
+# delete the content of wpa_supplicant
+def clear_wifi():
+    p=_get_config_path()
+    run(\
+    'sudo cp %s/wpa_supplicant.empty /etc/wpa_supplicant/wpa_supplicant.conf' % p)
+
 # start access point
 def start_ap():
     p=_get_config_path()

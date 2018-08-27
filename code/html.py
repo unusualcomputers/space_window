@@ -233,7 +233,18 @@ _main_table_standalone=u"""
     <input type="hidden" name="hiddenshutdown_CNT" value="SHUTDOWN">
     <input type="submit" value="Shutdown">
     </form>
-</td></tr>
+</td>
+<td>
+    <form action="/reset_wifi">
+    <input type="hidden" name="hiddenn_reset_wifi_CNT" value="RESET_WIFI">
+    <input type="submit" value="Reset WiFi">
+    </form>
+</td>
+
+
+
+
+</tr>
 </table>    
 """
 
