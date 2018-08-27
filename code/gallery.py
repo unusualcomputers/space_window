@@ -58,8 +58,9 @@ class Gallery:
         if self._do_resume: self.stop()
 
     def _resume(self):
-        if self._do_resume: self.stop()
-    
+        if self._do_resume: self.play()
+        self._do_resume=False
+
     def _make_thumb_path(self,picpath):
         picfile,picext = splitext(basename(picpath))
         thumbfile=picfile+'_thumb'+picext
