@@ -311,7 +311,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             This will delete all your wifi settings and reboot, are you sure?
             </p>
 
-            <form action="/really_reset_wifi">
+            <form action="/reset_wifi_really">
             <input type="hidden" name="hidden_{}" value="{}">
             <button type="submit" name="action" value="really reset {}">
                     Yes, I do know what I'm doing.
@@ -429,7 +429,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 html=self.make_clear_wifi_html()
                 self._respond(html)
                 return
-            elif 'really_reset_wifi?' in self.path:
+            elif 'reset_wifi_really?' in self.path:
                 wifi.clear_wifi()
                 _processes.kill_running()
                 _processes.wait()
