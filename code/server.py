@@ -156,12 +156,13 @@ def _handle_connect_request():
         _status_update('changing wifi networks\n'+\
             'this is a fragile process\n'+\
             "give it a few minutes\nif it didn't work, reboot")
-        _handle_start_wifi_req(params)
-        set_standalone(False)
+        if _handle_start_wifi_req(params):
+            set_standalone(False)
     finally:
         _ip=wifi.get_ip()
         _connecting_timer=None
         _processes.resume()
+
 def _free_disk_space():
     stat=os.statvfs('/')
     return stat.f_bfree * stat.f_frsize
