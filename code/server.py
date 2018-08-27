@@ -216,8 +216,9 @@ def _upload_videoi_job(server):
 
 def _upload_pic_job(server):
     try:
+        _gallery.pause()
         _processes.wait() 
-        sleep(1)
+        sleep(2)
         chunk_size=128*1024
         _status_update('Uploading')
         total_size=int(server.headers['Content-Length'])
