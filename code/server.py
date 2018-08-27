@@ -435,10 +435,12 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 return
             elif 'reboot?' in self.path:
                 _processes.kill_running()
+                _processes.wait()
                 _status_update('rebooting in a few seconds, see you soon :)')
                 Timer(5,_reboot).start()
             elif 'shutdown?' in self.path:
                 _processes.kill_running()
+                _processes.wait()
                 _status_update('shutting down in a few seconds, goodbye :)')
                 Timer(5,_shutdown).start()
             elif 'kodi?' in self.path:
