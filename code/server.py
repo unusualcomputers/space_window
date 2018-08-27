@@ -190,7 +190,6 @@ def _upload_video_job(server):
                 if not chunk: break
                 videoout.write(chunk)
         
-        _status_update('Uploaded video file')
         if file_cnt==2: 
             subsname=os.path.splitext(filename)[0].replace(' ','_')+'.srt'
             with file(os.path.join(p,subsname), 'wb') as subsout:
@@ -220,7 +219,6 @@ def _upload_pic_job(server):
         _processes.wait() 
         sleep(2)
         chunk_size=128*1024
-        _status_update('Uploading')
         total_size=int(server.headers['Content-Length'])
         form=server.get_post_form()
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
@@ -243,8 +241,6 @@ def _upload_pic_job(server):
                     chunk = picturein.read(chunk_size)
                     total_loaded+= len(chunk)
                     percent=int(float(total_loaded)/total_size*100)
-                    _status_update(\
-                        'Uploading pictures\n%d percent' % percent)
                     if not chunk: break
                     pictureout.write(chunk)
             
