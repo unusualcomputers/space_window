@@ -179,14 +179,12 @@ def _upload_video_job(server):
         else: file_cnt=2
         
         total_loaded=0
-        percent=0
         video_filename=os.path.join(p,filename.replace(' ','_'))
         with file(video_filename, 'wb') as videoout:
             videoin = form['video'].file
             while True:
                 chunk = videoin.read(chunk_size)
                 total_loaded+= len(chunk)
-                percent=int(float(total_loaded)/total_size*100)
                 if not chunk: break
                 videoout.write(chunk)
         
@@ -197,9 +195,9 @@ def _upload_video_job(server):
                 while True:
                     chunk = subsin.read(chunk_size)
                     total_loaded+= len(chunk)
-                    percent=int(float(total_loaded)/total_size*100)
                     if not chunk: break
                     subsout.write(chunk)
+        
         if not os.path.isfile(video_filename):    
             _status_update('Something went wrong, sorry :(')
             sleep(10)
@@ -229,7 +227,6 @@ def _upload_pic_job(server):
             return
 
         total_loaded=0
-        percent=0
         not_uploaded=[]
         uploaded=[]
         for ff in files:
@@ -240,7 +237,6 @@ def _upload_pic_job(server):
                 while True:
                     chunk = picturein.read(chunk_size)
                     total_loaded+= len(chunk)
-                    percent=int(float(total_loaded)/total_size*100)
                     if not chunk: break
                     pictureout.write(chunk)
             
