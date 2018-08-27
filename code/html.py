@@ -253,7 +253,7 @@ def build_html(body):
 
 def get_standalone_html(rows_html):
     html = _head_foot(_html_template_main).\
-        replace('[%HTML_BODY%]',_main_table_standaloney).\
+        replace('[%HTML_BODY%]',_main_table_standalone).\
         replace('STREAM_ROWS',rows_html)
     return _count(html)
 
