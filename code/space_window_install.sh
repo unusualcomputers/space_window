@@ -10,8 +10,8 @@ git clone https://github.com/unusualcomputers/space_window.git
 apt-get install -y dnsmasq hostapd
 systemctl stop dnsmasq
 systemctl stop hostapd
-systemctl disable dnsmasq
-systemctl disable hostapd
+#systemctl disable dnsmasq
+#systemctl disable hostapd
 
 # omx player
 apt-get install -y omxplayer
