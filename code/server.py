@@ -162,23 +162,28 @@ def _handle_connect_request():
         _ip=wifi.get_ip()
         _connecting_timer=None
         _processes.resume()
+def _free_disk_space():
+    stat=os.statvfs('/')
+    return stat.f_bfree * stat.f_frsize
 
 def _upload_video_job(server):
     try:
         _processes.pause() 
         chunk_size=128*1024
         total_size=int(server.headers['Content-Length'])
+        if (total_size * 5) > _free_disk_space():
+            return 'Not enough disk splace left'
         form=server.get_post_form()
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'videos')
         if not os.path.exists(p):
             os.makedirs(p)
         name = form['name'].value
         if len(name)==0 or name=='NAME':
-            return
+            return 'Videos must have names'
 
         filename = form['video'].filename
         if len(filename)==0:
-            return
+            return 'Erm, you did not give me a file'
 
         if len(form['subs'].filename)==0: file_cnt=1
         else: file_cnt=2
@@ -207,14 +212,17 @@ def _upload_video_job(server):
             _status_update('Something went wrong, sorry :(')
             sleep(10)
             _processes.resume()
+            return 'File not saved for some reason'
         else:
             _streams.add(name,video_filename,'default')
             server._send_to('/')
             _log.info('playing uploaded video')
             _processes.play_stream(name)
+            return ''
     except:
         _log.exception('Error while processing upload')
         _processes.resume()
+        return 'There was an exception, cehck the logs'
 
 def _upload_pic_job(server):
     try:
@@ -223,13 +231,15 @@ def _upload_pic_job(server):
         sleep(2)
         chunk_size=128*1024
         total_size=int(server.headers['Content-Length'])
+        if (total_size * 5) > _free_disk_space():
+            return 'Not enough disk splace left'
         form=server.get_post_form()
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
         if not os.path.exists(p):
             os.makedirs(p)
         files = form['picture']
         if files is None or len(files)==0:
-            return
+            return 'Erm, you did not give me a file'
 
         total_loaded=0
         not_uploaded=[]
@@ -253,9 +263,9 @@ def _upload_pic_job(server):
         if not len(not_uploaded)==0:
             s=''.join(not_uploaded)
             s='Something went wrong, not all files were uploaded :('
-            _status_update(s)
-            return
+            return s
         _gallery.add_several(uploaded)
+        return ''
     finally:
         _processes.stop_waiting() 
 
@@ -285,11 +295,17 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                      })
  
     def _upload_pic(self):
-        _waiting_status('Uploading',_upload_pic_job,(self,))      
+        res=_waiting_status('Uploading',_upload_pic_job,(self,))      
+        if res != '':
+            _status_update('There was a problem\n%s' % err)
+            sleep(10)
         self._send_to('/gallery?dummy=1')
     
     def _upload_video(self):
-        _waiting_status('Uploading',_upload_video_job,(self,))      
+        res=_waiting_status('Uploading',_upload_video_job,(self,))      
+        if res != '':
+            _status_update('There was a problem\n%s' % err)
+            sleep(10)
         self._send_to('/')
                 
     def do_POST(self):
