@@ -1,4 +1,5 @@
 from mopidy_json_client import MopidyClient
+from mopidy_json_client.messages import ResponseMessage
 import wifi_control as wifi
 from wifi_control import run
 import logger
