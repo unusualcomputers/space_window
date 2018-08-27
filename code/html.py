@@ -181,18 +181,12 @@ _main_table=u"""
     <input type="submit" value="Shutdown">
     </form>
 </td>
-<td>
+<td class="center">
     <form action="/reset_wifi">
     <input type="hidden" name="hiddenn_reset_wifi_CNT" value="RESET_WIFI">
     <input type="submit" value="Reset WiFi">
     </form>
 </td>
-<!--<td class="center">
-    <form action="/wifi">
-    <input type="hidden" name="hiddenwifi_CNT" value="WIFI">
-    <input type="submit" value="Change WiFi">
-    </form>
-</td>-->
 </tr>
 </table>    
 """
