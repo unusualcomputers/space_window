@@ -103,7 +103,6 @@ def get_connected_ssid():
 # lists available wifi interfces
 def _list_wifi_interfaces():
     s=run('sudo wpa_cli interface')
-    s=list(s)
     p='Available interfaces:\n'
     return s[s.find(p)+len(p):].split()
 
