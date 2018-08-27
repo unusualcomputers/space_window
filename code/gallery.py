@@ -53,11 +53,11 @@ class Gallery:
         config = Config('space_window.conf',__file__)    
         self._delay=config.getint('gallery','frame_delay',10) 
  
-    def _pause(self):
+    def pause(self):
         self._do_resume=self.is_playing()
         if self._do_resume: self.stop()
 
-    def _resume(self):
+    def resume(self):
         if self._do_resume and not self.is_playing(): self.play()
         self._do_resume=False
 
@@ -118,7 +118,7 @@ class Gallery:
             self._append_file(p, scrh,scrw)
    
     def remove_several(self,picpaths):
-        self._pause()
+        self.pause()
         try:
             for picpath in picpaths:
                 if exists(picpath): os.remove(picpath)
@@ -133,7 +133,7 @@ class Gallery:
             self.images=new_images
             self._rename_files()
         finally:
-            self._resume()
+            self.resume()
  
     def _make_file_name(self,fname,i):
         nm,ext=splitext(basename(fname))
@@ -168,7 +168,7 @@ class Gallery:
         for i in range(1,sz):
             current=self.images[i]
             if current[0]==fname:
-                self._pause()
+                self.pause()
                 try:
                     self.images[i-1]=current
                     self.images[i]=prev
@@ -190,12 +190,12 @@ class Gallery:
                     self.images[i]=(name_1,name_th_1,prev[2],prev[3],
                         prev[4],prev[5])
                 finally:
-                    self._resume()
+                    self.resume()
                     return
             prev=current
 
     def add_several(self,fnames):
-        self._pause()
+        self.pause()
         try:
             screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
             scrh=screen.get_height()
@@ -208,7 +208,7 @@ class Gallery:
                 i+=1
                 self._append_file(picpath, scrh,scrw)
         finally:
-            self._resume()
+            self.resume()
 
 
     def is_pic(self,fpath):
