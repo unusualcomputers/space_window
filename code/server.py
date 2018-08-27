@@ -401,6 +401,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _status_update('Downloading updates\n'+\
                     'They will take effect when you reboot')
                 _update()
+                sleep(3)
                 _processes.resume()
             elif 'configuration?' in self.path:
                 html = _config.get_html()
