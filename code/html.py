@@ -95,17 +95,17 @@ _main_table=u"""
     <table width=100%>
     STREAM_ROWS
     </table>
-    </form></div>
+</form></div>
     <br/>
     <hr/>
     <br/>
     <div align="left">
-    <form align="center" action="/add_link">
+<form align="center" action="/add_link">
     <table width="100%">
     <tr>
     <td>
-        <label for="name">Name</label><br/>
-        <input name="name" id="name" value="" type="text" size="15"></td>
+    <label for="name">Name</label><br/>
+    <input name="name" id="name" value="" type="text" size="15"></td>
     <td>
     <label for="link">Link to stream</label><br/>
     <input name="link" id="link" value="" type="text"></td>
