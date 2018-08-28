@@ -419,7 +419,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             elif 'refresh_caches?' in self.path:
                 _processes.refresh_caches()
             elif 'add_link?' in self.path:
-                if ('name' not in params) or ('link' not in params):
+                if ('name' in params) and ('link' in params):
                     name=params['name'][0]
                     link=params['link'][0]
                     quality=params['quality'][0]
