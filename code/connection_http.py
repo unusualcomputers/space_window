@@ -122,7 +122,7 @@ def _make_wifi_rows():
     ret = ''
     nd=wifi.list_network_data()
     if len(nd)==0:
-        return 'No networks found, refresh to try again.'
+        return '<h1>No networks found, refresh to try again.</h1>'
     
     for (adapter,name,tp) in nd:
         global _cnt
@@ -158,7 +158,9 @@ class StandaloneWifiServer(BaseHTTPRequestHandler):
         if test_connection():
             return True
 
-        _report('can\'t connect to wifi :(\nbringing access point up again')
+        _report('can\'t connect to wifi :(\nbringing my wifi up again\nt' +
+            'most likely you typed the password wrong\n'+
+            'also, you may have to reboot')
         wifi.start_ap()
         self._return_to_front()
         return False

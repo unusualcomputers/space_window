@@ -472,6 +472,14 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     return
             elif 'scan_wifi?' in self.path:
                 html = connection.make_wifi_html() 
+                if 'refresh to try again' in html:
+                    self._send_to('/scan_wifi_again?dummy=0')
+                    return
+                self._respond(html)
+                return
+            elif 'scan_wifi_again?' in self.path:
+                _log.info('Scanning again')
+                html = connection.make_wifi_html() 
                 self._respond(html)
                 return
             elif 'reboot?' in self.path:

@@ -10,12 +10,10 @@ import os.path
 from collections import OrderedDict
 import re
 from config_util import Config
-import logging
+import logger
 import socket
 
-logging.basicConfig()
-log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
+_log=logger.get(__name__)
 
 _hostapd_conf="""
 interface=wlan0
@@ -76,16 +74,16 @@ def run(rcmd):
         response_stdout, response_stderr = response[0], response[1]
     except OSError, e:
         if e.errno == errno.ENOENT:
-            log.warn( 'Unable to locate %s.' % executable ) 
+            _log.warn( 'Unable to locate %s.' % executable ) 
         else:
-            log.warn('O/S error occured when trying to run %s: "%s"' % \
+            _log.warn('O/S error occured when trying to run %s: "%s"' % \
                 (executable, str(e)))
         return None    
     except ValueError, e:
-        log.warn('Value error when running %s' % executable) 
+        _log.warn('Value error when running %s' % executable) 
     else:
         if proc.wait() != 0:
-            log.warn('Executable %s returned with the error: "%s"' \
+            _log.warn('Executable %s returned with the error: "%s"' \
                 %(executable,response_stderr)) 
             return response
         else:
