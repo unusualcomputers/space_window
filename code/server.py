@@ -425,7 +425,9 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     quality=params['quality'][0]
                     if quality=='QUOALITY' or quality=='':
                         quality='default'
+                    _processes.kill_running()
                     _streams.add(name,link,quality)
+                    _processes.play_stream(name)                    
             elif 'clock?' in self.path:
                 _processes.play_clock()
             elif 'slideshow?' in self.path:

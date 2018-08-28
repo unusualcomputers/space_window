@@ -84,7 +84,7 @@ Video file
 <br><br>
 Subtitles 
     <input type="file" name = "subs"/>
-<p><input type="submit" value="Upload"></p>
+<p><input type="submit" value="Upload" style="width:15%;"></p>
 </form>
 [%FOOTER%]
 """

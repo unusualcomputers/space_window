@@ -32,7 +32,7 @@ _pic_form="""
         <form enctype="multipart/form-data" action="/upload_pic" method="post"> 
         Pictures to upload 
         <input type="file" accept="image/jpeg" name = "picture" multiple/>
-        <p><input type="submit" value="Upload"></p>
+        <p><input type="submit" value="Upload" style="width:15%;"></p>
         </form>
         """
 class Gallery:
