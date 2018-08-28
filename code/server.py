@@ -423,7 +423,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     name=params['name'][0]
                     link=params['link'][0]
                     if name=='' or link=='':
-                        html='<h2>You have to tell me the name'+
+                        html='<h2>You have to tell me the name'+\
                             ' and the link to add a named link -_-</h2>'
                         self._respond(get_empty_html(html))
                         return
