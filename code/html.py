@@ -22,13 +22,14 @@ _html_header=u"""
             }
         input[type=text]{
             color: #ff8000;
-            background-color: #200020;
+            background-color: #201020;
             border-color: #600060;
             border-radius: 7px; 
             border-style: solid;
             font-family: "Comic Sans MS";
             }
         input[type=submit]{
+            width: 80%;
             color: #ff8000;
             background-color: #200020;
             border-color: #600060;
@@ -46,8 +47,7 @@ _html_header=u"""
             }
         input[type=password]{
             color: #ff8000;
-            background-color: #800080;
-            border-color: #600060;
+            background-color: #201020;
             border-radius: 7px; 
             border-style: solid;
             font-family: "Comic Sans MS";
@@ -101,11 +101,20 @@ _main_table=u"""
     <br/>
     <div align="left">
     <form align="center" action="/add_link">
-    <input type="text" name="name" value="NAME">
-    <input type="text" name="link" value="LINK">
-    <input type="text" name="quality" value="default">
-    <input type="hidden" name="hiddenadd_CNT" value="ADDLINK">
-    <input type="submit" value="Add stream">
+    <table width="100%">
+    <tr>
+    <td>
+        <label for="name">Name</label><br/>
+        <input name="name" id="name" value="" type="text" size="15"></td>
+    <td>
+    <label for="link">Link to stream</label><br/>
+    <input name="link" id="link" value="" type="text"></td>
+    <td>
+    <label for="quality">Stream quality</label><br/>
+    <input name="quality" id="quality" value="default" type="text" size="10">
+    <input name="hiddenadd_CNT" value="ADDLINK" type="hidden"></td>
+    <td class ="center"><br/><input value="Add stream" type="submit"></td>
+    </tr></table>
 </form></div>
 <br/>
 <hr/>
@@ -116,11 +125,6 @@ _main_table=u"""
     <form action="/slideshow">
     <input type="hidden" name="hiddennasa_CNT" value="NASAPOD">
     <input type="submit" value="Nasa POD">
-    </form>
-</td><td class="center">
-    <form action="/next">
-    <input type="hidden" name="hiddenplay_CNT" value="NEXT">
-    <input type="submit" value="Play next">
     </form>
 </td><td class="center">
     <form action="/rough" target="_blank">
@@ -137,12 +141,27 @@ _main_table=u"""
     <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
     <input type="submit" value="Photo gallery">
     </form>
+</td>
+</tr>
+<tr><td colspan="4"><br/><br/></td></tr>
+<tr>
+<td class="center">
+    <form action="/next">
+    <input type="hidden" name="hiddenplay_CNT" value="NEXT">
+    <input type="submit" value="Play next">
+    </form>
 </td><td class="center">
     <form action="/upload">
     <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
     <input type="submit" value="Upload video">
     </form>
-</td><!--<td class="center">
+</td><td class="center">
+    <form action="/configuration">
+    <input type="hidden" name="hiddenconfig_CNT" value="CONFIGURATION">
+    <input type="submit" value="Configuration">
+    </form>
+</td>
+<!--<td class="center">
     <form action="/kodi">
     <input type="hidden" name="hiddenkodi_CNT" value="KODI">
     <input type="submit" value="kodi :)">
@@ -151,18 +170,6 @@ _main_table=u"""
 </tr>
 <tr><td colspan="4"><br/><br/></td></tr>
 <tr>
-<td class="center">
-    <form action="/configuration">
-    <input type="hidden" name="hiddenconfig_CNT" value="CONFIGURATION">
-    <input type="submit" value="Configuration">
-    </form>
-</td>
-<!--<td class="center">
-    <form action="/refresh_caches">
-    <input type="hidden" name="hiddenrefresh_CNT" value="REFRESH_CACHES">
-    <input type="submit" value="Clear cache">
-    </form>
-</td>-->
 <td class="center">
     <form action="/update_sw">
     <input type="hidden" name="hiddenupdate_CNT" value="UPDATE">

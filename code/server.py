@@ -420,9 +420,17 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _processes.refresh_caches()
             elif 'add_link?' in self.path:
                 if params['name'][0] != 'NAME' and params['link'][0]!='LINK':
-                    name=params['name'][0].replace(' ','')
-                    _streams.add(params['name'][0],params['link'][0],
-                        params['quality'][0])
+                    name=params['name'][0]
+                    link=params['link'][0]
+                    if name=='' or link=='':
+                        html='<h2>You have to tell me the name'+
+                            ' and the link to add a named link -_-</h2>'
+                        self._respond(get_empty_html(html))
+                        return
+                    quality=params['quality'][0]
+                    if quality=='QUOALITY' or quality=='':
+                        quality='default'
+                    _streams.add(name,link,quality)
             elif 'clock?' in self.path:
                 _processes.play_clock()
             elif 'slideshow?' in self.path:
