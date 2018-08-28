@@ -75,7 +75,6 @@ class Streamer(PlayerBase):
                 [prebuff],
                 iter(partial(stream_fd.read, _chunk_size), b"")
             )
-            self._status(':)')
             for data in stream_iterator:
                 with self.lock:
                     if thread_id not in self.alive_threads: break
@@ -83,6 +82,7 @@ class Streamer(PlayerBase):
         except:
             _log.exception('exception while outputing stream')
         finally:
+            self._status(':)')
             try:
                 with self.lock:
                     if thread_id in self.alive_threads:

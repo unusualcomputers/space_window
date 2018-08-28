@@ -106,10 +106,10 @@ class YouTubePlayer(PlayerBase):
             mp4s=filter(lambda s: s.extension=='mp4',pfy.streams)
             if len(mp4s)==0:return []
             if quality=='worst' or len(mp4s)==1:
-                return [mp4s[0].url]
+                return [(title,author,mp4s[0].url)]
             if quality=='best':
-                return [pfy.getbest('mp4').url]
-            if quality[-1]=='p': 
+                return [(title,author,pfy.getbest('mp4').url)]
+            if quality[-1]=='p':
                 s='x'+quality[:-1]
                 try:
                     nq=int(quality[:-1])
@@ -215,7 +215,6 @@ class YouTubePlayer(PlayerBase):
                         cmd='%s "%s"' % (self._player_cmd,u)
                     else:
                         cmd='%s "%s"' % (self._player_pl_cmd,u)
-                    self._status(':)')
                     os.system(cmd)
  
                 with self.lock:
@@ -229,6 +228,7 @@ class YouTubePlayer(PlayerBase):
         except:
             _log.exception('exception while playing '+url)
         finally:
+            self._status(':)')
             with self.lock:
                 if thread_id in self.alive_threads:
                     self.alive_threads.remove(thread_id)

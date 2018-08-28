@@ -20,10 +20,10 @@ class FilePlayer(PlayerBase):
             else:
                 cmd='%s "%s"' % (self._player_cmd,url)
             _log.info('omx command: '+cmd)
-            self._status(':)')
             while self.playing:
                 os.system(cmd)
         finally:
+            self._status(':)')
             pass
  
     def can_play(self,url):

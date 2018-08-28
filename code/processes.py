@@ -121,7 +121,6 @@ class ProcessHandling:
         self._streams.play(name)
         self._status_update('playing %s' % name)
         sleep(3)
-        self._status_update(':)')
         self._start_timer()
 
     def play_gallery(self):
