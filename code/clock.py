@@ -32,6 +32,10 @@ class Clock:
         self._date_font = pygame.font.Font( fontname, date_sz )
         self._black.fill(bckcol)
         self._init_rects()
+        timezone=config.get('clock','timezone','NONE')
+        if timezone != 'NONE':
+            os.environ['TZ']=timezone
+            time.tzset()
 
     def is_playing(self):
         return self.running

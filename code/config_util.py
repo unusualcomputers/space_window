@@ -130,6 +130,7 @@ class Config:
         clkbg=clkbck[1]
         clkbb=clkbck[2]
 
+        clocktimezone=self.get('clock','timezone')
         clocktimesize=self.get('clock','time_size')
         clockdatesize=self.get('clock','date_size')
         clockborder=self.get('clock','border')
@@ -216,6 +217,11 @@ class Config:
             <td><input name="clockbackcolb" value="%s" type="text"></td>
             </tr>
             <tr>
+            <td>clock time zonr</td>
+            <td><input name="clocktimezone" value="%s" type="text"></td>
+            <td colspan="2">time zone to use for the clock, for complete list checkout <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List">wikipedia</a> - it is the entry in column TZ*</td>
+            </tr>
+            <tr>
             <td>clock time size</td>
             <td><input name="clocktimesize" value="%s" type="text"></td>
             <td>size of time digits</td>
@@ -273,7 +279,7 @@ go to www.yr.no, find your location  and copy the last part of the web address h
             </form></div>
         """ %(_cnt,html_start_with,fontname,fontsize,txtr,txtg,txtb,
             bckr,bckg,bckb,clkr,clkg,clkb,clkbr,clkbg,clkbb,
-            clocktimesize,clockdatesize,clockborder,nasafontsize,
+            clocktimezone,clocktimesize,clockdatesize,clockborder,nasafontsize,
             nasadelay,gallerydelay,weatherloc)
         return html
 
@@ -294,6 +300,8 @@ go to www.yr.no, find your location  and copy the last part of the web address h
         clkbck='%s,%s,%s' % (\
             p['clockbackcolr'][0],p['clockbackcolg'][0],p['clockbackcolb'][0])
         self.set('clock','background',clkbck)
+        clocktimezone=p['clocktimezone'][0]
+        self.set('clock','timezone',clocktimezone)
         clocktimesize=p['clocktimesize'][0]
         self.set('clock','time_size',clocktimesize)
         clockdatesize=p['clockdatesize'][0]
