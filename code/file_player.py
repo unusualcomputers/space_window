@@ -24,7 +24,6 @@ class FilePlayer(PlayerBase):
                 os.system(cmd)
         finally:
             self._status(':)')
-            pass
  
     def can_play(self,url):
         return os.path.isfile(url)

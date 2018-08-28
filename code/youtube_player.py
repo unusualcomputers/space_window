@@ -184,7 +184,14 @@ class YouTubePlayer(PlayerBase):
         except:
             _log.exception('exception while getting remaining you tube urls')
             raise
-    
+   
+    def _finish_playing(self, thread_id):
+        self._status(':)')
+        with self.lock:
+            if thread_id in self.alive_threads:
+                self.alive_threads.remove(thread_id)
+        self.playing_playlist=False
+ 
     def _play_loop_impl(self,url,quality):
         thread_id=_next_thread_id()
         try:
@@ -206,10 +213,14 @@ class YouTubePlayer(PlayerBase):
                         
             while True:
                 for i in range(first,sz):
-                    if not self.playing: return
+                    if not self.playing: 
+                        self._finish_playing(thread_id)
+                        return
                     with self.lock:
                         (name,author,u)=urls[i]
-                        if thread_id not in self.alive_threads: return
+                        if thread_id not in self.alive_threads: 
+                            self._finish_playing(thread_id)
+                            return
                     self._status('playing\n%s\n%s' % (name,author))
                     if s==1:
                         cmd='%s "%s"' % (self._player_cmd,u)
@@ -228,11 +239,8 @@ class YouTubePlayer(PlayerBase):
         except:
             _log.exception('exception while playing '+url)
         finally:
-            self._status(':)')
-            with self.lock:
-                if thread_id in self.alive_threads:
-                    self.alive_threads.remove(thread_id)
-            self.playing_playlist=False
+            self._finish_playing(thread_id)
+            return
 
     def _stop_threads(self):
         with self.lock:

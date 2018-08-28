@@ -354,7 +354,7 @@ class Gallery:
             self._end_loop(black,screen)
         except:
             self._running=False
-            _log.exception('exception in nasa pod slideshow')
+            _log.exception('exception in photo gallery')
             raise
 
 
