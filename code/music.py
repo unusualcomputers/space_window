@@ -49,7 +49,7 @@ class Music:
         self.path=join(dirname(abspath(__file__)),'music')
         if not isdir(self.path): os.mkdir(self.path)
         self.files_data=[]#(name,is_folder,full_path) 
-        self.running=False
+        self._running=False
         self.lock=threading.Lock()
         self.reload_config()
 
@@ -212,7 +212,7 @@ class Music:
                 os.system(cmd)
             else:
                 for name,path in playlist:
-                    if not self.running: 
+                    if not self._running: 
                         return
                 cmd='%s "%s"' % (self._player_cmd,path)
                 os.system(cmd)
