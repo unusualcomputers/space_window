@@ -328,7 +328,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
-        self.wfile.write(html)
+        self.wfile.write(html.encode('utf-8')
     
     def _send_to(self,addr):
         self.send_response(301)
@@ -460,6 +460,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                     index=int(ps[len('play_music '):])
                 else: 
                    raise Exception('Unknown request %s' % self.path)
+                _processes.play_music(False,[index])
                 self._send_to('/music?dummy=1')
                 return 
             elif 'really_remove_music?' in self.path:

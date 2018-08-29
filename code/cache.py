@@ -31,7 +31,7 @@ class SynchronisedCache:
             self.add(key,val)
 
     def remove(self,key):
-        with self.lock():
+        with self.lock:
             new_cache=[]
             for k,val in self.cache:
                 if k!=key: self.cache.append((key,val))

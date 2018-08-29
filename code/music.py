@@ -96,7 +96,7 @@ class Music:
         <td>
         <td>
         <button type="submit" name="action" value="play_music %s">
-                        up
+                        Play
         </button></td>
         </tr>
         """ % (name,_cnt,name,i,i,i)
@@ -111,7 +111,7 @@ class Music:
                 self.files_data.append((f,False,p))
 
     def refresh(self):
-        with self.lock():
+        with self.lock:
             self._reload_files()
 
     def make_html(self):
@@ -177,7 +177,7 @@ class Music:
     def _music(self,i,shuffle):    
         try:
             playlist=[]
-            with self.lock(): 
+            with self.lock: 
                 if len(i)==0:
                     for name, is_folder, path in self.files_data:
                         if not is_folder:
