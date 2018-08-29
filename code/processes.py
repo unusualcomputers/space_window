@@ -220,7 +220,10 @@ class ProcessHandling:
         elif self._start_with=='gallery':
             self.play_gallery()
         else:
-            self.play_next()
+            try:
+                self.play_next()
+            except:
+                self.play_nasa()
         self._start_timer()
 
     def run_something(self):

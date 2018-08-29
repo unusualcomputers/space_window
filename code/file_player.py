@@ -21,7 +21,6 @@ class FilePlayer(PlayerBase):
                 cmd='%s "%s" --subtitles "%s"' % (self._player_cmd,url,subs)
             else:
                 cmd='%s "%s"' % (self._player_cmd,url)
-            _log.info('omx command: '+cmd)
             while self.playing:
                 subprocess.call(cmd,shell=True)
         finally:

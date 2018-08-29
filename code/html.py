@@ -148,11 +148,10 @@ _main_table=u"""
     <input type="submit" value="Photo gallery">
     </form>
 </td>
+</tr>
 <tr><td colspan="4"><br></td></tr>
 <tr><td colspan="4"><hr></td></tr>
 <tr><td colspan="4"><br></td></tr>
-</tr>
-<tr><td colspan="4"><br/><br/></td></tr>
 <tr>
 <td class="center">
     <form action="/next">
