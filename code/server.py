@@ -283,8 +283,12 @@ def _upload_pic_job(server):
         sleep(2)
         chunk_size=128*1024
         total_size=int(server.headers['Content-Length'])
-        if (total_size * 5) > _free_disk_space():
+        free=_free_disk_space()
+        if (total_size * 5) > free:
             _processes.stop_waiting() 
+            _log.info('Not enough disk space for download.'+
+                ' Free space %s bytes, required 5 * %s bytes' \
+                % (free,total_size)
             return 'Not enough disk splace left'
         form=server.get_post_form()
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
@@ -292,7 +296,8 @@ def _upload_pic_job(server):
             os.makedirs(p)
         files = form['picture']
         if files is None or len(files)==0:
-            _processes.stop_waiting() 
+            _processes.stop_waiting()
+            _log.info('No file given for upload') 
             return 'Erm, you did not give me a file'
 
         total_loaded=0
@@ -315,7 +320,8 @@ def _upload_pic_job(server):
                 uploaded.append(picture_filename)
 
         if not len(not_uploaded)==0:
-            s=''.join(not_uploaded)
+            s=','.join(not_uploaded)
+            _log.info('Files not uploaded: %s' %s)
             s='Something went wrong, not all files were uploaded :('
             return s
         _gallery.add_several(uploaded)
@@ -352,21 +358,21 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
     def _upload_music(self):
         res=_waiting_status('Uploading',_upload_music_job,(self,))      
         if res != '':
-            _status_update('There was a problem\n%s' % err)
+            _status_update('There was a problem\n%s' % res)
             sleep(10)
         self._send_to('/music?dummy=1')
     
     def _upload_pic(self):
         res=_waiting_status('Uploading',_upload_pic_job,(self,))      
         if res != '':
-            _status_update('There was a problem\n%s' % err)
+            _status_update('There was a problem\n%s' % res)
             sleep(10)
         self._send_to('/gallery?dummy=1')
     
     def _upload_video(self):
         res=_waiting_status('Uploading',_upload_video_job,(self,))      
         if res != '':
-            _status_update('There was a problem\n%s' % err)
+            _status_update('There was a problem\n%s' % res)
             sleep(10)
         self._send_to('/')
                 
