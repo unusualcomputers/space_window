@@ -116,6 +116,7 @@ class Music:
     def make_html(self):
         self._reload_files()
         i=0
+        rows=[]
         for name,is_folder,path in self.files_data:
            rows.append(self._make_html_row(is_folder,name,i))
            i+=1
