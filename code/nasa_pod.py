@@ -35,7 +35,7 @@ class NasaPod:
     def _build_list(self):
         html = requests.get(self._apod_archive_url).content
         s=html.find(u"<b>")
-        e=html.find(iu"</b>")
+        e=html.find(u"</b>")
         pages=filter(lambda x:u'<a href="' in x,html[s:e].split('\n'))
         return pages
 
