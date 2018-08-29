@@ -52,7 +52,13 @@ _html_header=u"""
             border-radius: 7px; 
             border-style: solid;
             font-family: "Comic Sans MS";
-          }
+            }
+        hr{
+            border: none;
+            height: 1px;
+            color: #600060; /* old IE */
+            background-color: #600060; /* Modern Browsers */
+            }
         .center{text-align:center;}
 </style>
 </head>
@@ -100,23 +106,22 @@ _main_table=u"""
     <br/>
     <hr/>
     <br/>
-    <div align="left">
 <form align="center" action="/add_link">
-    <table width="100%">
+    <table width="75%">
     <tr>
-    <td>
+    <td class="center">
     <label for="name">Name</label><br/>
     <input name="name" id="name" value="" type="text" size="15"></td>
-    <td>
+    <td class="center">
     <label for="link">Link to stream</label><br/>
     <input name="link" id="link" value="" type="text"></td>
-    <td>
+    <td class="center">
     <label for="quality">Stream quality</label><br/>
     <input name="quality" id="quality" value="default" type="text" size="10">
     <input name="hiddenadd_CNT" value="ADDLINK" type="hidden"></td>
     <td class ="center"><br/><input value="Add stream" type="submit"></td>
     </tr></table>
-</form></div>
+</form>
 <br/>
 <hr/>
 <br/>
@@ -143,6 +148,9 @@ _main_table=u"""
     <input type="submit" value="Photo gallery">
     </form>
 </td>
+<tr><td colspan="4"><br></td></tr>
+<tr><td colspan="4"><hr></td></tr>
+<tr><td colspan="4"><br></td></tr>
 </tr>
 <tr><td colspan="4"><br/><br/></td></tr>
 <tr>
@@ -175,7 +183,7 @@ _main_table=u"""
     </form>
 </td>-->
 </tr>
-<tr><td colspan="4"><br/><br/></td></tr>
+<tr><td colspan="4"><br/></td></tr>
 <tr>
 <td class="center">
     <form action="/update_sw">

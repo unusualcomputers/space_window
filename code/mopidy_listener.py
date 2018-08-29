@@ -25,7 +25,7 @@ class FixedMopidyClient(MopidyClient):
             _log.exception(ex)
 
 class MopidyUpdates:
-    def __init__(self,updates_func):
+    def __init__(self,updates_func,stop_others):
         ps=run('ps -e')
         if ps.find('opidy') == -1:
             subprocess.Popen(['mopidy'])             
@@ -36,6 +36,7 @@ class MopidyUpdates:
         self._mopidy.bind_event('track_playback_started', self.playback_started)
         self._mopidy.bind_event('stream_title_changed', self.title_changed)
         self._show_updates=False
+        self._stop_others=stop_others
 
     def update(self,msg):
         if self._show_updates:
@@ -44,6 +45,7 @@ class MopidyUpdates:
     # mopidy updates
     def playback_started(self,tl_track):
         try:
+            self._stop_others()
             track=tl_track.get('track') if tl_track else None
             if not track:
                 return

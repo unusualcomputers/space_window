@@ -76,14 +76,20 @@ class ProcessHandling:
     def launch_mopidy(self):
         try:
             if _standalone: return
-            self._mopidy=MopidyUpdates(self._status_update)
+            self._mopidy=MopidyUpdates(self._status_update,self._mopidy_started)
             self._mopidy.show_updates()
         except:
             _log.exception('exception while launching mopidy')
             
     def streams(self):
         return self._streams
-            
+
+    def _mopidy_started(self):
+        if self._streams.is_playing():
+            self._streams._stop()
+        if self._music.is_playing():
+            self._music._stop()
+    
     def kill_running(self):
         _log.info('stopping running shows')
         self._stop_timer()
