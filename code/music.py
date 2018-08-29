@@ -98,7 +98,7 @@ class Music:
                         up
         </button></td>
         </tr>
-        """ % (filename,_cnt,filename,i,filename,i)
+        """ % (name,_cnt,name,i,name,i)
         
 
     def _reload_files(self):
