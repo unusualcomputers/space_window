@@ -416,6 +416,16 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 else: #if it's not remove, then it's play
                     _log.info('playing as requested')
                     _processes.play_stream(ps[len('play '):])
+            elif 'really_remove_music?' in self.path:
+                _processes.wait()
+                _status_update('Removing music, please wait')
+                sleep(2)
+                ps=params['action'][0]
+                indices=[int(i) for i in ps[len('really remove '):].split(',')]
+                _music.remove(indices)
+                self._send_to('/music?dummy=1')
+                _processes.stop_waiting()
+                return
             elif 'music?' in self.path:
                 html=_music.make_html()
                 self._respond(html)
@@ -469,16 +479,6 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _processes.play_music(False,[index])
                 self._send_to('/music?dummy=1')
                 return 
-            elif 'really_remove_music?' in self.path:
-                _processes.wait()
-                _status_update('Removing music, please wait')
-                sleep(2)
-                ps=params['action'][0]
-                indices=[int(i) for i in ps[len('really remove '):].split(',')]
-                _music.remove(indices)
-                self._send_to('/music?dummy=1')
-                _processes.stop_waiting()
-                return
             elif 'gallery_list?' in self.path:
                 ps=params['action'][0]
                 if 'picremove' in ps:
