@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import threading
 
 # simple limited size caches for things

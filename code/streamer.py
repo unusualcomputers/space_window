@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from streamlink_cli.utils import NamedPipe
 from streamlink_cli.output import PlayerOutput
 from streamlink import Streamlink

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from mopidy_json_client import MopidyClient
 from mopidy_json_client.messages import ResponseMessage
 import wifi_control as wifi

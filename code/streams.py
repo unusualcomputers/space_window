@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from jsonable import Jsonable
 import os
 from html import build_html

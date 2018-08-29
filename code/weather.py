@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from config_util import Config
 import re
 import requests

@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import pygame as pg
 from time import *
 import threading

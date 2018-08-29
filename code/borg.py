@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 #thanks aleax: http://www.aleax.it/Python/5ep.html
 
 #borg ensures that the state is shared between all instances of a class

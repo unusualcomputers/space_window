@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from html import build_html
 
 class WaitingMsgs:

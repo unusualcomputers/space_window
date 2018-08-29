@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from youtube_player import YouTubePlayer
 from streamer import Streamer
 from file_player import FilePlayer

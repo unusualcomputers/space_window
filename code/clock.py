@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import pygame,sys
 from pygame.locals import QUIT
 import time

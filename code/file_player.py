@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from player_base import PlayerBase
 import logger
 import os

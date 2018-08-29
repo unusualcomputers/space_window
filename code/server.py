@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from BaseHTTPServer import HTTPServer
 from BaseHTTPServer import BaseHTTPRequestHandler
 import ConfigParser

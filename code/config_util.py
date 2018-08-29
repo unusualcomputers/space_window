@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import ConfigParser
 from os.path import *
 import random

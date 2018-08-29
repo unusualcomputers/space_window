@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import sys
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 from urlparse import urlparse, parse_qs

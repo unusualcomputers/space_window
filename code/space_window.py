@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from time import sleep
 import connection_http as connection
 import pygame

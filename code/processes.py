@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import threading
 from nasa_pod import NasaPod
 from clock import Clock
