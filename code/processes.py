@@ -9,6 +9,7 @@ import streams as streamsmod
 import logger
 from time import sleep
 from gallery import Gallery
+from music import Music
 from config_util import Config
 _standalone=False
 _log=logger.get(__name__)
@@ -30,6 +31,7 @@ class ProcessHandling:
         self._streams=Streams.load()
         self._nasa=NasaPod()
         self._gallery=Gallery(status_update_func)
+        self._music=Music(status_update_func)
         self._clock=Clock()
         self._mopidy=None
         self._status_update=status_update_func    
@@ -65,6 +67,7 @@ class ProcessHandling:
         sleep(5)
         self._nasa.load_config()
         self._gallery.load_config()
+        self._music.load_config()
         self._clock.load_config()
         self.resume()
 
@@ -85,6 +88,7 @@ class ProcessHandling:
         self._streams.stop()
         self._nasa.stop()
         self._gallery.stop()
+        self._music.stop()
         self._clock.stop()
         if not _standalone and self._mopidy is not None:
             self._mopidy.stop()
@@ -123,6 +127,11 @@ class ProcessHandling:
         #sleep(3)
         self._start_timer()
 
+    def play_music(self,shuffle,i):
+        self.kill_running()
+        self._music.play(shuffle,i)
+        self._start_timer()
+    
     def play_gallery(self):
         if self._gallery.is_playing(): return
         self.kill_running()
@@ -161,7 +170,7 @@ class ProcessHandling:
     def _something_playing(self):
         return (self._streams.is_playing() or self._nasa.is_playing()\
             or self._clock.is_playing() or self._gallery.is_playing() or \
-            self._wait)
+            self._music.is_playing() or self._wait)
 
     def run_first_time(self):
         if _standalone:
@@ -211,3 +220,6 @@ class ProcessHandling:
 
     def gallery(self):
         return self._gallery
+    
+    def music(self):
+        return self._music

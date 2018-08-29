@@ -27,6 +27,7 @@ _ip=wifi.get_ip()
 _processes=None
 _streams=None
 _gallery=None
+_music=None
 _server=None
 _standalone=False
 _cnt=random.randint(0,1000)
@@ -49,10 +50,12 @@ def initialise_server():
     global _processes
     global _streams
     global _gallery
+    global _music
     if _processes is None:
         _processes=ProcessHandling(_status_update)
         _streams=_processes.streams()
         _gallery=_processes.gallery()
+        _music=_processes.gallery()
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
     _log.info('Started httpserver on port %i',PORT_NUMBER)
@@ -225,6 +228,51 @@ def _upload_video_job(server):
         _processes.resume()
         return 'There was an exception, cehck the logs'
 
+def _upload_music_job(server):
+    try:
+        chunk_size=128*1024
+        total_size=int(server.headers['Content-Length'])
+        if (total_size * 5) > _free_disk_space():
+            return 'Not enough disk splace left'
+        form=server.get_post_form()
+        p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'music')
+        foldername = form['foldername'].value
+        p=os.path.join(p,foldername)
+        if not os.path.exists(p):
+            os.makedirs(p)
+        files = form['music']
+        if files is None or len(files)==0:
+            return 'Erm, you did not give me a file'
+
+        total_loaded=0
+        not_uploaded=[]
+        uploaded=[]
+        for ff in files:
+            filename=ff.filename
+            music_filename=os.path.join(p,filename)
+            with _music.lock():
+                with file(music_filename, 'wb') as musicout:
+                    musicin = ff.file 
+                    while True:
+                        chunk = musicin.read(chunk_size)
+                        total_loaded+= len(chunk)
+                        if not chunk: break
+                        musicout.write(chunk)
+                
+                if not os.path.isfile(music_filename):    
+                    not_uploaded.append(filename)
+                else:
+                    uploaded.append(music_filename)
+
+        if not len(not_uploaded)==0:
+            s=''.join(not_uploaded)
+            s='Something went wrong, not all files were uploaded :('
+            return s
+        _music.refresh() 
+        return ''
+    finally:
+        pass
+
 def _upload_pic_job(server):
     try:
         _gallery.pause()
@@ -233,6 +281,7 @@ def _upload_pic_job(server):
         chunk_size=128*1024
         total_size=int(server.headers['Content-Length'])
         if (total_size * 5) > _free_disk_space():
+            _processes.stop_waiting() 
             return 'Not enough disk splace left'
         form=server.get_post_form()
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
@@ -240,6 +289,7 @@ def _upload_pic_job(server):
             os.makedirs(p)
         files = form['picture']
         if files is None or len(files)==0:
+            _processes.stop_waiting() 
             return 'Erm, you did not give me a file'
 
         total_loaded=0
@@ -266,6 +316,7 @@ def _upload_pic_job(server):
             s='Something went wrong, not all files were uploaded :('
             return s
         _gallery.add_several(uploaded)
+        _processes.stop_waiting() 
         return ''
     finally:
         _processes.stop_waiting() 
@@ -295,6 +346,13 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                      'CONTENT_TYPE':self.headers['Content-Type'],
                      })
  
+    def _upload_music(self):
+        res=_waiting_status('Uploading',_upload_music_job,(self,))      
+        if res != '':
+            _status_update('There was a problem\n%s' % err)
+            sleep(10)
+        self._send_to('/music?dummy=1')
+    
     def _upload_pic(self):
         res=_waiting_status('Uploading',_upload_pic_job,(self,))      
         if res != '':
@@ -316,6 +374,8 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
             return
         if 'upload_pic' in self.path:
             self._upload_pic()
+        elif 'upload_music' in self.path:
+            self._upload_music()
         else:
             self._upload_video()
  
@@ -353,11 +413,64 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 else: #if it's not remove, then it's play
                     _log.info('playing as requested')
                     _processes.play_stream(ps[len('play '):])
+            elif 'music?' in self.path:
+                html=_music.make_html()
+                self._respond(html)
+                return     
             elif 'gallery?' in self.path:
                 _processes.play_gallery()
                 html=_gallery.make_html()
                 self._respond(html)
                 return     
+            elif 'music_list?' in self.path:
+                ps=params['action'][0]
+                if 'musicremove' in ps:
+                    to_remove=[]
+                    for p in params:
+                        if 'remove_music_' in p:
+                            to_remove.append(params[p][0])
+                    
+                    if len(to_remove)==0:
+                        self._send_to('/music?dummy=1')
+                        return
+                    indices=','.join(to_remove)
+                    html=_music.make_remove_html(indices)
+                    self._respond(html)
+                    return
+                elif 'musicplayall' in ps:
+                    to_play=[]
+                    for p in params:
+                        if 'remove_music_' in p:
+                            to_play.append(int(params[p][0]))
+                    
+                    _processes.play_music(False,to_play)
+                    self._send_to('/music?dummy=1')
+                    return
+                elif 'musicshuffleall' in ps:
+                    to_play=[]
+                    for p in params:
+                        if 'remove_music_' in p:
+                            to_play.append(int(params[p][0]))
+                    
+                    _processes.play_music(True,to_play)
+                    self._send_to('/music?dummy=1')
+                    return
+                elif 'play_music' in ps:
+                    index=int(ps[len('play_music '):])
+                else: 
+                   raise Exception('Unknown request %s' % self.path)
+                self._send_to('/music?dummy=1')
+                return 
+            elif 'really_remove_music?' in self.path:
+                _processes.wait()
+                _status_update('Removing music, please wait')
+                sleep(2)
+                ps=params['action'][0]
+                indices=[int i for i in ps[len('really remove '):].split(',')]
+                _music.remove(indices)
+                self._send_to('/music?dummy=1')
+                _processes.stop_waiting()
+                return
             elif 'gallery_list?' in self.path:
                 ps=params['action'][0]
                 if 'picremove' in ps:

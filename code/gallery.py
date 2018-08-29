@@ -9,7 +9,6 @@ from time import *
 import threading
 import logger
 from html import build_html,get_empty_html
-from time import sleep
 
 _log=logger.get(__name__)
 _cnt=random.randint(0,1000)
@@ -234,7 +233,7 @@ class Gallery:
         <input type="checkbox" name="remove_pic_%s" value="%s">
         <td>
         <button type="submit" name="action" value="picup %s">
-                        up
+                        Up
         </button></td>
         </tr>
         """ % (picpath,thumb_path,_cnt,picpath,picpath,picpath,picpath)

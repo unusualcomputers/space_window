@@ -156,6 +156,12 @@ _main_table=u"""
     <input type="submit" value="Upload video">
     </form>
 </td><td class="center">
+    <form action="/music">
+    <input type="hidden" name="hiddenmusic_CNT" value="MUSIC">
+    <input type="submit" value="Upload music">
+    </form>
+</td>
+<td class="center">
     <form action="/configuration">
     <input type="hidden" name="hiddenconfig_CNT" value="CONFIGURATION">
     <input type="submit" value="Configuration">
@@ -225,6 +231,12 @@ _main_table_standalone=u"""
     <input type="submit" value="Upload Video">
     </form>
 </td><td class="center">
+    <form action="/music">
+    <input type="hidden" name="hiddenmusic_CNT" value="MUSIC">
+    <input type="submit" value="Upload music">
+    </form>
+</td>
+<td class="center">
     <form action="/gallery">
     <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
     <input type="submit" value="Photo gallery">
