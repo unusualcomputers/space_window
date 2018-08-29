@@ -251,7 +251,7 @@ def _upload_music_job(server):
         for ff in files:
             filename=ff.filename
             music_filename=os.path.join(p,filename)
-            with _music.lock():
+            with _music.lock:
                 with file(music_filename, 'wb') as musicout:
                     musicin = ff.file 
                     while True:
