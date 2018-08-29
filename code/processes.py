@@ -64,6 +64,7 @@ class ProcessHandling:
         self._resume_func=self.run_something
 
     def reload_config(self):
+        self._status_update('Applying configuration')
         self.pause()
         sleep(5)
         self._nasa.load_config()

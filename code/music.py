@@ -56,9 +56,9 @@ class Music:
         self.files_data=[]#(name,is_folder,full_path) 
         self._running=False
         self.lock=threading.Lock()
-        self.reload_config()
+        self.load_config()
 
-    def reload_config(self):
+    def load_config(self):
         config = Config('space_window.conf',__file__)    
         self._player=config.get('player','player','omxplayer')
        
