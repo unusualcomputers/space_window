@@ -75,7 +75,7 @@ _html_template_main=u"""
 [%HTML_BODY%]
 [%FOOTER%]
 """           
-_html_upload="""
+_html_upload=u"""
 [%HEADER%]
 <form enctype="multipart/form-data" action="/upload_video" method="post"> 
 <input type="text" name="name" value="NAME">

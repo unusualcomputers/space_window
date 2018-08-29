@@ -11,7 +11,7 @@ from config_util import Config
 _log=logger.get(__name__)
 _cnt=random.randint(0,1000)
 
-_music_form="""
+_music_form=u"""
         <div align="left">
         <form align="center" action="/music_list">
         <table width=100%>
@@ -71,7 +71,7 @@ class Music:
         _cnt+=1
         
         if is_folder is False:
-            return """
+            return u"""
         <tr>
         <td></td>
         <td>%s</td>
@@ -86,7 +86,7 @@ class Music:
         </tr>
         """ % (name,_cnt,name,i,i,i)
         else:
-            return """
+            return u"""
         <tr>
         <td>%s</td>
         <td></td>

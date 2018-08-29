@@ -143,35 +143,35 @@ class Config:
         weatherloc=self.get('weather','location')
 
         if startwith=='nasa':
-            html_start_with="""
+            html_start_with=u"""
     <input type="radio" name="startwith" value="streams" > Streams<br/>
     <input type="radio" name="startwith" value="nasa" checked> Nasa POD<br/>
     <input type="radio" name="startwith" value="clock" > Clock<br/>
     <input type="radio" name="startwith" value="gallery" > Gallery<br/>
             """ 
         elif startwith=='clock':
-            html_start_with="""
+            html_start_with=u"""
     <input type="radio" name="startwith" value="streams" > Streams<br/>
     <input type="radio" name="startwith" value="nasa" > Nasa POD<br/>
     <input type="radio" name="startwith" value="clock" checked> Clock<br/>
     <input type="radio" name="startwith" value="gallery" > Gallery<br/>
             """ 
         elif startwith=='gallery':
-            html_start_with="""
+            html_start_with=u"""
     <input type="radio" name="startwith" value="streams" > Streams<br/>
     <input type="radio" name="startwith" value="nasa" > Nasa POD<br/>
     <input type="radio" name="startwith" value="clock" > Clock<br/>
     <input type="radio" name="startwith" value="gallery" checked> Gallery<br/>
             """ 
         else:
-            html_start_with="""
+            html_start_with=u"""
     <input type="radio" name="startwith" value="streams" checked> Streams<br/>
     <input type="radio" name="startwith" value="nasa" > Nasa POD<br/>
     <input type="radio" name="startwith" value="clock" > Clock<br/>
     <input type="radio" name="startwith" value="gallery" > Gallery<br/>
             """ 
 
-        html = """ 
+        html = u""" 
         <div align="right">
         <form align="center" action="/config_change">
             <input name="hidden_%s" value="config" type="hidden">

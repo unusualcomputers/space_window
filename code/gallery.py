@@ -13,7 +13,7 @@ from html import build_html,get_empty_html
 
 _log=logger.get(__name__)
 _cnt=random.randint(0,1000)
-_pic_form="""
+_pic_form=u"""
         <div align="left">
         <form align="center" action="/gallery_list">
         <table width=100%>
@@ -227,7 +227,7 @@ class Gallery:
     def _make_html_row(self,picpath,thumb_path):
         global _cnt
         _cnt+=1
-        return """
+        return u"""
         <tr>
         <td><a href="%s"><img src=%s></a></td>
         <td>
