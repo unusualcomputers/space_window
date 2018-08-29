@@ -156,7 +156,7 @@ class Music:
     def is_playing(self):
         return self._running
 
-    def play(self,shuffle=false,i=[]):
+    def play(self,shuffle,i):
         if len(self.files_data)<1:
             return
         if self._running: return
