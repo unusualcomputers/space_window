@@ -89,7 +89,9 @@ class ProcessHandling:
             self._streams._stop()
         if self._music.is_playing():
             self._music._stop()
-    
+        if not self._something_playing():
+            self.play_clock()
+ 
     def kill_running(self):
         _log.info('stopping running shows')
         self._stop_timer()

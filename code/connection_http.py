@@ -97,7 +97,7 @@ _html_template=u"""
     </head>
     <body>
 
-    <h1>%s - Wifi</h1>
+    <h1>%s - Wi-Fi</h1>
     <br><br>
 
     <h3>Choose a network to connect to.<br/>

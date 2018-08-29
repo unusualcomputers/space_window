@@ -205,7 +205,7 @@ _main_table=u"""
 <td class="center">
     <form action="/reset_wifi">
     <input type="hidden" name="hiddenn_reset_wifi_CNT" value="RESET_WIFI">
-    <input type="submit" value="Reset WiFi">
+    <input type="submit" value="Reset Wi-Fi">
     </form>
 </td>
 </tr>
@@ -231,7 +231,7 @@ _main_table_standalone=u"""
 <td>
     <form action="/scan_wifi">
     <input type="hidden" name="hiddenscan_CNT" value="SCANWIFI">
-    <input type="submit" value="Scan Wifi">
+    <input type="submit" value="Connect Wi-Fi">
     </form>
 </td><td>
     <form action="/upload" target="_blank">

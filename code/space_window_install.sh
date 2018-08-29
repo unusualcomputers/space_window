@@ -52,8 +52,7 @@ sed -i 's|#hostname = 127.0.0.1|hostname=0.0.0.0|g' /root/.config/mopidy/mopidy.
 sed -i "s|#media_dir =|media_dir = $(pwd)/space_window/code/music|" /root/.config/mopidy/mopidy.conf
 sed -i "s|#media_dirs =|media_dirs = $(pwd)/space_window/code/music|" /root/.config/mopidy/mopidy.conf
 # add the launching code to rc.local
-sed -i "\$i sudo mopidy local scan&" /etc/rc.local
-sed -i "\$i sleep 20" /etc/rc.local
+sed -i "\$i sudo mopidy local scan" /etc/rc.local
 sed -i "\$i sudo mopidy&" /etc/rc.local
 sed -i "\$i sleep 10" /etc/rc.local
 sed -i "\$i sudo python $(pwd)/space_window/code/space_window.py&" /etc/rc.local
