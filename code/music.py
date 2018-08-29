@@ -216,8 +216,8 @@ class Music:
                 for name,path in playlist:
                     if not self._running: 
                         return
-                cmd='%s "%s"' % (self._player_cmd,path)
-                subprocess.call(cmd,shell=True)
+                    cmd='%s "%s"' % (self._player_cmd,path)
+                    subprocess.call(cmd,shell=True)
         except:
             self._running=False
             _log.exception('exception in music player')
