@@ -183,7 +183,7 @@ class Music:
                         m=self.files_data[j]
                         j+=1
                         playlist.append((m[0],m[2]))
-                else len(i)==1:
+                elif len(i)==1:
                     m=self.files_data[i[0]]
                     playlist.append((m[0],m[2]))
                 else:
