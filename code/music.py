@@ -37,9 +37,8 @@ _music_form=u"""
         <hr/>
         <br/>
        <form enctype="multipart/form-data" action="/upload_music" method="post"> 
-        Music to upload 
-        <input type="text" id="foldername" name="foldername" value="">
-        <label for="foldername">Folder to upload to </label>
+        Music to upload<br/> 
+        Folder to upload to <input type="text" name="foldername" value=""><br/>
         <input type="file" accept="audio/*" name = "music" multiple/>
         <p><input type="submit" value="Upload" style="width:15%;"></p>
         </form>
@@ -129,7 +128,7 @@ class Music:
         global _cnt
         _cnt+=1
         form = u"""    
-            <p style="font-size:45px">Really remove all these pictures?</p>
+            <p style="font-size:45px">Really remove all these files?</p>
 
             <form action="/really_remove_music">
             <input type="hidden" name="hidden_{}" value="{}">

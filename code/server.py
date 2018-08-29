@@ -271,6 +271,8 @@ def _upload_music_job(server):
             return s
         _music.refresh() 
         return ''
+    except:
+        _log.exception('Error while uploading music')
     finally:
         pass
 
