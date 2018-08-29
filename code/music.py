@@ -50,6 +50,7 @@ class Music:
         self.files_data=[]#(name,is_folder,full_path) 
         self.running=False
         self.lock=threading.Lock()
+        self.reload_config()
 
     def reload_config(self):
         config = Config('space_window.conf',__file__)    
