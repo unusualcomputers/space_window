@@ -124,8 +124,7 @@ class ProcessHandling:
         self._status_update('starting %s' % name)
         self._current_stream=name
         self._streams.play(name)
-        #self._status_update('playing %s' % name)
-        #sleep(3)
+        self._status_update('playing %s' % name)
         self._start_timer()
 
     def play_music(self,shuffle,i):
@@ -189,7 +188,6 @@ class ProcessHandling:
             _log.info('about to play apod')
             self.play_nasa()
         else: 
-            self._current_stream=name
             _log.info('about to play stream %s' % name)
             self.play_stream(name)
 
@@ -205,6 +203,7 @@ class ProcessHandling:
         self._stop_timer()
         if self._something_playing():
             self._start_timer()
+            self._status_update(':)')
             return
 
         if self._start_with=='clock':
@@ -221,6 +220,7 @@ class ProcessHandling:
         self._stop_timer()
         if self._something_playing():
             self._start_timer()
+            self._status_update(':)')
             return
 
         if _standalone:
