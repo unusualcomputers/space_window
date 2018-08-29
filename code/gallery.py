@@ -106,7 +106,7 @@ class Gallery:
         return True
 
     def _load_files(self):
-        self._status_update('Loading gallery images')
+        _log.info('Loading gallery images')
         screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
         scrh=screen.get_height()
         scrw=screen.get_width()
@@ -115,6 +115,7 @@ class Gallery:
         self.images=[]
         for p in pictures:
             self._append_file(p, scrh,scrw)
+        _log.info('Loaded gallery images')
    
     def remove_several(self,picpaths):
         self.pause()
