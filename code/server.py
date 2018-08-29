@@ -466,7 +466,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _status_update('Removing music, please wait')
                 sleep(2)
                 ps=params['action'][0]
-                indices=[int i for i in ps[len('really remove '):].split(',')]
+                indices=[int(i) for i in ps[len('really remove '):].split(',')]
                 _music.remove(indices)
                 self._send_to('/music?dummy=1')
                 _processes.stop_waiting()
