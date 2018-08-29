@@ -55,7 +55,7 @@ def initialise_server():
         _processes=ProcessHandling(_status_update)
         _streams=_processes.streams()
         _gallery=_processes.gallery()
-        _music=_processes.gallery()
+        _music=_processes.music()
     handler=SpaceWindowServer
     _server = HTTPServer(('', PORT_NUMBER),handler )
     _log.info('Started httpserver on port %i',PORT_NUMBER)
