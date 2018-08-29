@@ -27,6 +27,10 @@ _music_form=u"""
                         Shuffle all
         </button>
         </td><td>
+        <button type="submit" name="action" value="musicstop">
+                        Stop
+        </button>
+        </td><td>
         <button type="submit" name="action" value="musicremove">
                         Remove selected
         </button>
@@ -139,10 +143,10 @@ class Music:
         """.format(_cnt,csvindices,csvindices)
         return build_html(form)
     
-    def remove(self,csvindices):
+    def remove(self,to_remove):
         if self.is_playing():
             self.stop()
-        to_remove=[int(i) for i in csvindices.split(',')]
+        to_remove.sort()
         for i in to_remove:
             if self.file_data[i][1]:#folder
                 j=i+1

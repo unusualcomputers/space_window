@@ -427,7 +427,11 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 return     
             elif 'music_list?' in self.path:
                 ps=params['action'][0]
-                if 'musicremove' in ps:
+                if 'musicstop' in ps:
+                    _music.stop()
+                    self._send_to('/music?dummy=1')
+                    return
+                elif 'musicremove' in ps:
                     to_remove=[]
                     for p in params:
                         if 'remove_music_' in p:
