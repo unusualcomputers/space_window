@@ -55,11 +55,12 @@ class Music:
 
     def reload_config(self):
         config = Config('space_window.conf',__file__)    
-        self._player=config.get('player','player',_player)
+        self._player=config.get('player','player','omxplayer')
        
-        self._player_args=config.get('player','player_args',_player_args)
-        self._player_pl_args=config.get('player','playlist_player_args',\
-                _player_args)
+        self._player_args=config.get('player','player_args',
+            ' --timeout 60 --loop --no-osd -b')
+        self._player_pl_args=config.get('player','playlist_player_args',
+               ' --timeout 60 --no-osd -b')
         
         self._player_cmd=self._player+' '+self._player_args
         self._player_pl_cmd=self._player+' '+self._player_pl_args
