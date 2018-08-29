@@ -83,7 +83,7 @@ class Music:
                         Play
         </button></td>
         </tr>
-        """ % (name,_cnt,name,i,name)
+        """ % (name,_cnt,name,i,i,i)
         else:
             return """
         <tr>
@@ -91,14 +91,14 @@ class Music:
         <td></td>
         <td>
         <input type="hidden" name="hidden_%s" value="%s">
-        <input type="checkbox" name="remove_folder_music_%s" value="%s">
+        <input type="checkbox" name="remove_music_%s" value="%s">
         <td>
         <td>
         <button type="submit" name="action" value="play_music %s">
                         up
         </button></td>
         </tr>
-        """ % (name,_cnt,name,i,name,i)
+        """ % (name,_cnt,name,i,i,i)
         
 
     def _reload_files(self):

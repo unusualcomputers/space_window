@@ -128,25 +128,46 @@ class ProcessHandling:
         self._start_timer()
 
     def play_music(self,shuffle,i):
-        self.kill_running()
+        _log.info('stopping running shows')
+        self._stop_timer()
+        self._streams.stop()
+        if not _standalone and self._mopidy is not None:
+            self._mopidy.stop()
+        self._current_stream=None
+        self._music.stop()
         self._music.play(shuffle,i)
         self._start_timer()
     
     def play_gallery(self):
         if self._gallery.is_playing(): return
-        self.kill_running()
+        _log.info('stopping running shows')
+        self._stop_timer()
+        self._streams.stop()
+        self._nasa.stop()
+        self._gallery.stop()
+        self._clock.stop()
+        self._current_stream=None
         self._gallery.play()
         self._start_timer()
     
     def play_nasa(self):
         if self._nasa.is_playing(): return
-        self.kill_running()
+        self._stop_timer()
+        self._streams.stop()
+        self._gallery.stop()
+        self._clock.stop()
+        self._current_stream=None
         self._nasa.play()
         self._start_timer()
     
     def play_clock(self):
         if self._clock.is_playing(): return
-        self.kill_running()
+        self._stop_timer()
+        self._streams.stop()
+        self._nasa.stop()
+        self._gallery.stop()
+        self._clock.stop()
+        self._current_stream=None
         self._clock.play()
         self._start_timer()
     
