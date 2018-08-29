@@ -288,7 +288,7 @@ def _upload_pic_job(server):
             _processes.stop_waiting() 
             _log.info('Not enough disk space for download.'+
                 ' Free space %s bytes, required 5 * %s bytes' \
-                % (free,total_size)
+                % (free,total_size))
             return 'Not enough disk splace left'
         form=server.get_post_form()
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
