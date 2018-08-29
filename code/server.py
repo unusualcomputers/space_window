@@ -328,7 +328,7 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
-        self.wfile.write(html.encode('utf-8')
+        self.wfile.write(html.encode('utf-8'))
     
     def _send_to(self,addr):
         self.send_response(301)
