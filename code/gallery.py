@@ -107,6 +107,7 @@ class Gallery:
         return True
 
     def _load_files(self):
+        self._status_update('loading gallery images')
         _log.info('Loading gallery images')
         screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
         scrh=screen.get_height()

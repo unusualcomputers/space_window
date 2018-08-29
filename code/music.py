@@ -148,7 +148,7 @@ class Music:
             self.stop()
         to_remove.sort()
         for i in to_remove:
-            if self.file_data[i][1]:#folder
+            if self.files_data[i][1]:#folder
                 j=i+1
                 while j<len(self.files_data) and not self.files_data[j][1]:
                     path=self.files_data[j][2]

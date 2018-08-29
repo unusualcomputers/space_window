@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 import requests
 from random import *
 import io
@@ -34,23 +33,23 @@ class NasaPod:
 
     def _build_list(self):
         html = requests.get(self._apod_archive_url).content
-        s=html.find(u"<b>")
-        e=html.find(u"</b>")
-        pages=filter(lambda x:u'<a href="' in x,html[s:e].split('\n'))
+        s=html.find("<b>")
+        e=html.find("</b>")
+        pages=filter(lambda x:'<a href="' in x,html[s:e].split('\n'))
         return pages
 
     def _load_at_index(self,x,pages,scrw,scrh):
         l=pages[x]
-        t=l.split(u':')
-        uri=self._apod_url+t[1].split(u'"')[1]
+        t=l.split(':')
+        uri=self._apod_url+t[1].split('"')[1]
         html=requests.get(uri).content
-        s=html.find(u'<IMG SRC="')
+        s=html.find('<IMG SRC="')
         if s != -1:    
-            l=len(u'<IMG SRC="')
-            e=html.find(u'"',s+l)
+            l=len('<IMG SRC="')
+            e=html.find('"',s+l)
             uri=self._apod_url+html[s+l:e]
             date=t[0]
-            name=t[1].split(u'>')[1].split('<')[0]
+            name=t[1].split('>')[1].split('<')[0]
             image_file = io.BytesIO(requests.get(uri).content)
             image = pg.image.load(image_file)
             h=image.get_height()
