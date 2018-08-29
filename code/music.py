@@ -183,7 +183,7 @@ class Music:
                         if not is_folder:
                             playlist.append((name,path))
                 elif len(i)==1 and self.files_data[i[0]][1]:
-                    j=i[0]+i
+                    j=i[0]+1
                     while j<len(self.files_data) and not self.files_data[j][1]:
                         m=self.files_data[j]
                         j+=1
@@ -195,7 +195,7 @@ class Music:
                     idxs=[]
                     for ii in i:
                         if self.files_data[ii][1]:#folder
-                            j=i[0]+i
+                            j=i[0]+1
                             while j<len(self.files_data) and \
                                 not self.files_data[j][1]:
                                 if j not in idxs: idxs.append(j)
