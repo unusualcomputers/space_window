@@ -161,7 +161,7 @@ class Music:
             return
         if self._running: return
         self._running=True
-        threading.Thread(target=self._music,args(i,shuffle)).start()
+        threading.Thread(target=self._music,args=(i,shuffle)).start()
 
     def stop(self):
         self._running=False
