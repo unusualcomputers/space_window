@@ -5,6 +5,7 @@ import os
 from os.path import *
 import time
 from wifi_control import run
+import subprocess
 
 _log=logger.get(__name__)
 
@@ -22,7 +23,7 @@ class FilePlayer(PlayerBase):
                 cmd='%s "%s"' % (self._player_cmd,url)
             _log.info('omx command: '+cmd)
             while self.playing:
-                os.system(cmd)
+                subprocess.call(cmd,shell=True)
         finally:
             self._status(':)')
  

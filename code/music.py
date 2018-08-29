@@ -7,6 +7,7 @@ from html import build_html,get_empty_html
 from time import sleep
 import threading
 from config_util import Config
+import subprocess
 
 _log=logger.get(__name__)
 _cnt=random.randint(0,1000)
@@ -59,9 +60,9 @@ class Music:
         self._player=config.get('player','player','omxplayer')
        
         self._player_args=config.get('player','player_args',
-            ' --timeout 60 --loop --no-osd -b')
+            ' --timeout 60 --loop --no-osd -b').replace('-b','')
         self._player_pl_args=config.get('player','playlist_player_args',
-               ' --timeout 60 --no-osd -b')
+               ' --timeout 60 --no-osd -b').replace('-b','')
         
         self._player_cmd=self._player+' '+self._player_args
         self._player_pl_cmd=self._player+' '+self._player_pl_args
@@ -211,13 +212,13 @@ class Music:
 
             if len(playlist)==1:
                 cmd='%s "%s"' % (self._player_pl_cmd,playlist[0][1])
-                os.system(cmd)
+                subprocess.call(cmd,shell=True)
             else:
                 for name,path in playlist:
                     if not self._running: 
                         return
                 cmd='%s "%s"' % (self._player_cmd,path)
-                os.system(cmd)
+                subprocess.call(cmd,shell=True)
         except:
             self._running=False
             _log.exception('exception in music player')

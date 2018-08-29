@@ -7,6 +7,7 @@ from cache import Cache
 from player_base import PlayerBase
 import logger
 import json
+import subprocess
 
 _cache_size=100
 _default_res=360
@@ -227,7 +228,7 @@ class YouTubePlayer(PlayerBase):
                         cmd='%s "%s"' % (self._player_cmd,u)
                     else:
                         cmd='%s "%s"' % (self._player_pl_cmd,u)
-                    os.system(cmd)
+                    subprocess.call(cmd,shell=True)
  
                 with self.lock:
                     sz=len(urls)

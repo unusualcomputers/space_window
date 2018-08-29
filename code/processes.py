@@ -131,7 +131,8 @@ class ProcessHandling:
     def play_music(self,shuffle,i):
         _log.info('stopping running shows')
         self._stop_timer()
-        self._streams.stop()
+        if self._streams.is_playing():
+            self._streams.stop()
         if not _standalone and self._mopidy is not None:
             self._mopidy.stop()
         self._current_stream=None
@@ -143,7 +144,8 @@ class ProcessHandling:
         if self._gallery.is_playing(): return
         _log.info('stopping running shows')
         self._stop_timer()
-        self._streams.stop()
+        if self._streams.is_playing():
+            self._streams.stop()
         self._nasa.stop()
         self._gallery.stop()
         self._clock.stop()
@@ -154,7 +156,8 @@ class ProcessHandling:
     def play_nasa(self):
         if self._nasa.is_playing(): return
         self._stop_timer()
-        self._streams.stop()
+        if self._streams.is_playing():
+            self._streams.stop()
         self._gallery.stop()
         self._clock.stop()
         self._current_stream=None
@@ -164,7 +167,8 @@ class ProcessHandling:
     def play_clock(self):
         if self._clock.is_playing(): return
         self._stop_timer()
-        self._streams.stop()
+        if self._streams.is_playing():
+            self._streams.stop()
         self._nasa.stop()
         self._gallery.stop()
         self._clock.stop()
