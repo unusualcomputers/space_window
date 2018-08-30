@@ -218,7 +218,7 @@ class Config:
             <td><input name="clockbackcolb" value="%s" type="text"></td>
             </tr>
             <tr>
-            <td>clock time zonr</td>
+            <td>clock time zone</td>
             <td><input name="clocktimezone" value="%s" type="text"></td>
             <td colspan="2">time zone to use for the clock, for complete list checkout <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List">wikipedia</a> - it is the entry in column TZ*</td>
             </tr>
