@@ -14,7 +14,7 @@ class borg:
 #   and implement all initialisation in a method init_once
 class borg_init_once:
     _shared_state = {}
-    def __init__(self):
+    def __init__(self,param):
         self.__dict__ = self._shared_state
         if len(self._shared_state)==0:
-            self.init_once()
+            self.init_once(param)

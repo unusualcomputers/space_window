@@ -7,6 +7,7 @@ _screen=None
 def pygame_init():
     pygame.display.init()
     pygame.font.init()
+    pg.mouse.set_visible(False)	
 
 def screen():
     global _screen
