@@ -66,3 +66,13 @@ interface=wlan0
 use_pygame=true
 #sleep_on_connect=10
 #execute_when_connected=None
+
+[pygame]
+# used to deal with small gpio screens
+# fbdev is used to set SDL_FBDEV variable
+# see https://github.com/notro/fbtft/wiki/Pygame for example
+fbdev=None
+screen_width=0
+screen_height=0
+screen_depth=0
+

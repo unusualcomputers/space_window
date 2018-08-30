@@ -21,7 +21,7 @@ def set_standalone(standalone):
     streamsmod.set_standalone(standalone)
 
 class ProcessHandling:
-    def __init__(self,status_update_func):
+    def __init__(self,status_update_func,screen):
         config = Config('space_window.conf',__file__)    
         self._start_with=config.get('global','start_with','streams')
         self._current_stream=None
@@ -30,10 +30,10 @@ class ProcessHandling:
         self._check_timer=None
         self._wait=False
         self._streams=Streams.load()
-        self._nasa=NasaPod()
-        self._gallery=Gallery(status_update_func)
+        self._nasa=NasaPod(screen)
+        self._gallery=Gallery(status_update_func,screen)
         self._music=Music(status_update_func)
-        self._clock=Clock()
+        self._clock=Clock(screen)
         self._mopidy=None
         self._status_update=status_update_func    
         if not _standalone:

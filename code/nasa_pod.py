@@ -13,13 +13,12 @@ from config_util import Config
 
 _log=logger.get(__name__)
 class NasaPod:
-    def __init__(self):
+    def __init__(self,screen):
+        self._screen=screen
         self._apod_url='https://apod.nasa.gov/apod/'
         self._apod_archive_url='https://apod.nasa.gov/apod/archivepix.html'
         # delay between frames in seconds
         self._running=False
-        pg.display.init()
-        pg.font.init()
         self.load_config()
 
     def load_config(self):
@@ -89,10 +88,8 @@ class NasaPod:
 
     def _slideshow(self):    
         try:
-            pg.display.init()
-            pg.font.init()
             pg.mouse.set_visible(False)	
-            screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
+            screen = self._screen 
             scrh=screen.get_height()
             scrw=screen.get_width()
             black=screen.copy()
@@ -193,12 +190,4 @@ class NasaPod:
     def stop(self):
         self._running=False
 
-if __name__=="__main__":    
-    try:
-        apod=NasaPod()
-        apod.play()
-    except:
-        _log.exception('nasa pod main')
-    finally:
-        pg.quit()
 

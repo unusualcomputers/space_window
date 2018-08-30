@@ -35,7 +35,8 @@ _pic_form=u"""
         </form>
         """
 class Gallery:
-    def __init__(self,status_update_func):
+    def __init__(self,status_update_func,screen):
+        self._screen=screen
         self.thumb_sz=64
         self.load_config() 
         self._status_update=status_update_func    
@@ -43,7 +44,6 @@ class Gallery:
         self.thumbspath=join(self.path,'thumbnails')
         if not isdir(self.path): os.mkdir(self.path)
         if not isdir(self.thumbspath): os.mkdir(self.thumbspath)
-        pg.display.init()
         self._load_files()
         self._running=False
         self._do_resume=False
@@ -108,9 +108,8 @@ class Gallery:
     def _load_files(self):
         self._status_update('loading gallery images')
         _log.info('Loading gallery images')
-        screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
-        scrh=screen.get_height()
-        scrw=screen.get_width()
+        scrh=self._screen.get_height()
+        scrw=self._screen.get_width()
         pictures=glob.glob(join(self.path,'*.*'))
         pictures.sort()
         self.images=[]
@@ -198,9 +197,8 @@ class Gallery:
     def add_several(self,fnames):
         self.pause()
         try:
-            screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
-            scrh=screen.get_height()
-            scrw=screen.get_width()
+            scrh=self._screen.get_height()
+            scrw=self._screen.get_width()
             i=len(self.images)
             for fname in fnames:
                 name=self._make_file_name(fname,i)
@@ -288,17 +286,16 @@ class Gallery:
             if len(self.images)<1:return
             self._running=True
             pg.mouse.set_visible(False)	
-            screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
-            scrh=screen.get_height()
-            scrw=screen.get_width()
-            black=screen.copy()
+            scrh=self._screen.get_height()
+            scrw=self._screen.get_width()
+            black=self._screen.copy()
             black.fill((0,0,0))
-            blackalpha=screen.copy()
+            blackalpha=self._screen.copy()
             blackalpha.fill((0,0,0))
 
             prev_p=None
             t0=time()-self._delay
-            screen.blit(black,(0,0))
+            self._screen.blit(black,(0,0))
             pg.display.flip()
             idx=0
             while self._running:
@@ -319,14 +316,13 @@ class Gallery:
                     #fading out
                     for i in range(0,255,1):
                         if not self._running: 
-                            self._end_loop(black,screen)
+                            self._end_loop(black,self._screen)
                             return
                         #sleep(0.02)
                         image.set_alpha(255-i)
                         #blackalpha.set_alpha(255-i)
-                        screen.blit(black,(0,0))
-                        #screen.blit(blackalpha,(0,0))
-                        screen.blit(image,(x,y))
+                        self._screen.blit(black,(0,0))
+                        self._screen.blit(image,(x,y))
                         pg.display.flip()
                     black.fill((0,0,0))
                 image = p
@@ -334,25 +330,25 @@ class Gallery:
                 iw=image.get_width()
                 x=(scrw-iw)/2
                 y=(scrh-ih)/2
-                screen.blit(black,(0,0))
+                self._screen.blit(black,(0,0))
                 # fading in
                 for i in range(0,255,1):
                     if not self._running: 
-                        self._end_loop(black,screen)
+                        self._end_loop(black,self._screen)
                         return
                     #sleep(0.02)
                     image.set_alpha(i)
                     blackalpha.set_alpha(i)
-                    screen.blit(blackalpha,(0,0))
-                    screen.blit(image,(x,y))
+                    self._screen.blit(blackalpha,(0,0))
+                    self._screen.blit(image,(x,y))
                     pg.display.flip()
-                screen.blit(black,(0,0))
+                self._screen.blit(black,(0,0))
                 image.set_alpha(255)
                 #black.fill((0,0,0))
-                screen.blit(image,(x,y))
+                self._screen.blit(image,(x,y))
                 pg.display.flip()
                 prev_p=p
-            self._end_loop(black,screen)
+            self._end_loop(black,self._screen)
         except:
             self._running=False
             _log.exception('exception in photo gallery')

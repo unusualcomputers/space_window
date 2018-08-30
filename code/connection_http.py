@@ -8,7 +8,6 @@ import socket
 from subprocess import Popen
 import shlex
 import py_game_msg as msg
-import pygame
 from processes import *
 import logger
 import os
@@ -22,18 +21,10 @@ _sleep_on_connect=wifi.config.getint('access-point','sleep_on_connect',10)
 
 _log=logger.get(__name__)
 
-if wifi.config.getbool('access-point','use_pygame',False):
-    _msg=msg.MsgScreen()
-else:
-    _msg=None
-
 _keep_running=True
 
 def _default_reporting_func( s ):
-    if _msg is not None:
-        _msg.set_text( s )
-    else:
-        print s
+    _log(s)
 
 _reporting_func=_default_reporting_func
 

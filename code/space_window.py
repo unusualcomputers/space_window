@@ -1,15 +1,19 @@
+import pg_init
+_screen=pg_init.screen()
 from __future__ import unicode_literals
 from time import sleep
 import connection_http as connection
 import pygame
-from server import wait_to_initialise,start_server,stop_server,set_standalone
+from server import *
+set_screen(_screen)
+_status_update=get_status_update_func()
 import logger
-
 _log=logger.get(__name__)
 
 try:
     _log.info('hello :)')
     _log.info('configuring wifi')
+    connection.set_reporting_func(_status_update)
     connected=connection.test_connection()
     #connection.configure_wifi(30,False)
     #Create a web server and define the handler to manage the

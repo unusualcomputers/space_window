@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+import pg_init as pgm
 import pygame,sys
 from pygame.locals import QUIT
 import time
@@ -8,12 +9,9 @@ from weather import Weather
 import os
 
 class Clock:
-    def __init__(self):
-        pygame.display.init()
-        pygame.font.init()
-        #size = width, height = 640, 480
-        #self._screen = pygame.display.set_mode( size, 0 , 32 )
-        self._screen = pygame.display.set_mode((0,0),pygame.FULLSCREEN )
+    def __init__(self,screen):
+        pgm.init()
+        self._screen = screen 
         self._black=self._screen.copy()
         self.running=False    
         self.load_config()

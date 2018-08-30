@@ -40,9 +40,19 @@ def set_standalone(standalone):
     _standalone=standalone
     procmod.set_standalone(standalone)
 
-_msg=msg.MsgScreen()
+_screen=None
+_msg=None
+def set_screen(screen):
+    global _screen
+    global _msg
+    _screen = screen
+    _msg=msg.MsgScreen(_screen)
+
 def _status_update(txt):
     _msg.set_text(txt)
+
+def get_status_update_func():
+    return _status_update()
 
 def initialise_server():
     global _server
@@ -52,7 +62,7 @@ def initialise_server():
     global _gallery
     global _music
     if _processes is None:
-        _processes=ProcessHandling(_status_update)
+        _processes=ProcessHandling(_status_update,_screen)
         _streams=_processes.streams()
         _gallery=_processes.gallery()
         _music=_processes.music()
@@ -535,9 +545,9 @@ class SpaceWindowServer(BaseHTTPRequestHandler):
                 _log.info('saved new config')
                 _processes.pause()
                 _log.info('updating msg screen')
-                _msg=msg.MsgScreen()
+                _msg=msg.MsgScreen(_screen)
                 _log.info('init msg screen')
-                _msg.init_once()
+                _msg.init_once(_screen)
                 _log.info('reloading conf')
                 _processes.reload_config()
             elif 'next?' in self.path:

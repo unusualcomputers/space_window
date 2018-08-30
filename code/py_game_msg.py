@@ -6,14 +6,9 @@ import os
 import sys
 from config_util import Config
 from borg import borg_init_once
-#os.putenv('SDL_VIDEODRIVER','fbcon')
-#os.putenv('SDL_FBDEV','/dev/fb0')
-
-pg.display.init()
-pg.font.init()
 
 class MsgScreenThread:
-    def __init__(self):
+    def __init__(self,screen):
         config = Config('space_window.conf',__file__)    
 
         self._border=config.getint('message','border',10)
@@ -32,7 +27,7 @@ class MsgScreenThread:
         self.font=None
         #sleep(1)
         pg.mouse.set_visible(False)	
-        self.screen = pg.display.set_mode((0,0),pg.FULLSCREEN )
+        self.screen = screen
         self.black=self.screen.copy()
         self.black.fill(bckcol)
         self.font = pg.font.SysFont(fontname, fontsz)
@@ -82,9 +77,6 @@ class MsgScreenThread:
         self.screen.blit(self.black,(0,0))
          
     def run_msg(self):
-        #pg.init()
-        pg.display.init()
-        pg.font.init()
         local_text=''
         while(self.get_running()):
             for event in pg.event.get():
@@ -105,11 +97,11 @@ class MsgScreenThread:
             sleep(self._delay)
 
 class MsgScreen(borg_init_once):
-    def __init__(self):
-        borg_init_once.__init__(self)
+    def __init__(self,screen):
+        borg_init_once.__init__(self,screen)
 
-    def init_once(self):
-        self._msg=MsgScreenThread()
+    def init_once(self,screen):
+        self._msg=MsgScreenThread(screen)
 
     def start_thread(self):
         if self._msg.get_running(): return
@@ -141,10 +133,3 @@ class MsgScreen(borg_init_once):
         t=self._msg.blank()
         self._msg.lock.release()
          
-if __name__=='__main__':
-    msg=MsgScreen()
-    msg.set_text('Hello World!')
-    sleep(5)
-    msg.stop()
-    pg.display.quit()
-    pg.quit()
