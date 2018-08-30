@@ -228,10 +228,15 @@ _main_table_standalone=u"""
 <br/>
 <table width=100%>
 <tr>
-<td>
-    <form action="/scan_wifi">
-    <input type="hidden" name="hiddenscan_CNT" value="SCANWIFI">
-    <input type="submit" value="Connect Wi-Fi">
+<td class="center">
+    <form action="/gallery">
+    <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
+    <input type="submit" value="Photo gallery">
+    </form>
+</td><td class="center">
+    <form action="/rough" target="_blank">
+    <input type="hidden" name="hiddenrough_CNT" value="ROUGH">
+    <input type="submit" value="Radio">
     </form>
 </td><td>
     <form action="/upload" target="_blank">
@@ -244,12 +249,24 @@ _main_table_standalone=u"""
     <input type="submit" value="Upload music">
     </form>
 </td>
-<td class="center">
-    <form action="/gallery">
-    <input type="hidden" name="hiddengallery_CNT" value="GALLERY">
-    <input type="submit" value="Photo gallery">
+</tr>
+<tr><td colspan="4"><br></td></tr>
+<tr><td colspan="4"><hr></td></tr>
+<tr><td colspan="4"><br></td></tr>
+<tr>
+<td>
+    <form action="/scan_wifi">
+    <input type="hidden" name="hiddenscan_CNT" value="SCANWIFI">
+    <input type="submit" value="Connect Wi-Fi">
     </form>
-</td><td>
+</td>
+<td class="center">
+    <form action="/configuration">
+    <input type="hidden" name="hiddenconfig_CNT" value="CONFIGURATION">
+    <input type="submit" value="Configuration">
+    </form>
+</td>
+<td>
     <form action="/reboot">
     <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
     <input type="submit" value="Reboot">
