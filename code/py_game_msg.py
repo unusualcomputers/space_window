@@ -26,7 +26,6 @@ class MsgScreenThread:
         self.black=None
         self.font=None
         #sleep(1)
-        pg.mouse.set_visible(False)	
         self.screen = screen
         self.black=self.screen.copy()
         self.black.fill(bckcol)

@@ -285,7 +285,6 @@ class Gallery:
         try:
             if len(self.images)<1:return
             self._running=True
-            pg.mouse.set_visible(False)	
             scrh=self._screen.get_height()
             scrw=self._screen.get_width()
             black=self._screen.copy()
