@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-import pg_init as pgm
 import pygame,sys
 from pygame.locals import QUIT
 import time
@@ -10,7 +9,6 @@ import os
 
 class Clock:
     def __init__(self,screen):
-        pgm.init()
         self._screen = screen 
         self._black=self._screen.copy()
         self.running=False    
