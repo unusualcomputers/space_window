@@ -26,6 +26,9 @@ chmod a+x ./rasp_radio_rough_install_lite.sh
 # mopidy json client
 pip install https://github.com/ismailof/mopidy-json-client/archive/master.zip
 
+# mopidy musicbox webclient
+pip install mopidy-musicbox-webclient
+
 # websocket
 pip install websocket-client
 
