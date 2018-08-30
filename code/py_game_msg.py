@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import pygame as pg
+from pg_init import pygame_init
 from time import *
 import threading
 import os
@@ -76,6 +77,7 @@ class MsgScreenThread:
         self.screen.blit(self.black,(0,0))
          
     def run_msg(self):
+        pygame_init()
         local_text=''
         while(self.get_running()):
             for event in pg.event.get():
