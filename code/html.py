@@ -238,7 +238,7 @@ _main_table_standalone=u"""
     <input type="hidden" name="hiddenrough_CNT" value="ROUGH">
     <input type="submit" value="Radio">
     </form>
-</td><td>
+</td><td class="center">
     <form action="/upload" target="_blank">
     <input type="hidden" name="hiddenupload_CNT" value="UPLOAD">
     <input type="submit" value="Upload Video">
@@ -254,7 +254,7 @@ _main_table_standalone=u"""
 <tr><td colspan="4"><hr></td></tr>
 <tr><td colspan="4"><br></td></tr>
 <tr>
-<td>
+<td class="center">
     <form action="/scan_wifi">
     <input type="hidden" name="hiddenscan_CNT" value="SCANWIFI">
     <input type="submit" value="Connect Wi-Fi">
@@ -266,13 +266,13 @@ _main_table_standalone=u"""
     <input type="submit" value="Configuration">
     </form>
 </td>
-<td>
+<td class="center">
     <form action="/reboot">
     <input type="hidden" name="hiddenreboot_CNT" value="REBOOT">
     <input type="submit" value="Reboot">
     </form>
 </td>
-<td>
+<td class="center">
     <form action="/shutdown">
     <input type="hidden" name="hiddenshutdown_CNT" value="SHUTDOWN">
     <input type="submit" value="Shutdown">
