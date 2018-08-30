@@ -23,7 +23,7 @@ def screen():
         depth=config.getint('pygame','screen_depth',0)
     
         if depth==0:
-            _screen=pygame.display.set_mode((0,0),pg.FULLSCREEN)
+            _screen=pygame.display.set_mode((0,0),pygame.FULLSCREEN)
         else:
-            _screen=pygame.display.set_mode((0,0),pg.FULLSCREEN,depth)
+            _screen=pygame.display.set_mode((0,0),pygame.FULLSCREEN,depth)
     return _screen
