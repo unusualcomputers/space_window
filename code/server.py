@@ -52,7 +52,7 @@ def _status_update(txt):
     _msg.set_text(txt)
 
 def get_status_update_func():
-    return _status_update()
+    return _status_update
 
 def initialise_server():
     global _server
