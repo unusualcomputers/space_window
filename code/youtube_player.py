@@ -188,7 +188,7 @@ class YouTubePlayer(PlayerBase):
             raise
    
     def _finish_playing(self, thread_id):
-        self._status(':)')
+        self._status('')
         with self.lock:
             if thread_id in self.alive_threads:
                 self.alive_threads.remove(thread_id)

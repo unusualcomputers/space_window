@@ -24,7 +24,7 @@ class FilePlayer(PlayerBase):
             while self.playing:
                 subprocess.call(cmd,shell=True)
         finally:
-            self._status(':)')
+            self._status('')
  
     def can_play(self,url):
         return os.path.isfile(url)

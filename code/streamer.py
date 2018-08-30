@@ -83,7 +83,7 @@ class Streamer(PlayerBase):
         except:
             _log.exception('exception while outputing stream')
         finally:
-            self._status(':)')
+            self._status('')
             try:
                 with self.lock:
                     if thread_id in self.alive_threads:
