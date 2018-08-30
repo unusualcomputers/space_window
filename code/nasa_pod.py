@@ -98,6 +98,7 @@ class NasaPod:
 
             (text,textrect)=self._place_text(("loading first image",""),
                 screen=screen)
+            screen.blit(black,(0,0))
             screen.blit(text, textrect)
             pg.display.flip()
 
