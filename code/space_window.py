@@ -1,6 +1,6 @@
+from __future__ import unicode_literals
 import pg_init
 _screen=pg_init.screen()
-from __future__ import unicode_literals
 from time import sleep
 import connection_http as connection
 import pygame
