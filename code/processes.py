@@ -133,7 +133,7 @@ class ProcessHandling:
         self._status_update('starting %s' % name)
         self._current_stream=name
         self._streams.play(name)
-        self._status_update('playing %s' % name)
+        self._status_update('about to play %s' % name)
         self._start_timer()
 
     def play_music(self,shuffle,i):
