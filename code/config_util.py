@@ -142,6 +142,18 @@ class Config:
         gallerydelay=self.get('gallery','frame_delay')        
         weatherloc=self.get('weather','location')
 
+        has_alsa='alsa' in self.get('player','player_args')
+        if has_alsa:
+            html_alsa=u"""
+    <input type="radio" name="has_alsa" value="default" > Default<br/>
+    <input type="radio" name="has_alsa" value="alsa" checked> Soundcard<br/>
+        """
+        else:
+            html_alsa=u"""
+    <input type="radio" name="has_alsa" value="default" checked> Default<br/>
+    <input type="radio" name="has_alsa" value="alsa" > Soundcard<br/>
+        """
+
         if startwith=='nasa':
             html_start_with=u"""
     <input type="radio" name="startwith" value="streams" > Streams<br/>
@@ -260,6 +272,11 @@ class Config:
 go to www.yr.no, find your location  and copy the last part of the web address here (for example: https://www.yr.no/place/United_Kingdom/England/London/ is address for london, the input in this field would then be: United_Kingdom/England/London) 
             </td>
             </tr>
+            <tr><td colspan="4"><hr/></td></tr>
+            <tr>
+            <td>sound output</td>
+            <td>%s</td>
+            <td colspan="2">soundcard option should work for most sound cards and dac hats, it simply switches output to alsa though, you still have to make your card work with raspberry first</td>
             </tr>
             <tr><td><br/><br/></td></tr>
             <tr>
@@ -281,7 +298,7 @@ go to www.yr.no, find your location  and copy the last part of the web address h
         """ %(_cnt,html_start_with,fontname,fontsize,txtr,txtg,txtb,
             bckr,bckg,bckb,clkr,clkg,clkb,clkbr,clkbg,clkbb,
             clocktimezone,clocktimesize,clockdatesize,clockborder,nasafontsize,
-            nasadelay,gallerydelay,weatherloc)
+            nasadelay,gallerydelay,weatherloc,html_alsa)
         return html
 
     def parse_form_inputs(self,p):
@@ -320,4 +337,20 @@ go to www.yr.no, find your location  and copy the last part of the web address h
         weatherloc=p['weatherloc'][0]
         self.set('weather','location',weatherloc)
 
-        
+        has_alsa=p['has_alsa'][0]
+        has_alsa_current='alsa' in self.get('player','player_args')
+        if has_alsa!=has_alsa_current:
+            if has_alsa:
+                self.set('player','player_args',
+                    '-o alsa --timeout 60 --loop --no-osd -b') 
+                self.set('player','playlist_player_args',
+                    '-o alsa --timeout 60 --no-osd -b') 
+                os.system("sed -i '/output/ c\output = alsasink' "+\
+                    "/root/.config/mopidy/mopidy.conf")
+            else: 
+                self.set('player','player_args',
+                    ' --timeout 60 --loop --no-osd -b') 
+                self.set('player','playlist_player_args',
+                    ' --timeout 60 --no-osd -b') 
+                os.system("sed -i '/output/ c\#output = autoaudiosinkk' "+\
+                    "/root/.config/mopidy/mopidy.conf")

@@ -12,13 +12,13 @@ def pygame_init():
 def screen():
     global _screen
     if _screen is None:
-        pygame_init()
         config = Config('space_window.conf',__file__)    
         fbdev = config.get('pygame','fbdev','None')
         if fbdev != 'None':
             os.putenv('SDL_VIDEODRIVER','fbcon')
             os.environ["SDL_FBDEV"] = fbdev
 
+        pygame_init()
         scrw=config.getint('pygame','screen_width',0)
         scrh=config.getint('pygame','screen_height',0)
         depth=config.getint('pygame','screen_depth',0)
