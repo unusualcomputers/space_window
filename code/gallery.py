@@ -271,6 +271,7 @@ class Gallery:
         threading.Thread(target=self._slideshow).start()
 
     def stop(self):
+        self._status_update('')
         self._running=False
         sleep(1)
 

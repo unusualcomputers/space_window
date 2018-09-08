@@ -26,6 +26,11 @@ class PlayerBase:
         
         self._player_cmd=self._player+' '+self._player_args
         self._player_pl_cmd=self._player+' '+self._player_pl_args
+        fbdev = config.get('pygame','fbdev','None')
+        if fbdev != 'None':
+            self._player_cmd='fbcp& ' + self._player_cmd
+            self._player_pl_cmd='fbcp& ' + self._player_pl_cmd
+ 
         _log=logger.get(__name__)
 
     def set_status_func(self,func):
@@ -63,6 +68,7 @@ class PlayerBase:
         return self.playing
 
     def _kill_player(self):
+        os.system('pkill -9 fbcp')
         os.system('pkill -9 %s' % self._player)
 
     def play(self,url,quality):
@@ -75,6 +81,7 @@ class PlayerBase:
         pass
 
     def stop(self):
+        self._status_update('')
         self._stop_threads()
         self.playing=False    
         self._kill_player()

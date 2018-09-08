@@ -212,7 +212,6 @@ class ProcessHandling:
         self._stop_timer()
         if self._something_playing():
             self._start_timer()
-            self._status_update('')
             return
 
         if self._start_with=='clock':
