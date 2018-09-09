@@ -81,7 +81,7 @@ class PlayerBase:
         pass
 
     def stop(self):
-        self._status_update('')
+        self._status_func('')
         self._stop_threads()
         self.playing=False    
         self._kill_player()
