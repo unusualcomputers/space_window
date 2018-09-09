@@ -79,6 +79,7 @@ def _update():
     copyfile(old_path,new_path)
     os.system('cd %s;git checkout -- %s' % (this_path,old_path))
     os.system('cd %s;git pull' % this_path)
+    os.system('pip install -U youtube-dl')
     parser = ConfigParser.SafeConfigParser()
     
     parser.read(old_path)
