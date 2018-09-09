@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import ConfigParser
+import os
 from os.path import *
 import random
 import logger
@@ -337,7 +338,7 @@ go to www.yr.no, find your location  and copy the last part of the web address h
         weatherloc=p['weatherloc'][0]
         self.set('weather','location',weatherloc)
 
-        has_alsa=p['has_alsa'][0]
+        has_alsa='alsa' in p['has_alsa'][0]
         has_alsa_current='alsa' in self.get('player','player_args')
         if has_alsa!=has_alsa_current:
             if has_alsa:
