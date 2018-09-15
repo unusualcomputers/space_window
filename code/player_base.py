@@ -26,8 +26,11 @@ class PlayerBase:
         
         self._player_cmd=self._player+' '+self._player_args
         self._player_pl_cmd=self._player+' '+self._player_pl_args
+        self._player_stream_cmd=self._player_pl_cmd
+        self._player_fbcp=''
         fbdev = config.get('pygame','fbdev','None')
         if fbdev != 'None':
+            self._player_fbcp='fbcp&'
             self._player_cmd='fbcp& ' + self._player_cmd
             self._player_pl_cmd='fbcp& ' + self._player_pl_cmd
  
@@ -51,6 +54,7 @@ class PlayerBase:
             self._play_loop_impl(url,quality)
         except:
             _log.exception('player loop exception')
+            self.stop()
         finally:
             self.playing=False
 

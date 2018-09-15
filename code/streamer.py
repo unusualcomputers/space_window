@@ -46,7 +46,7 @@ class Streamer(PlayerBase):
    
     def _create_output(self):
         namedpipe=self._make_pipe()
-        return PlayerOutput(self._player_cmd,args='{filename}',
+        return PlayerOutput(self._player_stream_cmd,args='{filename}',
             quiet=False,kill=True,namedpipe=namedpipe,http=None)
 
     def _open_stream(self,stream):
@@ -113,6 +113,8 @@ class Streamer(PlayerBase):
     def _play_loop_impl(self,url, quality):
         streams=self._get_streams(url)
         if not streams: return
+        if self._player_fbcp != '':
+            os.system(self._player_fbcp)
         stream=None
         if len(streams)==1:
             stream=streams.values()[0]
