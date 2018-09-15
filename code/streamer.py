@@ -34,13 +34,16 @@ class Streamer(PlayerBase):
         self.lock=threading.Lock()
         self.alive_threads=[]
     
-    
-    def _make_pipe(self):
-        global _cnt
-        _cnt+=1
-        pipename='unusualpipe={}{}'.format(os.getpid(),_cnt)
-        return NamedPipe(pipename)
-      
+    def _make_pipe(self,cnt=10):
+        try:
+            pipename='unusualpipe={}{}'.format(os.getpid(),cnt)
+            return NamedPipe(pipename)
+        except OSError:
+            if cnt>0:
+                return self._make_pipe(cnt-1)
+            else:
+                raise    
+   
     def _create_output(self):
         namedpipe=self._make_pipe()
         return PlayerOutput(self._player_cmd,args='{filename}',
