@@ -60,5 +60,10 @@ sed -i "\$i sudo mopidy&" /etc/rc.local
 sed -i "\$i sleep 10" /etc/rc.local
 sed -i "\$i sudo python $(pwd)/space_window/code/space_window.py&" /etc/rc.local
 sed -i '1s/$/ consoleblank=0/' /boot/cmdline.txt
+
+#rng tools help python requests
+apt-get install -y rng-tools
+systemctl enable rng-tools
+systemctl start rng-tools
 reboot now
 

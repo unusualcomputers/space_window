@@ -16,7 +16,7 @@ _default_res='360p'
 _chunk_size=10240
 _cache_size=50                               
 _thread_id=0
-
+_cnt=1
 _log=logger.get(__name__)
 def _next_thread_id():
     global _thread_id
@@ -35,15 +35,11 @@ class Streamer(PlayerBase):
         self.alive_threads=[]
     
     
-    def _make_pipe(self,cnt=10):
-        try:
-            pipename='unusualpipe={}{}'.format(os.getpid(),cnt)
-            return NamedPipe(pipename)
-        except OSError:
-            if cnt>0:
-                return self._make_pipe(cnt-1)
-            else:
-                raise
+    def _make_pipe(self):
+        global _cnt
+        _cnt+=1
+        pipename='unusualpipe={}{}'.format(os.getpid(),_cnt)
+        return NamedPipe(pipename)
       
     def _create_output(self):
         namedpipe=self._make_pipe()
