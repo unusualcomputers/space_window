@@ -11,7 +11,7 @@ Either way, it will be telling you what to do or how to connect to it.
 
 Once you connect to the space window you will see something like this in your browser: 
 
-![space window browser](pic/sw_browser_home_s.png])
+![space window browser](https://github.com/unusualcomputers/space_window/blob/master/pics/sw_browser_home.png])
 
 The list at the top are videos, you can either upload your own or more interestingly just give it links to online streams or you tube clips (even playlists). If your network is very slow you can specify quality of the videos you want to stream.
 
@@ -36,9 +36,11 @@ The list at the top are videos, you can either upload your own or more interesti
     Plays next :)
 
 * Upload video
+
     You can upload your own videos and subtitles for them.
 
 * Upload music
+
     If you want mopidy to play your local music files you can upload them here.
 
 * Configuration
