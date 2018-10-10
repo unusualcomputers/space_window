@@ -1,6 +1,8 @@
-Rock-i is a computer made of a rock, concrete and love. Inside it is a raspberry pi zero and and I2S dac sound card, wrapped in a bit of bathroom silicone and connected to a small speaker, a 4'' gpio screen and a big red button. 
+Rock-i is a computer made of a rock, concrete and love. 
 
-It is setup to run [space window](https://github.com/unusualcomputers/space_window/blob/master/code/README.md) software and it will stream videos, play music, show your photos and more.
+Inside it is a raspberry pi zero and and I2S dac sound card, wrapped in a bit of bathroom silicone and connected to a small speaker, a 4'' gpio screen and a big red button. 
+
+It is setup to run [space window](https://github.com/unusualcomputers/space_window/blob/master/code/README.md) software and it will stream videos from the internet or play your own ones, show beautiful pictures of space that NASA publishes every day or some you chose yourself, play radio and podcasts and show time and weather where you are. 
 
 It is very beautiful. 
 
