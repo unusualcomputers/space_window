@@ -58,9 +58,7 @@ Most of the magic is in software and it will run just fine on Pi Zero - a bigger
 
 Our first one used nice 10.1'' lcd from banggood, the second one a 4'' Waveshare one [LINK TO rock-i]. The big lcd we used came with a board that had separate 3.5mm audio output so that was easy, we also tried this with an I2S audio DAC and a usb sound card. Finally you'll need a way to connect to the internet. Pi Zero W built in WiFi works well, though in our models we used plain old Pi Zero with a short cable and Edimax WiFi dongle in order to get the dongle out in the clear to improve reception (one thing you want to try and get right is a nice strong WiFi reception). Of course you will need a power supply, how mighty it should be will depend mostly on your choice of the screen, for our big 10'' lcd version we use a 2.5A one.
 
-![sw1](https://github.com/unusualcomputers/space_window/blob/master/pics/space1.jpg) ![sw2](https://github.com/unusualcomputers/space_window/blob/master/pics/space3.jpg)
-![sw3](https://github.com/unusualcomputers/space_window/blob/master/pics/space4.jpg)
-![swback](https://github.com/unusualcomputers/space_window/blob/master/pics/spaceW%20back1.jpg)
+![sw1](https://github.com/unusualcomputers/space_window/blob/master/pics/space1.jpg) ![sw2](https://github.com/unusualcomputers/space_window/blob/master/pics/space3.jpg) ![sw3](https://github.com/unusualcomputers/space_window/blob/master/pics/space4.jpg) ![swback](https://github.com/unusualcomputers/space_window/blob/master/pics/spaceW%20back1.jpg)
 
 
 All in all, you need to put together a raspberry based machine that can connect to internet, has a screen on which OMXPlayer can display movies and if you can some way for it to play music. It should all run from a Raspbian Lite installation, window managers would just slow things down and are not used at all. There is so much information and good advice around on how to get this going in various configurations that almost anything you can think of can be made to work. Let us know if you need help figuring any of this out, more than happy to help.
