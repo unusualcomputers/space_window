@@ -6,11 +6,12 @@ If it is not connected to the internet it will create it's own standalone WiFi n
 
 Either way, it will be telling you what to do or how to connect to it.
 
-[OVDE NEKI OD FILMICA]
  
-How to use it
+## How to use it
 
-Once you connect to the space window you will see something like this in your browser [sw_browser_home.png].
+Once you connect to the space window you will see something like this in your browser: 
+
+![space window browser](pic/sw_browser_home_s.png])
 
 The list at the top are videos, you can either upload your own or more interestingly just give it links to online streams or you tube clips (even playlists). If your network is very slow you can specify quality of the videos you want to stream.
 
