@@ -2,33 +2,33 @@ Space window is like a picture that shows faraway places.
 
 It will stream videos from the internet or play your own ones, show beautiful pictures of space that NASA publishes every day or some you chose yourself, play radio and podcasts and show time and weather where you are. You control it via an internet browser.
 
-If it is not connected to the internet it will create it's own standalone network so that you can connect to it and configure a WiFi connection, or just upload videos, music and pictures that it will then play for you. 
+If it is not connected to the internet it will create its own standalone network so that you can still reach it and configure a WiFi connection or just upload videos, music and pictures that it will then play for you. 
 
 It is friendly and when you switch it on it will tell you what it is doing and how to connect to it.
  
 ## How to use it
 
-Once you connect to the space window you will see something like this in your browser: 
+Space window creates a small website through which you can control it: 
 
 ![space window browser](https://github.com/unusualcomputers/space_window/blob/master/pics/sw_browser_home.png)
 
-In the list at the top are videos, you can add links to online streams or youtube clips and playlists or upload your own. If your network is very slow you can specify quality of the videos you want to stream. We rely on [streamlink](https://github.com/streamlink/streamlink) so the full list of online streams that would work is in [streamlink documentation](https://streamlink.github.io/plugin_matrix.html)
+In the list at the top are videos, you can add links to online streams or youtube clips and playlists or upload your own. If your network is very slow you can specify quality of the videos you want to stream. We rely on [streamlink](https://github.com/streamlink/streamlink) so the full list of online streams that would work is in [streamlink documentation](https://streamlink.github.io/plugin_matrix.html).
 
  * Nasa POD   
    
-   Clicking this will connect to Nasa and start a slideshow of their picture of the day, starting with today's one and then going through all the other thousands of them in a random order. 
+   Clicking this will connect to Nasa and start a slideshow of their picture of the day, first showing today's one and then going through all the other thousands of them in a random order. 
 
 * Radio
   
-   Radio opens a new tab showing [Mopidy](https://www.mopidy.com/) control page. Here world is your oyster - it will play thousands of internet radio stations, podcasts, streams from MixCloud and so on. Radio will happily work together with stuff that doesn't play videos on screen - Nasa pistures, clock, photo gallery.
+   Radio opens a new tab showing [Mopidy](https://www.mopidy.com/) control page. Here the world is your oyster - it will play thousands of internet radio stations, podcasts, streams from MixCloud and so on. Radio will happily work together with stuff that doesn't play videos on screen - Nasa pictures, clock, photo gallery.
 
 * Clock
 
-  This button turns space window becomes into an fashioned digital clock. It will also show the weather where you are or where you configure it to - it gets this from wonderful [yr.no](yr.no) site and will cover most of the world.
+  This button turns space window into an old fashioned digital clock. It will also show the weather where you are or where you configure it to - it gets this from wonderful [yr.no](yr.no) site and will cover most of the world.
 
 * Photo Gallery
 
-    A slide show of your pictures, when you click this it will show you the list of them in the browser and let you add more.  
+    A slideshow of your pictures, when you click this it will show you the list of them in the browser and let you add more.  
 
 * Play next
 
@@ -44,7 +44,7 @@ In the list at the top are videos, you can add links to online streams or youtub
 
 * Configuration
 
-    There are quite a few options here - fonts, colors, slideshow speed, location for the clock and weather display and so on. Dfinitely worth checking out.
+    There are quite a few options here - fonts, colors, slideshow speed, location for the clock and weather display and so on. Definitely worth checking out.
 
 
 The bottom row of buttons is for maintenance, you'll use it rarely if ever, but they are handy (Update most of all, this is how we will fix bugs you tell us about).
@@ -81,7 +81,7 @@ Once all that is ready and you can connect to your raspberry terminal, download 
  ./space_window_install.sh
 ```
 
-The script installs a whole bunch of things, it's pretty easy to read if you want to fid out what, but in short all of it is software used to run our code provided by good people of the internet and nothing else. It takes a while, about half an hour or more on Pi Zero.
+The script installs a whole bunch of things, it's pretty easy to read if you want to find out what, but in short all of it is software used to run our code provided by good people of the internet and nothing else. It takes a while, about half an hour or more on Pi Zero.
 
 In most cases things would just work after you installed the code, and you can tweak much of the behaviour using the browser.
 Just reboot and watch the screen, it will tell you how to connect to it (basically type in the_name_of_your_machine.local in a browser on some computer on the same network, default is rapberrypi.local, ours is spacewindow.local).  
