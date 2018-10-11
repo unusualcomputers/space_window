@@ -63,8 +63,7 @@ Our first one used a nice 10.1'' lcd from banggood, [the second one](https://git
 ![sw3](https://github.com/unusualcomputers/space_window/blob/master/pics/space4.jpg) ![swback](https://github.com/unusualcomputers/space_window/blob/master/pics/spaceW%20back1.jpg)
 
 
-All in all, you need to put together a Raspberry Pi based machine that can connect to internet and if you can some way for it to play music. 
-You will need to make sure that OMXPlayer works in your setup. There is a simple way to test it [here](https://www.raspberrypi.org/documentation/raspbian/applications/omxplayer.md), but this will depend entirely on how you hooked things up, drop us a line if you get stuck. Rememeber to check if it can produce sound too.
+All in all, you need to put together a Raspberry Pi based machine that can connect to internet and, if you can, have some way to play music. If you are using usb sound cards or I2S dacs make sure alsa playback works on its own, once that is configured you can set it up in space window configuration page.
 
 It should all run from a Raspbian Lite installation, window managers would just slow things down and are not used at all. There is so much information and good advice around on how to get this going in various configurations that almost anything you can think of can be made to work. Let us know if you need help figuring any of this out.
 
@@ -89,7 +88,6 @@ Just reboot and watch the screen, it will tell you how to connect to it (basical
 
 ### Configuration
 
-
 If your hardware is unusual though, you may need to do some manual configuration. All configuration is in a file space_window/code/space_window.conf wherever you installed the software.
 
 #### GPIO screens
@@ -98,9 +96,9 @@ If your hardware is unusual though, you may need to do some manual configuration
  
 #### USB audio or I2S DAC
 
-If you are using usb audio card or I2S DAC, find the section [player] and follow the instructions there.
+If you are using usb audio card or I2S DAC, find the section [player] and follow the instructions there, or select "alsa" in configuration web page.
  
 #### WiFi configuration
 
-If you start space window without a network connection and it has a card that can create it's own hotspot it will create one and then display instructions on the screen how to connect to it and configure a connection to an existing network from within a browser. This would work out of the box with pi zero W or with edimax dongles. For the rest of them you may have to change the driver name in the configuration file mentioned above. This is really handy if you made a space window as a gift to someone and don't know their WiFi details when setting up the machine.  
+If you start space window without a network connection and it has hardware capable of it, it will create its own hotspot and then display instructions on the screen how to find it in a browser and configure a connection to an existing network from there. This would work out of the box with pi zero W or with edimax dongles. For the rest of them you may have to change the driver name in the configuration file. This is really handy if you made a space window as a gift to someone and don't know their WiFi details when setting up the machine. 
 
