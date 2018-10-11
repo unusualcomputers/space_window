@@ -4,7 +4,7 @@ It will stream videos from the internet or play your own ones, show beautiful pi
 
 If it is not connected to the internet it will create it's own standalone network so that you can connect to it and configure a WiFi connection, or just upload videos, music and pictures that it will then play for you. 
 
-It is friendly and when you switch it on it will tell you what to do or how to connect to it.
+It is friendly and when you switch it on it will tell you what it is doing and how to connect to it.
  
 ## How to use it
 
