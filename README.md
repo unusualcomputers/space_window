@@ -24,7 +24,7 @@ In the list at the top are videos, you can add links to online streams or youtub
 
 * Clock
 
-  This button turns space window into an old fashioned digital clock. It will also show the weather where you are or where you configure it to - it gets this from wonderful [yr.no](yr.no) site and will cover most of the world.
+  This button turns space window into an old fashioned digital clock. It will also show the weather where you are or where you configure it to - it gets this from wonderful [yr.no](https://www.yr.no/) site and will cover most of the world.
 
 * Photo Gallery
 
