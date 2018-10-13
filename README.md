@@ -12,6 +12,8 @@ Space window creates a small website through which you can control it:
 
 ![space window browser](https://github.com/unusualcomputers/space_window/blob/master/pics/sw_browser_home.png)
 
+There is a video screen capture of it [here](https://www.youtube.com/watch?v=9pF4ZKuxq8o&t=36s).
+
 In the list at the top are videos, you can add links to online streams or youtube clips and playlists or upload your own. If your network is very slow you can specify quality of the videos you want to stream. We rely on [streamlink](https://github.com/streamlink/streamlink) so the full list of online streams that would work is in [streamlink documentation](https://streamlink.github.io/plugin_matrix.html).
 
  * Nasa POD   
