@@ -79,7 +79,7 @@ Once all that is ready and you can connect to your raspberry terminal, download 
 ```
  wget https://raw.githubusercontent.com/unusualcomputers/space_window/master/code/space_window_install.sh
  sudo chmod a+x ./space_window_install.sh
- ./space_window_install.sh
+ sudo ./space_window_install.sh
 ```
 
 The script installs a whole bunch of things, it's pretty easy to read if you want to find out what, but in short all of it is software used to run our code provided by good people of the internet and nothing else. It takes a while, about half an hour or more on Pi Zero.
