@@ -92,6 +92,13 @@ class Config:
         if self.has(section,option):
             s=self.config.get(section,option)
             rgba=[int(i) for i in s.split(',')]
+            valid=range(0,256)
+            for c in rba: 
+                if c not in valid:  
+                    raise 'colors must be between 0 and 255'
+                    _log.info('colors must be between 0 and 255'+\
+                     '%s in section %s is wrong' % (option, section))        
+                    return default
             if len(rgba) not in [3,4]: 
                 raise 'colors must have 3 or 4 members,'+\
                      '%s in section %s is wrong' % (option, section) 
@@ -99,9 +106,14 @@ class Config:
         return default
     
     def setcolor(self,section,option,r,g,b,a=None):
+        valid=range(0,256)
         if a is None:
+            if not (r in valid and g in valid and b in valid):
+                raise 'colors must be between 0 and 255'
             value = '%s,%s,%s' %(r,g,b)
         else:
+            if not (r in valid and g in valid and b in valid and a in valid):
+                raise 'colors must be between 0 and 255'
             value = '%s,%s,%s,%s' %(r,g,b,a)
         self.config.set(section,option,value)
 

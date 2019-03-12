@@ -337,6 +337,8 @@ def _upload_pic_job(server):
         _gallery.add_several(uploaded)
         _processes.stop_waiting() 
         return ''
+    except Exception as e:
+        return str(e)
     finally:
         _processes.stop_waiting() 
 

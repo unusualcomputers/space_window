@@ -30,7 +30,7 @@ _pic_form=u"""
         <br/>
         <form enctype="multipart/form-data" action="/upload_pic" method="post"> 
         Pictures to upload 
-        <input type="file" accept="image/jpeg" name = "picture" multiple/>
+        <input type="file" accept="image/*" name = "picture" multiple/>
         <p><input type="submit" value="Upload" style="width:15%;"></p>
         </form>
         """
