@@ -288,10 +288,12 @@ def _upload_music_job(server):
 
 def _upload_pic_job(server):
     try:
+        _log.info('Pausing gallery and everythin else.')
         _gallery.pause()
         _processes.wait() 
         sleep(2)
         chunk_size=128*1024
+        _log.info('Pausing gallery and everythin else.')
         total_size=int(server.headers['Content-Length'])
         free=_free_disk_space()
         if (total_size * 5) > free:
@@ -300,9 +302,11 @@ def _upload_pic_job(server):
                 ' Free space %s bytes, required 5 * %s bytes' \
                 % (free,total_size))
             return 'Not enough disk splace left'
+        _log.info('Getting post form.')
         form=server.get_post_form()
         p=os.path.join(os.path.dirname(os.path.abspath(__file__)),'photos')
         if not os.path.exists(p):
+            _log.info('Making directories.')
             os.makedirs(p)
         files = form['picture']
         if files is None or len(files)==0:
@@ -313,9 +317,14 @@ def _upload_pic_job(server):
         total_loaded=0
         not_uploaded=[]
         uploaded=[]
+        _log.info('Preparing to upload')
+        _log.info('Uploading %i files' % len(files))
+ 
         for ff in files:
             filename=ff.filename
+            _log.info('Uploading file %s .' % filename)
             picture_filename=os.path.join(p,filename.replace(' ','_'))
+            _log.info('Path is %s .' % picture_filename)
             with file(picture_filename, 'wb') as pictureout:
                 picturein = ff.file 
                 while True:
@@ -323,6 +332,8 @@ def _upload_pic_job(server):
                     total_loaded+= len(chunk)
                     if not chunk: break
                     pictureout.write(chunk)
+            
+            _log.info('Uploaded file %s .' % filename)
             
             if not os.path.isfile(picture_filename):    
                 not_uploaded.append(filename)

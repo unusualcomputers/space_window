@@ -93,7 +93,7 @@ class Config:
             s=self.config.get(section,option)
             rgba=[int(i) for i in s.split(',')]
             valid=range(0,256)
-            for c in rba: 
+            for c in rgba: 
                 if c not in valid:  
                     raise 'colors must be between 0 and 255'
                     _log.info('colors must be between 0 and 255'+\
