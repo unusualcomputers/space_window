@@ -263,6 +263,10 @@ class Gallery:
         return self._running
 
     def play(self):
+        if len(self.images)<1:
+            self._status_update('Please upload some pictures to the gallery')
+            sleep(10)
+            return
         if self._running: return
         self._running=True
         threading.Thread(target=self._slideshow).start()
@@ -297,11 +301,6 @@ class Gallery:
             idx=0
             while self._running:
                 t1=time()
-                if len(self.images)<1:
-                    self._status_update(\
-                        'Please upload some pictures to the gallery')
-                    sleep(1)
-                    continue
                 if t1-t0 < self._delay: 
                     sleep(0.5)
                     continue

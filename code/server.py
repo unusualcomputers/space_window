@@ -238,6 +238,13 @@ def _upload_video_job(server):
         _log.exception('Error while processing upload')
         _processes.resume()
         return 'There was an exception, cehck the logs'
+def _resolve_type(files):
+    if files is None: return None
+    try:
+        l=len(files):
+    except:
+        return [files]
+    return files
 
 def _upload_music_job(server):
     try:
@@ -252,6 +259,7 @@ def _upload_music_job(server):
         if not os.path.exists(p):
             os.makedirs(p)
         files = form['music']
+        files=_resolve_type(files)
         if files is None or len(files)==0:
             return 'Erm, you did not give me a file'
 
@@ -309,6 +317,7 @@ def _upload_pic_job(server):
             _log.info('Making directories.')
             os.makedirs(p)
         files = form['picture']
+        files=_resolve_type(files)
         if files is None or len(files)==0:
             _processes.stop_waiting()
             _log.info('No file given for upload') 
